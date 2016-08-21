@@ -45,7 +45,7 @@
                 return (
                     <nav className={"navbar-"+this.state.menuVisibility}>
                         <MenuToggleButton onButtonClick={this.toggleMenuVisibility}  />
-                        <UserList onUserChange={this.handleUserChange} data={this.state.users} />
+                        <UserList onUserChange={this.handleUserChange} data={this.state} />
                     </nav>
                 );
             }
@@ -55,10 +55,11 @@
         var UserList = React.createClass({
             render: function() {
             //console.log("UserList: " , this);
-                var userEvent = this.props.onUserChange;
-                var userNodes = this.props.data.map(function(user) {
+                let userEvent = this.props.onUserChange;
+                let subjectUID = this.props.data.subjectUID;
+                let userNodes = this.props.data.users.map(function(user) {
                     return (
-                        <User user={user} key={user.userid} onClick={userEvent}>
+                        <User user={user} key={user.userid} onClick={userEvent} subjectUID={subjectUID}>
                         {user.userid}
                         </User>
                     );
@@ -74,9 +75,8 @@
 
         var User = React.createClass({
             render: function() {
-//                console.log("User: " , this);
                 return (
-                    <li className={thisUserID === this.props.user.userid ? 'nav-item nav-item-active' : 'nav-item'} onClick={() => this.props.onClick(this.props.user)}>
+                    <li className={this.props.subjectUID === this.props.user.userid ? 'nav-item nav-item-active' : 'nav-item'} onClick={() => this.props.onClick(this.props.user)}>
                         <a href="#" className="nav-link">{this.props.user.username}</a>
                     </li>
                 );
