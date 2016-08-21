@@ -3,7 +3,6 @@
         "use strict";
 
         const thisUserID = 58627; //set this after authentication.
-        let subjectUID = thisUserID; //always loads your own page by defualt.
 
         var UserMenu = React.createClass({
 
@@ -24,15 +23,14 @@
             getInitialState: function() {
                 return {
                     users : [],
-                    subjectUID : "",
+                    subjectUID : thisUserID,
                     menuVisibility : "closed"  //valid values are open and closed
                 };
             },
 
-            handleUserChange : function(VID) {
-            console.log("BEGIN handleUserChange " , VID);
+            handleUserChange : function(user) {
                 this.setState({menuVisibility: 'closed'});
-                this.setState({subjectUID: VID});
+                this.setState({subjectUID: user.userid});
             },
 
             toggleMenuVisibility: function() {
@@ -78,7 +76,7 @@
             render: function() {
 //                console.log("User: " , this);
                 return (
-                    <li className={thisUserID === this.props.user.userid ? 'nav-item nav-item-active' : 'nav-item'} onClick={this.props.onClick}>
+                    <li className={thisUserID === this.props.user.userid ? 'nav-item nav-item-active' : 'nav-item'} onClick={() => this.props.onClick(this.props.user)}>
                         <a href="#" className="nav-link">{this.props.user.username}</a>
                     </li>
                 );
