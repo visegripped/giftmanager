@@ -1,0 +1,66 @@
+.user-list {
+  width: 250px;
+  height: 40px;
+  margin-right: 33px;
+  position: relative;
+  float: right;
+  overflow: visible;
+}
+.user-list-ul {
+  display: flex;
+  flex-flow: column;
+}
+.user-list-item {
+  margin: 0;
+  width: 100%;
+  text-align: right;
+  display: none;
+  background-color: #0275d8;
+  padding-right: 15px;
+  order: 2;
+}
+.user-list .user-list-item + .user-list-item {
+  margin-left: 0;
+}
+.user-list-item:hover {
+  background-color: #025aa5;
+}
+.user-list-item-active {
+  display: block;
+  order: 1;
+  opacity: 1;
+}
+.user-list-item-active:hover {
+  cursor: default;
+  background-color: #0275d8;
+  opacity: 1;
+}
+.user-list-item .nav-item {
+  float: none;
+}
+.user-list-open .user-list-item {
+  display: block;
+}
+.user-list-icon-users {
+  background: url(../../images/users.png) no-repeat;
+  background-size: contain;
+  display: block;
+  margin: 3px;
+  height: 22px;
+  width: 22px;
+}
+.user-list-button-toggle {
+  outline-width: 0 ;
+  position: absolute;
+  top: 4px;
+  right: -33px;
+  padding: 0;
+  background-color: #0275d8;
+  border: 0;
+  margin: 0;
+  text-indent: 28px;
+  width: 28px;
+  height: 28px;
+  overflow: hidden;
+}
+/*# sourceMappingURL=dest/css/userlist.css.map */

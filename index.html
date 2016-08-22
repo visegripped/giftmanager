@@ -11,47 +11,11 @@
 
     <!--http://v4-alpha.getbootstrap.com/getting-started/introduction/-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY" crossorigin="anonymous">
+    <link rel="stylesheet" href="dist/css/userlist.css">
 
     <style>
         /* CSS Document */
-
         body {padding-top: 80px;}
-
-.navbar  {
-height: 60px;
-padding:0;
-}
-
-        .navbar-nav {
-        width: 200px;
-        height: 40px;
-        text-align:right;
-        }
-
-         .navbar-open {
-        overflow: visible;
-        }
-
-         .navbar-open .nav-item {
-            display: block;
-            background: #ccc;
-        }
-
-        .nav-item {
-        width: 200px;
-        margin: 0;
-        display: none;
-        }
-
-        .nav-item-active {
-        display: block
-        }
-
-
-.float-right {
-float:right;
-}
-
     </style>
 
     <script src="https://npmcdn.com/react@15.3.0/dist/react.js"></script>
@@ -68,7 +32,7 @@ float:right;
 
 <section class="navbar navbar-dark bg-primary navbar-fixed-top">
     <div class="container">
-        <div class="row clearfix" id="menuContainer">
+        <div class="row clearfix" id="userListContainer">
         </div>
     </div>
 </section>
@@ -83,6 +47,7 @@ float:right;
 
 
 <script type="text/babel" src="src/js/userlist.js"></script>
+<script type="text/babel" src="src/js/itemlist.js"></script>
 
 </body>
 </html>
