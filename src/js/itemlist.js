@@ -1,4 +1,17 @@
 (function(React){
+
+        "use strict";
+
+/*
+$status[0] = 'none';
+$status[2] = 'reserved';
+$status[10] = 'purchased';
+$status[50] = 'cancelled';
+*/
+
+
+        const thisUserID = 58627; //set this after authentication.
+
         var ItemList = React.createClass({
 
             loadItemListFromServer: function() {
@@ -17,7 +30,8 @@
 
             getInitialState: function() {
                 return {
-                    data: []
+                    data: [],
+                    subjectUID : thisUserID,
                 };
             },
             componentDidMount: function() {
@@ -31,7 +45,7 @@
                 return (
 
                         <div className="item-list">
-                            <ItemListTable data={this.state.data} />
+                            <ItemListTable data={this.state.data} subjectUID={this.state.subjectUID} />
                         </div>
                 );
             }
@@ -43,9 +57,11 @@
 // tutorial10.js
         var ItemListTable = React.createClass({
             render: function() {
+              var subjectUID = this.props.subjectUID;
+              console.log(" -> subjectUID: " + subjectUID);
                 var items = this.props.data.map(function(item) {
                     return (
-                            <Item item={item} key={item.itemid}>
+                            <Item item={item} key={item.itemid} subjectUID={subjectUID}>
                             </Item>
                     );
                 });
@@ -61,28 +77,48 @@
 
 
         var Item = React.createClass({
-
-            handleInfoClick: function(e) {
-            console.log("got here");
-                this.setState({show_description: true});
-                console.log(this);
-            },
-
             render: function() {
                 return (
-                        <tr>
+                        <tr className={this.props.item.status === 50 ? 'removed' : ''}>
+                            <td>
+                                <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? ''  : 'hidden-xs-up'}>link</a>
+                            </td>
                             <td>
                                 {this.props.item.item_name}<br />
                                 {this.props.item.show_description}
                             </td>
-
                             <td>
-                                <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? ''  : 'hidden-xs-up'}>link</a>
+                                <ItemSelectListSelf status={this.props.item.status} />
                             </td>
                         </tr>
                 );
             }
         });
+
+
+                var ItemSelectListSelf = React.createClass({
+                  render : function(){
+                    return (
+                      <select>
+                        <option></option>
+                        {this.props.status === 50 ? <option>UnCancel</option> : <option>Cancel</option>}
+                      </select>
+                    );
+                  }
+                });
+
+                var ItemSelectListOther = React.createClass({
+                  render : function(){
+                    return (
+                      <select>
+                        <option></option>
+                        <option value='2' selected={this.props.status === 2 ? 'selected' : ''}>Reserved</option>
+                        <option value='10' selected={this.props.status === 10 ? 'selected' : ''}>Purchased</option>
+                        <option value='XX'>Unpurchase/Unreserve</option>
+                      </select>
+                    );
+                  }
+                });
 
 
 
