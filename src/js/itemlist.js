@@ -103,17 +103,21 @@ $status[50] = 'cancelled';
 
             render: function() {
                 return (
-                        <div className={'list-group-item row status-'+this.props.item.status}>
-                            <div className='col-xs-2'>
-                                <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? 'btn'  : 'hidden-xs-up'}>L</a>
-                            </div>
+                        <div className={'list-group-item status-'+this.props.item.status}>
+                          <div className='row'>
                             <div className='col-xs-10 col-sm-8'>
-                                {this.props.item.item_name}<br />
-                                {this.props.item.show_description}
+                                {this.props.item.item_name}
+                            </div>
+                            <div className='col-xs-2 item-list-item-btns'>
+                                <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? 'btn btn-info btn-sm'  : 'hidden-xs-up'}>L</a>
                             </div>
                             <div className='col-xs-12 col-sm-2'>
                                 <ItemSelectListSelf status={this.props.item.status} onStatusChange={this.handleStatusChange} />
                             </div>
+                            <p className='col-xs-12 item-list-item-desc'>
+                              {this.props.item.item_desc}
+                            </p>
+                          </div>
                         </div>
                 );
             }
@@ -129,7 +133,7 @@ $status[50] = 'cancelled';
                  },
                   render : function(){
                     return (
-                      <select  onChange={this.props.onStatusChange}>
+                      <select className='item-list-item-select' onChange={this.props.onStatusChange}>
                         <option></option>
                         {this.props.status === 50 ? <option>UnCancel</option> : <option>Cancel</option>}
                       </select>
@@ -148,7 +152,7 @@ $status[50] = 'cancelled';
 
                     return (
 
-                      <select defaultValue={this.props.status} onChange={this.props.onStatusChange} data={this.props.itemid}>
+                      <select className='item-list-item-select' defaultValue={this.props.status} onChange={this.props.onStatusChange} data={this.props.itemid}>
                         <option></option>
                         <option value='2'>Reserved</option>
                         <option value='10'>Purchased</option>

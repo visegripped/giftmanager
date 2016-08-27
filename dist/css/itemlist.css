@@ -4,3 +4,18 @@
 .item-list.list-group .list-group-item:nth-child(odd) {
   background: #FFF;
 }
+.item-list-item-desc {
+  margin: 12px 0 0 0;
+}
+.item-list-item-btns {
+  text-align: right;
+}
+.item-list-item-select {
+  width: 100%;
+  margin-top: 12px;
+}
+@media screen only and (min-width: 550px) {
+  .item-list-item-select {
+    margin-top: 0;
+  }
+}

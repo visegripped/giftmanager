@@ -4,7 +4,7 @@
     "userid" : "58627",
     "item_name" : "first item",
     "item_link" : "http://www.starwars.com/",
-    "item_desc" : "this is the description.  It goes here.",
+    "item_desc" : "this is the description.  It goes here. sometimes it may be a little long so we will have to account for that in the design.",
     "item_type" : "",
     "status" : 10,
     "remove" : "",
