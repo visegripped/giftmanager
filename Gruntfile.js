@@ -15,14 +15,14 @@ module.exports = function(grunt) {
 
         less : {
           options : {
-            sourceMap : true,
-            sourceMapFilename : 'dest/css/userlist.css.map',
+            sourceMap : false,
+            sourceMapFilename : 'dist/css/*.css.map',
             compress : false
           },
           theme : {
             expand : true,
             flatten : true,
-            src : ["src/less/userlist.less"],
+            src : ["src/less/itemlist.less","src/less/userlist.less"],
             dest : "dist/css/",
             ext : ".css"
           }

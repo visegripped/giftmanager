@@ -66,11 +66,9 @@ $status[50] = 'cancelled';
                     );
                 });
                 return (
-                        <table className="table">
-                            <tbody>
+                        <div className="item-list list-group">
                             {items}
-                            </tbody>
-                        </table>
+                        </div>
                 );
             }
         });
@@ -105,18 +103,18 @@ $status[50] = 'cancelled';
 
             render: function() {
                 return (
-                        <tr className={'status-'+this.props.item.status}>
-                            <td>
-                                <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? ''  : 'hidden-xs-up'}>link</a>
-                            </td>
-                            <td>
+                        <div className={'list-group-item row status-'+this.props.item.status}>
+                            <div className='col-xs-2'>
+                                <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? 'btn'  : 'hidden-xs-up'}>L</a>
+                            </div>
+                            <div className='col-xs-10 col-sm-8'>
                                 {this.props.item.item_name}<br />
                                 {this.props.item.show_description}
-                            </td>
-                            <td>
+                            </div>
+                            <div className='col-xs-12 col-sm-2'>
                                 <ItemSelectListSelf status={this.props.item.status} onStatusChange={this.handleStatusChange} />
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
                 );
             }
         });

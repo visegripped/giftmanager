@@ -1,0 +1,6 @@
+.item-list.list-group .list-group-item:nth-child(even) {
+  background: #EFEFEF;
+}
+.item-list.list-group .list-group-item:nth-child(odd) {
+  background: #FFF;
+}
