@@ -45,7 +45,7 @@ $status[50] = 'cancelled';
                 return (
 
                         <div className="item-list">
-                            <ItemListTable data={this.state.data} subjectUID={this.state.subjectUID} />
+                            <ItemListTable data={this.state.data} subjectUID={this.state.subjectUID} itemListUrl={this.props.ItemListUrl} />
                         </div>
                 );
             }
@@ -57,11 +57,11 @@ $status[50] = 'cancelled';
 // tutorial10.js
         var ItemListTable = React.createClass({
             render: function() {
-              var subjectUID = this.props.subjectUID;
-              console.log(" -> subjectUID: " + subjectUID);
+              let subjectUID = this.props.subjectUID;
+                let itemListUrl = this.props.itemListUrl;
                 var items = this.props.data.map(function(item) {
                     return (
-                            <Item item={item} key={item.itemid} subjectUID={subjectUID}>
+                            <Item item={item} key={item.itemid} subjectUID={subjectUID} itemListUrl={itemListUrl}>
                             </Item>
                     );
                 });
@@ -77,9 +77,35 @@ $status[50] = 'cancelled';
 
 
         var Item = React.createClass({
+
+          handleStatusChange : function(event) {
+              this.setState({status: event.target.value});
+              let props = this.props.item;
+              let APIURL = this.props.itemListUrl
+              console.log(" -> props.itemid: " + props.itemid);
+              //todo ->need to do a post here.
+              $.ajax({
+                  url: APIURL,
+                  dataType: 'json',
+                  type: 'POST',
+                  data : {
+                    "itemid" : props.itemid,
+                    "status": event.target.value
+                  },
+                //  data: { },
+                  success: function(data) {
+                    console.log("Got to the ajax success!" , data);
+                      this.setState({data: data});
+                  }.bind(this),
+                  error: function(xhr, status, err) {
+                      console.error(props.url, status, err.toString());
+                  }.bind(this)
+              });
+          },
+
             render: function() {
                 return (
-                        <tr className={this.props.item.status === 50 ? 'removed' : ''}>
+                        <tr className={'status-'+this.props.item.status}>
                             <td>
                                 <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? ''  : 'hidden-xs-up'}>link</a>
                             </td>
@@ -88,7 +114,7 @@ $status[50] = 'cancelled';
                                 {this.props.item.show_description}
                             </td>
                             <td>
-                                <ItemSelectListSelf status={this.props.item.status} />
+                                <ItemSelectListOther status={this.props.item.status} onStatusChange={this.handleStatusChange} />
                             </td>
                         </tr>
                 );
@@ -98,8 +124,10 @@ $status[50] = 'cancelled';
 
                 var ItemSelectListSelf = React.createClass({
                   render : function(){
+                    let selectEvent = this.props.onStatusChange;
+                    console.log("selectEvent: " + selectEvent);
                     return (
-                      <select>
+                      <select  onChange={selectEvent} >
                         <option></option>
                         {this.props.status === 50 ? <option>UnCancel</option> : <option>Cancel</option>}
                       </select>
@@ -108,13 +136,27 @@ $status[50] = 'cancelled';
                 });
 
                 var ItemSelectListOther = React.createClass({
+                  getInitialState: function() {
+                     return {
+                         status: '',
+                         itemid: ''
+                     }
+                 },
                   render : function(){
+
                     return (
-                      <select>
+
+                      <select defaultValue={this.props.status} onChange={this.props.onStatusChange} data={this.props.itemid}>
                         <option></option>
-                        <option value='2' selected={this.props.status === 2 ? 'selected' : ''}>Reserved</option>
-                        <option value='10' selected={this.props.status === 10 ? 'selected' : ''}>Purchased</option>
-                        <option value='XX'>Unpurchase/Unreserve</option>
+                        <option value='2'>Reserved</option>
+                        <option value='10'>Purchased</option>
+                        {(() => {
+                          switch (this.props.status) {
+                            case 2:   return <option value='XX'>Unreserve</option>;
+                            case 10: return <option value='XX'>Unpurchase</option>;
+                            default:      return "";
+                          }
+                        })()}
                       </select>
                     );
                   }
@@ -124,8 +166,8 @@ $status[50] = 'cancelled';
 
         ReactDOM.render(
 
-                <ItemList ItemListUrl="api/list.json" pollInterval={10000} />,
-                document.getElementById('content')
+                <ItemList ItemListUrl="api/list.json" pollInterval={0} />,
+                document.getElementById('itemListContainer')
         );
 
          })(React);
