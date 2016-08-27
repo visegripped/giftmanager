@@ -114,7 +114,7 @@ $status[50] = 'cancelled';
                                 {this.props.item.show_description}
                             </td>
                             <td>
-                                <ItemSelectListOther status={this.props.item.status} onStatusChange={this.handleStatusChange} />
+                                <ItemSelectListSelf status={this.props.item.status} onStatusChange={this.handleStatusChange} />
                             </td>
                         </tr>
                 );
@@ -123,11 +123,15 @@ $status[50] = 'cancelled';
 
 
                 var ItemSelectListSelf = React.createClass({
+                  getInitialState: function() {
+                     return {
+                         status: '',
+                         itemid: ''
+                     }
+                 },
                   render : function(){
-                    let selectEvent = this.props.onStatusChange;
-                    console.log("selectEvent: " + selectEvent);
                     return (
-                      <select  onChange={selectEvent} >
+                      <select  onChange={this.props.onStatusChange}>
                         <option></option>
                         {this.props.status === 50 ? <option>UnCancel</option> : <option>Cancel</option>}
                       </select>
