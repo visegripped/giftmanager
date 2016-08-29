@@ -3,7 +3,7 @@
      "use strict";
 
      const thisUserID = 58627; //set this after authentication.
-     const customEvents = {
+     var customEvents = {
        userSelected : new CustomEvent("UserList.userSelected"),
        menuOpened : new CustomEvent("UserList.menuOpened"),
        menuClosed : new CustomEvent("UserList.menuClosed")
@@ -36,6 +36,10 @@
          handleUserChange : function(user) {
              this.setState({menuVisibility: 'closed'});
              this.setState({subjectUID: user.userid});
+             //customEvents.userSelected.initCustomEvent(user,true, false, user);
+             //console.log(" -> userDetail: " , user);
+             customEvents.userSelected.initCustomEvent("UserList.userSelected",true,true,user);
+             //customEvents.userSelected.detail = user;
              dispatchEvent(customEvents.userSelected);
          },
 

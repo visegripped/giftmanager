@@ -15,8 +15,9 @@ $status[50] = 'cancelled';
         var ItemList = React.createClass({
 
             loadItemListFromServer: function() {
+              console.log("BEGIN loadItemListFromServer. subjectUID: " + this.state.subjectUID); console.dir(this.state)
                 $.ajax({
-                    url: this.props.ItemListUrl,
+                    url: this.props.ItemListUrl + "-" + this.state.subjectUID + ".json",
                     dataType: 'json',
                     cache: false,
                     success: function(data) {
@@ -35,7 +36,13 @@ $status[50] = 'cancelled';
                 };
             },
             componentDidMount: function() {
+                let _this = this;
                 this.loadItemListFromServer();
+                addEventListener("UserList.userSelected",function(e){
+                  console.log("Item list successfully subscribed to user list event " + e.detail.userid);
+                  _this.setState({"subjectUID":e.detail.userid});
+                  _this.loadItemListFromServer();
+                },false, true);
                 if(this.props.pollInterval) {
                     setInterval(this.loadItemListFromServer, this.props.pollInterval);
                 }
@@ -79,11 +86,11 @@ $status[50] = 'cancelled';
           handleStatusChange : function(event) {
               this.setState({status: event.target.value});
               let props = this.props.item;
-              let APIURL = this.props.itemListUrl
+              let APIURL = this.props.itemListUrl;
               console.log(" -> props.itemid: " + props.itemid);
               //todo ->need to do a post here.
               $.ajax({
-                  url: APIURL,
+                  url: this.props.ItemListUrl + "-" + this.state.subjectUID + ".json",
                   dataType: 'json',
                   type: 'POST',
                   data : {
@@ -172,7 +179,7 @@ $status[50] = 'cancelled';
 
         ReactDOM.render(
 
-                <ItemList ItemListUrl="api/list.json" pollInterval={0} />,
+                <ItemList ItemListUrl="api/list" pollInterval={0} />,
                 document.getElementById('itemListContainer')
         );
 
