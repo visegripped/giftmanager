@@ -15,7 +15,7 @@ $status[50] = 'cancelled';
         var ItemList = React.createClass({
 
             loadItemListFromServer: function() {
-              console.log("BEGIN loadItemListFromServer. subjectUID: " + this.state.subjectUID); console.dir(this.state)
+              console.log("BEGIN loadItemListFromServer. subjectUID: " + this.state.subjectUID);
                 $.ajax({
                     url: this.props.ItemListUrl + "-" + this.state.subjectUID + ".json",
                     dataType: 'json',
@@ -29,6 +29,33 @@ $status[50] = 'cancelled';
                 });
             },
 
+//todo -> clean this up. get url generation into a function so that updates are less likely to break something.
+            handleItemStatusChange : function(event) {
+                this.setState({status: event.target.value});
+                let props = this.props.item;
+                let APIURL = this.props.itemListUrl;
+                console.log(" -> props.itemid: " + props.itemid);
+                //todo ->need to do a post here.
+                $.ajax({
+                    url: this.props.ItemListUrl + "-" + this.state.subjectUID + ".json",
+                    dataType: 'json',
+                    type: 'POST',
+                    data : {
+                      "itemid" : props.itemid,
+                      "status": event.target.value
+                    },
+                  //  data: { },
+                    success: function(data) {
+                      console.log("Got to the ajax success!" , data);
+                        this.setState({data: data});
+                    }.bind(this),
+                    error: function(xhr, status, err) {
+                        console.error(props.url, status, err.toString());
+                    }.bind(this)
+                });
+            },
+
+
             getInitialState: function() {
                 return {
                     data: [],
@@ -39,9 +66,9 @@ $status[50] = 'cancelled';
                 let _this = this;
                 this.loadItemListFromServer();
                 addEventListener("UserList.userSelected",function(e){
-                  console.log("Item list successfully subscribed to user list event " + e.detail.userid);
-                  _this.setState({"subjectUID":e.detail.userid});
-                  _this.loadItemListFromServer();
+                  _this.setState({"subjectUID": Number(e.detail.userid)},function(){
+                    _this.loadItemListFromServer();
+                  });
                 },false, true);
                 if(this.props.pollInterval) {
                     setInterval(this.loadItemListFromServer, this.props.pollInterval);
@@ -83,30 +110,6 @@ $status[50] = 'cancelled';
 
         var Item = React.createClass({
 
-          handleStatusChange : function(event) {
-              this.setState({status: event.target.value});
-              let props = this.props.item;
-              let APIURL = this.props.itemListUrl;
-              console.log(" -> props.itemid: " + props.itemid);
-              //todo ->need to do a post here.
-              $.ajax({
-                  url: this.props.ItemListUrl + "-" + this.state.subjectUID + ".json",
-                  dataType: 'json',
-                  type: 'POST',
-                  data : {
-                    "itemid" : props.itemid,
-                    "status": event.target.value
-                  },
-                //  data: { },
-                  success: function(data) {
-                    console.log("Got to the ajax success!" , data);
-                      this.setState({data: data});
-                  }.bind(this),
-                  error: function(xhr, status, err) {
-                      console.error(props.url, status, err.toString());
-                  }.bind(this)
-              });
-          },
 
             render: function() {
                 return (
