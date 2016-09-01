@@ -34,7 +34,6 @@ $status[50] = 'cancelled';
                 this.setState({status: event.target.value});
                 let props = this.props.item;
                 let APIURL = this.props.itemListUrl;
-                console.log(" -> props.itemid: " + props.itemid);
                 //todo ->need to do a post here.
                 $.ajax({
                     url: this.props.ItemListUrl + "-" + this.state.subjectUID + ".json",

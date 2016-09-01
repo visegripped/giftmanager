@@ -6,33 +6,22 @@
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// tutorial12.js
-        var CommentBox = React.createClass({
 
-            loadCommentsFromServer: function() {
-                $.ajax({
-                    url: this.props.commentsUrl,
-                    dataType: 'json',
-                    cache: false,
-                    success: function(data) {
-                        this.setState({data: data});
-                    }.bind(this),
-                    error: function(xhr, status, err) {
-                        console.error(this.props.commentsUrl, status, err.toString());
-                    }.bind(this)
-                });
-            },
 
+
+        var CommentForm = React.createClass({
             getInitialState: function() {
-                return {
-                    data: []
-                };
-            },
-            componentDidMount: function() {
-                this.loadCommentsFromServer();
-                if(this.props.pollInterval) {
-                    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
-                }
+              return {
+                  subject : {
+                    "UID" : "",
+                    "name" : ""
+                  },
+                  item: {
+                    "item_name" : "",
+                    "item_link" : "",
+                    "item_desc" : "",
+                  }
+              };
             },
 
             handleCommentSubmit: function(comment) {
@@ -62,126 +51,18 @@
 
             render: function() {
                 return (
-
-                        <div className="commentBox">
-                            <h1>Comments</h1>
-                            <CommentList data={this.state.data} />
-                            <CommentForm onCommentSubmit={this.handleCommentSubmit} />
-                        </div>
-                );
-            }
-        });
-
-
-
-        // tutorial2.js
-// tutorial10.js
-        var CommentList = React.createClass({
-            render: function() {
-                var commentNodes = this.props.data.map(function(comment) {
-                    return (
-                            <Comment comment={comment} key={comment.itemid}>
-                            </Comment>
-                    );
-                });
-                return (
-                        <table className="table">
-                            <tbody>
-                            {commentNodes}
-                            </tbody>
-                        </table>
-                );
-            }
-        });
-
-
-        var CommentForm = React.createClass({
-            getInitialState: function() {
-                return {
-                            "itemid" : "", //GUID
-                            "userid" : "", //userid of user who's list this is on.
-                            "item_name" : "", //short text name of item.
-                            "item_link" : "", //URL of item (optional)
-                            "item_desc" : "", //blob - description (optional)
-                            "item_type" : "", //not used
-                            "status" : "", //0 = default.
-                            "remove" : "", //set to 1 if the user has taken the item off their list.
-                            "create_date" : "", //not used
-                            "reserve_date" : "", //not used
-                            "buy_date" : "", //not used
-                            "received_date" : "", //not used
-                            "buy_userid" : "", //The userid of the purchaser
-                            "archive" : "" //set to 1 if item has been archived by administrator
-                          };
-            },
-            handleAuthorChange: function(e) {
-                this.setState({author: e.target.value});
-            },
-            handleTextChange: function(e) {
-                this.setState({text: e.target.value});
-            },
-            handleSubmit: function(e) {
-                e.preventDefault();
-                window.console.log("got to the onsubmit");
-                var author = this.state.author.trim();
-                var text = this.state.text.trim();
-                if (!text || !author) {
-                    return;
-                }
-                this.props.onCommentSubmit({author: author, text: text});
-                this.setState({author: '', text: ''});
-            },
-
-            render: function() {
-                return (
-                        <form className="commentForm" onSubmit={this.handleSubmit}>
-                            <input
-                                    type="text"
-                                    placeholder="Your name"
-                                    value={this.state.author}
-                                    onChange={this.handleAuthorChange}
-                            />
-                            <input
-                                    type="text"
-                                    placeholder="Say something..."
-                                    value={this.state.text}
-                                    onChange={this.handleTextChange}
-                            />
-                            <input type="submit" value="Post" />
-                        </form>
-                );
-            }
-        });
-
-
-
-
-// tutorial7.js
-        var Comment = React.createClass({
-
-            handleInfoClick: function(e) {
-            console.log("got here");
-                this.setState({show_description: true});
-                console.log(this);
-            },
-
-            render: function() {
-                return (
-                        <tr className="comment">
-
-                            <td className="commentAuthor">
-                                <a href='#' onClick={this.handleInfoClick} className={this.props.comment.item_desc ? ''  : 'hidden-xs-up'}>i</a>
-                                {this.props.comment.show_description ? <div>{this.props.comment.item_desc}</div> : ""}
-                            </td>
-
-                            <td>
-                                {this.props.comment.item_name}
-                            </td>
-
-                            <td>
-                                <a href={this.props.comment.item_link} target='_blank' className={this.props.comment.item_link ? ''  : 'hidden-xs-up'}>link</a>
-                            </td>
-                        </tr>
+                  <form onSubmit={this.handleCommentSubmit} className='item-add-form'>
+                    <fieldset className='item-add-form-fieldset'>
+                      <legend>Add item to list</legend>
+                      <label className='item-add-form-fieldset-label'>
+                        <input type="text" placeholder="gift" value={this.state.item.item_name} />
+                      </label>
+                      <label className='item-add-form-fieldset-label'>
+                        <textarea placeholder="description" value={this.state.item.item_desc}></textarea>
+                      </label>
+                      <input type="submit" value="Post" />
+                    </fieldset>
+                  </form>
                 );
             }
         });
@@ -190,6 +71,6 @@
 
         ReactDOM.render(
 
-                <CommentBox commentsUrl="api/list.json" pollInterval={0} />,
-                document.getElementById('content')
+                <CommentForm commentsUrl="api/item-add/" />,
+                document.getElementById('itemAddContainer')
         );
