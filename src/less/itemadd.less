@@ -2,11 +2,31 @@
   &-form {
 
     &-fieldset {
+      margin: 20px auto;
+
+      &-hint {
+        font-size: .7rem;
+        color: #666;
+      }
 
       &-label {
         display: block;
         margin: 0 0 10px 0;
+
+        &-text,
+        &-url,
+        &-textarea {
+          display: block;
+          width: 100%;
+        }
+
+        &-textarea {
+          height: 140px;
+        }
+
       }
+
+
     }
   }
 }

@@ -1,0 +1,20 @@
+.item-add-form-fieldset {
+  margin: 20px auto;
+}
+.item-add-form-fieldset-hint {
+  font-size: .7rem;
+  color: #666;
+}
+.item-add-form-fieldset-label {
+  display: block;
+  margin: 0 0 10px 0;
+}
+.item-add-form-fieldset-label-text,
+.item-add-form-fieldset-label-url,
+.item-add-form-fieldset-label-textarea {
+  display: block;
+  width: 100%;
+}
+.item-add-form-fieldset-label-textarea {
+  height: 140px;
+}

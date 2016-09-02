@@ -1,12 +1,6 @@
+(function(React){
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-         COMMENT LIST & SUBMIT
-
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-
-
+        "use strict";
 
 
         var CommentForm = React.createClass({
@@ -41,6 +35,7 @@
                     data: comment,
                     success: function(data) {
                         this.setState({data: data});
+
                     }.bind(this),
                     error: function(xhr, status, err) {
                         this.setState({data: comments}); //hhhhmmmm...  don't know that I agree with this. updates list if an error occurs?
@@ -53,14 +48,18 @@
                 return (
                   <form onSubmit={this.handleCommentSubmit} className='item-add-form'>
                     <fieldset className='item-add-form-fieldset'>
-                      <legend>Add item to list</legend>
+                      <legend className='item-add-form-fieldset-legend'>Add item to {this.state.subject.name} list</legend>
                       <label className='item-add-form-fieldset-label'>
-                        <input type="text" placeholder="gift" value={this.state.item.item_name} />
+                        <input name='item_name' type="text" className='item-add-form-fieldset-label-text' placeholder="gift" value={this.state.item.item_name} />
                       </label>
                       <label className='item-add-form-fieldset-label'>
-                        <textarea placeholder="description" value={this.state.item.item_desc}></textarea>
+                        <input name='item_link' type="url" className='item-add-form-fieldset-label-url' placeholder="link" value={this.state.item.item_url} />
                       </label>
-                      <input type="submit" value="Post" />
+                      <label className='item-add-form-fieldset-label'>
+                        <textarea name='item-desc' placeholder="optional description" className='item-add-form-fieldset-label-textarea' value={this.state.item.item_desc}></textarea>
+                      </label>
+                      <p className='item-add-form-fieldset-hint'>note - if you add an item to someone else&#8217;s list, it will automatically be set to &#8217;purchased&#8217; by you.</p>
+                      <input type="submit" value="Post" className='btn btn-primary' />
                     </fieldset>
                   </form>
                 );
@@ -74,3 +73,5 @@
                 <CommentForm commentsUrl="api/item-add/" />,
                 document.getElementById('itemAddContainer')
         );
+
+                 })(React);
