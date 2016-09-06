@@ -7,7 +7,7 @@
             getInitialState: function() {
               return {
                 "subjectUID" : "",
-                "subjectName" : ""
+                "subjectName" : "",
                 "item_name" : "",
                 "item_link" : "",
                 "item_desc" : ""
