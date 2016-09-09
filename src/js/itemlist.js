@@ -10,18 +10,24 @@ $status[50] = 'cancelled';
 */
 
 
-        const thisUserID = 58627; //set this after authentication.
+        const thisUserID = window.gmUtilities.getUriParamsAsObject()["userid"]; //set this after authentication.
+        let itemListContainer = document.getElementById('itemListContainer');
 
         var ItemList = React.createClass({
 
             loadItemListFromServer: function() {
-              console.log("BEGIN loadItemListFromServer. subjectUID: " + this.state.subjectUID);
+              let viewID = this.state.subjectUID;
                 $.ajax({
-                    url: this.props.ItemListUrl + "-" + this.state.subjectUID + ".json",
+                    url: this.props.ItemListUrl,
+                    data : {
+                      "cmd" : "giftList",
+                      "viewid" : viewID
+                    },
+                    type: 'GET',
                     dataType: 'json',
                     cache: false,
                     success: function(data) {
-                        this.setState({data: data});
+                        this.setState({data: data.gifts});
                     }.bind(this),
                     error: function(xhr, status, err) {
                         console.error(this.props.ItemListUrl, status, err.toString());
@@ -36,16 +42,16 @@ $status[50] = 'cancelled';
                 let APIURL = this.props.itemListUrl;
                 //todo ->need to do a post here.
                 $.ajax({
-                    url: this.props.ItemListUrl + "-" + this.state.subjectUID + ".json",
-                    dataType: 'json',
-                    type: 'POST',
-                    data : {
+                  url: this.props.ItemListUrl,
+                  data : {
+                      "cmd" : "giftList",
+                      "viewid" : viewID,
                       "itemid" : props.itemid,
                       "status": event.target.value
                     },
-                  //  data: { },
+                    dataType: 'json',
+                    type: 'PUT',
                     success: function(data) {
-                      console.log("Got to the ajax success!" , data);
                         this.setState({data: data});
                     }.bind(this),
                     error: function(xhr, status, err) {
@@ -180,9 +186,9 @@ $status[50] = 'cancelled';
 
 
         ReactDOM.render(
-
-                <ItemList ItemListUrl="api/list" pollInterval={0} />,
-                document.getElementById('itemListContainer')
+//itemListUrl loads from the html file instead of here, allowing for users to customize it easily without changing any JS.
+                <ItemList ItemListUrl={itemListContainer.getAttribute("data-url")} pollInterval={itemListContainer.getAttribute("data-poll-interval") || 0} />,
+                itemListContainer
         );
 
          })(React);
