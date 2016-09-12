@@ -98,6 +98,7 @@ I'm lazy.  Archive is set to 1 for old items.
                 return (
                         <div className={'list-group-item status-'+this.props.item.status}>
                           <div className='row'>
+                            <div className='col-xs=12' id='messaging-{this.props.item.itemid}'></div>
                             <div className='col-xs-10 col-sm-8'>
                                 {this.props.item.item_name}
                             </div>
@@ -115,6 +116,20 @@ I'm lazy.  Archive is set to 1 for old items.
                 );
             }
         });
+
+        // var ItemMessage = React.createClass({
+        //
+        //
+        //     render: function() {
+        //       // console.log("this: " , this);
+        //         return (
+        //                 <div className={'list-group-item status-'+this.props.item.status}>
+        //
+        //                 </div>
+        //         );
+        //     }
+        // });
+
 
         var ItemSelectListSelf = React.createClass({
 
@@ -177,7 +192,7 @@ I'm lazy.  Archive is set to 1 for old items.
          handleItemStatusChange : function(event) {
            let props = this.props;
            let newState = event.target.value;
-           console.log("handleItemStatusChange props.itemid: " + props.itemid + " and new state: " + newState);
+          //  console.log("handleItemStatusChange props.itemid: " + props.itemid + " and new state: " + newState);
              this.setState({status: event.target.value},function() {
                $.ajax({
                  url: _this.props.ItemListUrl,
