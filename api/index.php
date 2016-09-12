@@ -1,45 +1,10 @@
 <?php
-include "YOUR/PATH/HERE/credentials.php";
-//this all needs to be refactored. It's old code ported over to get an MVP up and running.
 header('Content-type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH');
 session_start();
-
-
-
-
-
-function getCredsJSArray($partner,$creds){
-	$r;
-	if($partner == 'facebook')	{
-		$r = $creds['facebook'];
-		}
-	else if($partner == 'google')	{
-		$r = $creds['google'];
-		}
-	else	{
-		$r = null;
-		}
-	return $r;
-	}
-
-function qt($str)	{
-	return ("'".mysql_escape_string($str)."'");
-	}
-
-function dqt($str)	{
-	return stripslashes($str);
-	}
-
-function pdoConnect()	{
-	$pdo = new PDO('mysql:host=localhost;dbname=:$db_name', $db_username, $db_password);
-// the following tells PDO we want it to throw Exceptions for every error.
-// this is far more useful than the default mode of throwing php errors
-	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	return $pdo;
-	}
-
+include "/home/vicegrip/includes/gm/db_functions.php";
+include "/home/vicegrip/includes/gm/credentials.php";
 
 
 //error handler.
@@ -150,12 +115,13 @@ $commands = array(
 //GM
 	"userList",
 	"giftList",
-	"giftCreate"
+	"giftListRemove"
 	);
 
 $response = array(); //what is returned by the API. either a successful response or an error.
 $cmd = $_REQUEST['cmd']; //shortcut. change to POST.
-
+$_SESSION['USERID'] = '58627l'; //todo -> remove this. here for testing purposes.
+$_SESSION['GROUPID'] = '1'; //todo -> remove this. here for testing purposes.
 
 
 //handle some high level errors.
@@ -204,14 +170,13 @@ function userList($req)	{
 			$response['users'][] = $row;
 			}
 		}
-	else {
-		$response = apiMsg(1003,$req,$stmt->errorInfo());
-		}
+	//### TODO -> need to handle error here.
+
 	$db = null; //closes the connection.
 	return $response;
 	}
 
-//http://coursesweb.net/php-mysql/integer-float-value-select-pdo-string-numeric_t
+
 function preserveType($row)	{
 	foreach($row AS $k=>$v) {
 		if(is_numeric($v)) $row[$k] = $v + 0;
@@ -220,8 +185,7 @@ function preserveType($row)	{
 	}
 
 
-//what a user would see when they are looking at someone elses list.
-function giftList($req)	{
+function giftListRemove($req) {
 	$db = pdoConnect();
 	//if no viewid is specified, the list for the user logged in will be returned.
 	if($_REQUEST['viewid'])	{
@@ -232,23 +196,59 @@ function giftList($req)	{
 		}
 //groupID is set here so that only users/gifts from the same group can be accessed.
 //removed items are not shown unless they've been flagged as purchased or reserved.
-	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
+//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
+	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and archive != 1");
 	$stmt->bindValue(":userid", $viewid);
-	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
+//	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
 	if ($stmt->execute()) {
+		$i = 0;
 		$response = apiMsg(100,$req,"");
 		$response['gifts'] = array();
 		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			$i++;
 			$response['gifts'][] = preserveType($row);
 			}
+		$response['userid'] = $viewid;
+		$response['rows'] = $i;
 		}
-	else {
-		$response = apiMsg(1003,$req,$stmt->errorInfo());
-		}
+	//### TODO -> need to handle error here.
 
 	$db = null; //closes the connection.
 	return $response;
+}
+
+function giftListPost($req){
+	$db = pdoConnect();
+
+	$stmt = $db->prepare("update vicegrip_family.gifts set remove=:remove where itemid=:itemid");
+	$stmt->bindValue(":itemid", $_REQUEST['itemid']);
+	$stmt->bindValue(":remove", $_REQUEST['remove']);
+
+	if ($stmt->execute()) {
+		$response = apiMsg(100,$req,"");
 	}
+
+	return $response;
+}
+
+//what a user would see when they are looking at someone elses list.
+function giftList($req)	{
+	$method = $_SERVER['REQUEST_METHOD'];
+	$response;
+	switch ($method) {
+		case 'GET':
+			$response = giftListGet($req);
+			break;
+		case 'POST':
+			$response =giftListPost($req);
+			break;
+
+		default:
+			//throw unsupported method type error.
+			break;
+	}
+	return $response;
+}
 
 function giftCreate($req)	{
 	if($req['recipient'] && $req['name'])	{
