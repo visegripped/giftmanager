@@ -115,7 +115,8 @@ $commands = array(
 //GM
 	"userList",
 	"giftList",
-	"giftListRemove"
+	"giftListUpdate",
+	"giftListStatus"
 	);
 
 $response = array(); //what is returned by the API. either a successful response or an error.
@@ -184,8 +185,21 @@ function preserveType($row)	{
 	return $row;
 	}
 
+	function giftListUpdate($req){
+		$db = pdoConnect();
 
-function giftListRemove($req) {
+		$stmt = $db->prepare("update vicegrip_family.gifts set status=:status where itemid=:itemid");
+		$stmt->bindValue(":itemid", $_REQUEST['itemid']);
+		$stmt->bindValue(":status", $_REQUEST['status']);
+
+		if ($stmt->execute()) {
+			$response = apiMsg(100,$req,"");
+		}
+
+		return $response;
+	}
+
+function giftListGet($req) {
 	$db = pdoConnect();
 	//if no viewid is specified, the list for the user logged in will be returned.
 	if($_REQUEST['viewid'])	{

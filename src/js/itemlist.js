@@ -105,7 +105,7 @@ I'm lazy.  Archive is set to 1 for old items.
                                 <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? 'btn btn-info btn-sm'  : 'hidden-xs-up'}>L</a>
                             </div>
                             <div className='col-xs-12 col-sm-2'>
-                                <ItemSelectListSelf status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} />
+                                {this.props.subjectUID === thisUserID ? <ItemSelectListSelf status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} /> : <ItemSelectListOther status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} />}
                             </div>
                             <p className='col-xs-12 item-list-item-desc'>
                               {this.props.item.item_desc}
@@ -172,11 +172,40 @@ I'm lazy.  Archive is set to 1 for old items.
                  itemid: ''
              }
          },
+
+
+         handleItemStatusChange : function(event) {
+           let props = this.props;
+           let newState = event.target.value;
+           console.log("handleItemStatusChange props.itemid: " + props.itemid + " and new state: " + newState);
+             this.setState({status: event.target.value},function() {
+               $.ajax({
+                 url: _this.props.ItemListUrl,
+                 data : {
+                     "cmd" : "giftListUpdate",
+                     "viewid" : _this.state.subjectUID,
+                     "itemid" : props.itemid,
+                     "userid" : thisUserID,
+                     "status": newState
+                   },
+                 dataType: 'json',
+                 type: 'POST',
+                 success: function(data) {
+                     this.setState({data: data});
+                 }.bind(this),
+                 error: function(xhr, status, err) {
+                     console.error(props.url, status, err.toString());
+                 }.bind(this)
+             });
+           });
+       },
+
+
           render : function(){
 
             return (
 
-              <select className='item-list-item-select' defaultValue={this.props.status} onChange={this.props.onStatusChange} data={this.props.itemid}>
+              <select className='item-list-item-select' defaultValue={this.props.status} onChange={this.handleItemStatusChange} data={this.props.itemid}>
                 <option></option>
                 <option value='2'>Reserved</option>
                 <option value='10'>Purchased</option>
