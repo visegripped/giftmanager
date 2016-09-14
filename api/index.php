@@ -115,6 +115,7 @@ $commands = array(
 //GM
 	"userList",
 	"giftList",
+	"giftListCreate",
 	"giftListUpdate",
 	"giftListStatus"
 	);
@@ -264,23 +265,25 @@ function giftList($req)	{
 	return $response;
 }
 
-function giftCreate($req)	{
-	if($req['recipient'] && $req['name'])	{
+function giftListCreate($req)	{
+	if($req['subjectUID'] && $req['item_name'])	{
 		$db = pdoConnect();
-		$sql = "INSERT INTO gifts (userid,name,link,note,remove_on,qty,added_by) VALUES (:userid,:name,:link,:note,:remove_on,:qty,:added_by)";
-		$remove_on = ($req['remove_on']) ? date("Y-m-d H:i:s", strtotime($req['remove_on'])) : 0;
+		// $sql = "INSERT INTO gifts (userid,name,link,note,remove_on,qty,added_by) VALUES (:userid,:name,:link,:note,:remove_on,:qty,:added_by)";
+		$sql = "INSERT INTO gifts (userid,item_name,item_link,item_desc,remove,create_date,buy_userid) VALUES (:userid,:name,:link,:desc,:remove,:create_date,:buy_userid)";
+		// $remove_on = ($req['remove_on']) ? date("Y-m-d H:i:s", strtotime($req['remove_on'])) : 0;
 		if($req['qty'])	{$qty = $req['qty'];}
 		else	{
-			$qty = ($_SESSION['USERID'] == $req['recipient']) ? 0 : 1; //a user adding an item to their own list with a blank quantity is 'infinite'. Adding an item to another persons list defaults to 1.
+			$qty = ($req['added_by'] == $req['subjectUID']) ? 0 : 1; //a user adding an item to their own list with a blank quantity is 'infinite'. Adding an item to another persons list defaults to 1.
 			}
 		$q = $db->prepare($sql);
-		$q->execute(array(':userid'=>$req['recipient'],
-			':name'=>$req['name'],
-			':link'=>$req['link'] || '',
-			':note'=>$req['note'] || '',
-			':remove_on'=>$remove_on,
-			':qty'=>$qty,
-			':added_by'=>1 //###TODO -> this should be session-> userid
+		$q->execute(array(
+			':userid'=>$req['subjectUID'],
+			':name'=>$req['item_name'],
+			':link'=>$req['item_link'] || '',
+			':desc'=>$req['item_desc'] || '',
+			':remove'=> ($req['added_by'] == $req['subjectUID']) ? 0 : 1,
+			':create_date'=>"",
+			':buy_userid'=> $req['added_by'] //###TODO -> this should be session-> userid
 			));
 		$response = apiMsg(100,$req,"Gift added to list.");
 		$db = null;

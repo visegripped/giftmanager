@@ -2,16 +2,28 @@
 
         "use strict";
 
+        const thisUserID = window.gmUtilities.getUriParamsAsObject()["userid"]; //set this after authentication.
+        let itemAddContainer = document.getElementById('itemAddContainer');
+        var customEvents = {
+          itemAdded : new CustomEvent("itemAdded")
+        };
 
         var CommentForm = React.createClass({
+
             getInitialState: function() {
               return {
-                "subjectUID" : "",
+                "subjectUID" : thisUserID,
                 "subjectName" : "",
                 "item_name" : "",
                 "item_link" : "",
                 "item_desc" : ""
               };
+            },
+
+            componentDidMount: function() {
+              addEventListener("UserList.userSelected",function(e){
+                _this.setState({"subjectUID": Number(e.detail.userid)});
+              },false, true);
             },
 
             handleItemNameChange: function(e) {
@@ -28,24 +40,23 @@
             handleCommentSubmit: function(e) {
                 e.preventDefault(); //keep the form from actually submitting.
 
-                var item = this.state;
-                console.log("handleCommentSubmit item: "); console.dir(item);
-
-                item.id = Date.now(); //tmp
-                // var newComments = comments.concat([comment]);
-                // this.setState({data: newComments});
+                var newItem = this.state || {};
+                newItem.cmd = 'giftListCreate';
+                newItem.userid = thisUserID;
+                newItem.added_by = this.state.subjectUID;
 
                 $.ajax({
-                    url: this.props.itemAddUrl,
+                    url: this.props.ItemAddUrl,
                     dataType: 'json',
                     type: 'POST',
-                    data: item,
+                    data: newItem,
                     success: function(data) {
                         console.log("successfully posted item to list");
-                    }.bind(this),
+                        dispatchEvent(customEvents.itemAdded);
+                    },
                     error: function(xhr, status, err) {
                         console.error(this.props.url, status, err.toString());
-                    }.bind(this)
+                    }
                 });
             },
 
@@ -82,8 +93,8 @@
 
         ReactDOM.render(
 
-                <CommentForm itemAddUrl="api/item-add/" />,
-                document.getElementById('itemAddContainer')
+                <CommentForm ItemAddUrl={itemAddContainer.getAttribute("data-url")} />,
+                itemAddContainer
         );
 
                  })(React);

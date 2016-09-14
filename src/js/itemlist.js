@@ -138,7 +138,7 @@ I'm lazy.  Archive is set to 1 for old items.
             handleItemStatusChange : function(event) {
               let props = this.props;
               let newState = event.target.value;
-              console.log("handleItemStatusChange props.itemid: " + props.itemid);
+              // console.log("handleItemStatusChange props.itemid: " + props.itemid);
                 this.setState({status: event.target.value},function() {
                   $.ajax({
                     url: _this.props.ItemListUrl,
@@ -170,7 +170,7 @@ I'm lazy.  Archive is set to 1 for old items.
              }
          },
           render : function(){
-            console.log("this.props.remove: " + this.props.remove);
+            // console.log("this.props.remove: " + this.props.remove);
             return (
               <select className='item-list-item-select' onChange={this.handleItemStatusChange} data={this.props.itemid}>
                 {this.props.remove === 1 ? <option value='2'>Removed</option> : <option></option>}
