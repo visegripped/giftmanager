@@ -2,7 +2,7 @@
 
      "use strict";
 
-     const thisUserID = 58627; //set this after authentication.
+     const thisUserID = window.gmUtilities.getUriParamsAsObject()["userid"]; //set this after authentication.
      var customEvents = {
        userSelected : new CustomEvent("UserList.userSelected"),
        menuOpened : new CustomEvent("UserList.menuOpened"),
@@ -37,7 +37,7 @@
              this.setState({menuVisibility: 'closed'});
              this.setState({subjectUID: user.userid});
              //customEvents.userSelected.initCustomEvent(user,true, false, user);
-             //console.log(" -> userDetail: " , user);
+             console.log(" -> userDetail: " , user);
              customEvents.userSelected.initCustomEvent("UserList.userSelected",true,true,user);
              //customEvents.userSelected.detail = user;
              dispatchEvent(customEvents.userSelected);
@@ -85,9 +85,10 @@
 
      var User = React.createClass({
          render: function() {
+          //  console.log(" -> this.props.subjectUID "+ this.props.subjectUID +" this.props.user.userid " + this.props.user.userid);
              return (
-                 <li className={this.props.subjectUID === this.props.user.userid ? 'nav-item user-list-item user-list-item-active' : 'nav-item user-list-item'} onClick={() => this.props.onClick(this.props.user)}>
-                     <a href="#" className="nav-link">{this.props.user.username}</a>
+                 <li className={this.props.subjectUID == this.props.user.userid ? 'nav-item user-list-item user-list-item-active' : 'nav-item user-list-item'} onClick={() => this.props.onClick(this.props.user)}>
+                     <a href="javascript:" className="nav-link">{this.props.user.username}</a>
                  </li>
              );
          }

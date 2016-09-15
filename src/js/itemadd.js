@@ -4,6 +4,7 @@
 
         const thisUserID = window.gmUtilities.getUriParamsAsObject()["userid"]; //set this after authentication.
         let itemAddContainer = document.getElementById('itemAddContainer');
+        let _this;
         var customEvents = {
           itemAdded : new CustomEvent("itemAdded")
         };
@@ -21,8 +22,10 @@
             },
 
             componentDidMount: function() {
+              _this = this;
               addEventListener("UserList.userSelected",function(e){
                 _this.setState({"subjectUID": Number(e.detail.userid)});
+                _this.setState({"subjectName": e.detail.username});
               },false, true);
             },
 
@@ -78,8 +81,6 @@
                       <label className='item-add-form-fieldset-label'>
                         <textarea name='item-desc' placeholder="optional description" className='item-add-form-fieldset-label-textarea' defaultValue={this.state.item_desc}  onChange={this.handleItemDescChange}></textarea>
                       </label>
-
-                      <p className='item-add-form-fieldset-hint'>note - if you add an item to someone else&#8217;s list, it will automatically be set to &#8217;purchased&#8217; by you.</p>
 
                       <input type="submit" value="Post" className='btn btn-primary' />
 
