@@ -3,6 +3,7 @@
      "use strict";
 
      const thisUserID = window.gmUtilities.getUriParamsAsObject()["userid"]; //set this after authentication.
+     let userListContainer = document.getElementById('userListContainer');
      var customEvents = {
        userSelected : new CustomEvent("UserList.userSelected"),
        menuOpened : new CustomEvent("UserList.menuOpened"),
@@ -106,8 +107,8 @@
      });
 
      ReactDOM.render(
-             <UserMenu usersUrl="api/users.json" userPollInterval={0} />,
-             document.getElementById('userListContainer')
+             <UserMenu usersUrl={userListContainer.getAttribute("data-url")} userPollInterval={0} />,
+             userListContainer
      );
 
 
