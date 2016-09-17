@@ -52,6 +52,7 @@ I'm lazy.  Archive is set to 1 for old items.
                 this.loadItemListFromServer();
                 addEventListener("UserList.userSelected",function(e){
                   _this.setState({"subjectUID": Number(e.detail.userid)},function(){
+                    console.log("state changed in itemlist. new subjectUID: " + this.state.subjectUID)
                     _this.loadItemListFromServer();
                   });
                 },false, true);
@@ -106,7 +107,8 @@ I'm lazy.  Archive is set to 1 for old items.
                                 <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? 'btn btn-info btn-sm'  : 'hidden-xs-up'}>L</a>
                             </div>
                             <div className='col-xs-12 col-sm-2'>
-                                {this.props.subjectUID === thisUserID ? <ItemSelectListSelf status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} /> : <ItemSelectListOther status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} />}
+                            //don't type check this, it won't always match and is overly specific anyway.
+                                {this.props.subjectUID == thisUserID ? <ItemSelectListSelf status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} /> : <ItemSelectListOther status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} />}
                             </div>
                             <p className='col-xs-12 item-list-item-desc'>
                               {this.props.item.item_desc}
