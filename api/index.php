@@ -205,30 +205,38 @@ function giftListGet($req) {
 	//if no viewid is specified, the list for the user logged in will be returned.
 	if($_REQUEST['viewid'])	{
 		$viewid = $_REQUEST['viewid'];
-		}
-	else	{
-		$viewid = $_SESSION['USERID'] || 1; //WARNING! the '1' is here just for testing.
-		}
-//groupID is set here so that only users/gifts from the same group can be accessed.
-//removed items are not shown unless they've been flagged as purchased or reserved.
-//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
-	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and archive != 1");
-	$stmt->bindValue(":userid", $viewid);
-//	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
-	if ($stmt->execute()) {
-		$i = 0;
-		$response = apiMsg(100,$req,"");
-		$response['gifts'] = array();
-		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			$i++;
-			$response['gifts'][] = preserveType($row);
-			}
-		$response['userid'] = $viewid;
-		$response['rows'] = $i;
-		}
-	//### TODO -> need to handle error here.
+		//groupID is set here so that only users/gifts from the same group can be accessed.
+		//removed items are not shown unless they've been flagged as purchased or reserved.
+		//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
+			$query = "SELECT * FROM gifts WHERE userid=:userid and archive != 1";
 
-	$db = null; //closes the connection.
+			//Don't show items that were added to this user's list by another user.
+			if($viewid == $_REQUEST['userid']) {
+				$query .= ' and remove != 2';
+			}
+			$stmt = $db->prepare($query);
+			$stmt->bindValue(":userid", $viewid);
+		//	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
+			if ($stmt->execute()) {
+				$i = 0;
+				$response = apiMsg(100,$req,"");
+				$response['gifts'] = array();
+				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+					$i++;
+					$response['gifts'][] = preserveType($row);
+					}
+				$response['userid'] = $viewid;
+				$response['rows'] = $i;
+				}
+			//### TODO -> need to handle error here.
+
+			$db = null; //closes the connection.
+		}
+		else {
+			$response = apiMsg(1007,$req,"viewid is required.");
+		}
+
+
 	return $response;
 }
 
@@ -239,12 +247,36 @@ function giftListPost($req){
 	$stmt->bindValue(":itemid", $_REQUEST['itemid']);
 	$stmt->bindValue(":remove", $_REQUEST['remove']);
 
-	if ($stmt->execute()) {
+	$results = $stmt->execute();
+
+	if ($results) {
 		$response = apiMsg(100,$req,"");
+		$response['item'] = getItemByID($_REQUEST['itemid']);
+//		$response['stuff'] = $results->fetch());
 	}
 
 	return $response;
 }
+
+
+function getItemByID($itemid) {
+	$r; //what is returned. either nothing or an item object.
+	if(itemid) {
+		$db = pdoConnect();
+		$stmt = $db->prepare("SELECT * FROM gifts WHERE itemid=:itemid");
+		$stmt->bindValue(":itemid", $itemid);
+	//	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
+		if ($stmt->execute()) {
+			$r = $stmt->fetch(PDO::FETCH_ASSOC);
+			}
+		$db = null; //closes the connection.
+	}
+	else {
+		$r = null;
+	}
+	return $r;
+}
+
 
 //what a user would see when they are looking at someone elses list.
 function giftList($req)	{
@@ -268,24 +300,20 @@ function giftList($req)	{
 function giftListCreate($req)	{
 	if($req['subjectUID'] && $req['item_name'])	{
 		$db = pdoConnect();
-		// $sql = "INSERT INTO gifts (userid,name,link,note,remove_on,qty,added_by) VALUES (:userid,:name,:link,:note,:remove_on,:qty,:added_by)";
-		$sql = "INSERT INTO gifts (userid,item_name,item_link,item_desc,remove,create_date,buy_userid) VALUES (:userid,:name,:link,:desc,:remove,:create_date,:buy_userid)";
-		// $remove_on = ($req['remove_on']) ? date("Y-m-d H:i:s", strtotime($req['remove_on'])) : 0;
-		if($req['qty'])	{$qty = $req['qty'];}
-		else	{
-			$qty = ($req['added_by'] == $req['subjectUID']) ? 0 : 1; //a user adding an item to their own list with a blank quantity is 'infinite'. Adding an item to another persons list defaults to 1.
-			}
+		$sql = "INSERT INTO gifts (userid,item_name,item_link,item_desc,remove,create_date,buy_userid) VALUES (:userid,:name,:link,:item_desc,:remove,:create_date,:buy_userid)";
 		$q = $db->prepare($sql);
 		$q->execute(array(
-			':userid'=>$req['subjectUID'],
+			':userid'=>$req['subjectUID'], //TODO -> rename this to recipient
 			':name'=>$req['item_name'],
-			':link'=>$req['item_link'] || '',
-			':desc'=>$req['item_desc'] || '',
-			':remove'=> ($req['added_by'] == $req['subjectUID']) ? 0 : 1,
+			':link'=>$req['item_link'],
+			':item_desc'=>$req['item_desc'],
+			':remove'=> ($req['userid'] == $req['subjectUID']) ? 0 : 2,
 			':create_date'=>"",
-			':buy_userid'=> $req['added_by'] //###TODO -> this should be session-> userid
+			':buy_userid'=> $req['userid'] //###TODO -> this should be session-> userid
 			));
+		$itemid = $db->lastInsertId();
 		$response = apiMsg(100,$req,"Gift added to list.");
+		$response['item'] = getItemByID($itemid);
 		$db = null;
 		}
 	else	{
