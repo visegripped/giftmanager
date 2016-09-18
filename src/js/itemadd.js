@@ -46,34 +46,38 @@
                 var newItem = this.state || {};
                 newItem.cmd = 'giftListCreate';
                 newItem.userid = thisUserID;
-                newItem.added_by = this.state.subjectUID;
 
                 $.ajax({
                     url: this.props.ItemAddUrl,
                     dataType: 'json',
                     type: 'POST',
                     data: newItem,
-                    success: function(data) {
-                        console.log("successfully posted item to list");
+                    success: function() {
                         dispatchEvent(customEvents.itemAdded);
+                        _this.setState({item_name: ''});
+                        _this.setState({item_desc: ''});
+                        _this.setState({item_link: ''},function(){
+                          console.log("this.state: " , _this.state);
+                        });
                     },
                     error: function(xhr, status, err) {
                         console.error(this.props.url, status, err.toString());
                     }
                 });
             },
-
+/*
+There are two different patterns used below for the inputs.
+Was exploring a solution for issue #3 and thought state might not be updating on change because of how the inputs are created.
+the solution didn't work.  No solution has been found though so I am keeping each till it's solved.
+Once a solution is found, the labels/inputs need to be updated to all be the same.
+*/
             render: function() {
                 return (
                   <form onSubmit={this.handleCommentSubmit} className='item-add-form'>
                     <fieldset className='item-add-form-fieldset'>
 
                       <legend className='item-add-form-fieldset-legend'>Add item to {this.state.subjectName} list</legend>
-
-                      <label className='item-add-form-fieldset-label'>
-                        <input required='required' name='item_name' type="text" className='item-add-form-fieldset-label-text' placeholder="gift" defaultValue={this.state.item_name} onChange={this.handleItemNameChange} />
-                      </label>
-
+<ItemNameInput ItemName={this.state.item_name} HandleItemNameChange={this.handleItemNameChange}  />
                       <label className='item-add-form-fieldset-label'>
                         <input name='item_link' type="url" className='item-add-form-fieldset-label-url' placeholder="link (http://...)" defaultValue={this.state.item_url} onChange={this.handleItemLinkChange} />
                       </label>
@@ -82,7 +86,7 @@
                         <textarea name='item-desc' placeholder="optional description" className='item-add-form-fieldset-label-textarea' defaultValue={this.state.item_desc}  onChange={this.handleItemDescChange}></textarea>
                       </label>
 
-                      <input type="submit" value="Post" className='btn btn-primary' />
+                      <input type="submit" value="Save" className='btn btn-primary' />
 
                     </fieldset>
                   </form>
@@ -92,10 +96,31 @@
 
 
 
-        ReactDOM.render(
+                var ItemNameInput = React.createClass({
+                  getInitialState: function() {
+                     return {
+                         item_name: ''
+                     }
+                 },
+                  render : function(){
 
-                <CommentForm ItemAddUrl={itemAddContainer.getAttribute("data-url")} />,
-                itemAddContainer
+                    return (
+                      <label className='item-add-form-fieldset-label'>
+                        <input required='required' name='item_name' type="text" className='item-add-form-fieldset-label-text' placeholder="gift" defaultValue={this.state.item_name} onChange={this.props.HandleItemNameChange} />
+                      </label>
+                    );
+                  }
+                });
+
+
+
+
+
+
+
+        ReactDOM.render(
+          <CommentForm ItemAddUrl={itemAddContainer.getAttribute("data-url")} />,
+          itemAddContainer
         );
 
                  })(React);

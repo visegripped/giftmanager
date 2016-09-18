@@ -26,7 +26,8 @@ I'm lazy.  Archive is set to 1 for old items.
                     url: this.props.ItemListUrl,
                     data : {
                       "cmd" : "giftList",
-                      "viewid" : this.state.subjectUID
+                      "viewid" : this.state.subjectUID,
+                      "userid" : thisUserID
                     },
                     type: 'GET',
                     dataType: 'json',
@@ -55,6 +56,11 @@ I'm lazy.  Archive is set to 1 for old items.
                     _this.loadItemListFromServer();
                   });
                 },false, true);
+
+                addEventListener("itemAdded",function(e){
+                  _this.loadItemListFromServer();
+                },false, true);
+
                 if(this.props.pollInterval) {
                     setInterval(this.loadItemListFromServer, this.props.pollInterval);
                 }
@@ -173,7 +179,6 @@ I'm lazy.  Archive is set to 1 for old items.
              }
          },
           render : function(){
-            console.log("this.state.remove: " + this.state.remove);
             return (
               <select className='item-list-item-select' defaultValue={this.state.remove} onChange={this.handleItemStatusChange} data={this.state.itemid}>
                 <option value='0'>{this.state.remove == 1 ? 'return to list' : ''}</option>
