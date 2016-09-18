@@ -52,7 +52,6 @@ I'm lazy.  Archive is set to 1 for old items.
                 this.loadItemListFromServer();
                 addEventListener("UserList.userSelected",function(e){
                   _this.setState({"subjectUID": Number(e.detail.userid)},function(){
-                    console.log("state changed in itemlist. new subjectUID: " + this.state.subjectUID)
                     _this.loadItemListFromServer();
                   });
                 },false, true);
@@ -107,7 +106,6 @@ I'm lazy.  Archive is set to 1 for old items.
                                 <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? 'btn btn-info btn-sm'  : 'hidden-xs-up'}>L</a>
                             </div>
                             <div className='col-xs-12 col-sm-2'>
-                            //don't type check this, it won't always match and is overly specific anyway.
                                 {this.props.subjectUID == thisUserID ? <ItemSelectListSelf status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} /> : <ItemSelectListOther status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} />}
                             </div>
                             <p className='col-xs-12 item-list-item-desc'>
@@ -142,6 +140,7 @@ I'm lazy.  Archive is set to 1 for old items.
               let newState = event.target.value;
               // console.log("handleItemStatusChange props.itemid: " + props.itemid);
                 this.setState({status: event.target.value},function() {
+                  let thisItem = this;
                   $.ajax({
                     url: _this.props.ItemListUrl,
                     data : {
@@ -153,8 +152,10 @@ I'm lazy.  Archive is set to 1 for old items.
                       },
                     dataType: 'json',
                     type: 'POST',
-                    success: function(data) {
-                        this.setState({data: data});
+                    success: function(apiResponse) {
+                      if(apiResponse.msgid == 100) {
+                        thisItem.setState(apiResponse.item);
+                      }
                     }.bind(this),
                     error: function(xhr, status, err) {
                         console.error(props.url, status, err.toString());
@@ -172,11 +173,11 @@ I'm lazy.  Archive is set to 1 for old items.
              }
          },
           render : function(){
-            // console.log("this.props.remove: " + this.props.remove);
+            console.log("this.state.remove: " + this.state.remove);
             return (
-              <select className='item-list-item-select' onChange={this.handleItemStatusChange} data={this.props.itemid}>
-                {this.props.remove === 1 ? <option value='2'>Removed</option> : <option></option>}
-                {this.props.remove === 1 ? <option value='0'>Add back to list</option> : <option value='1'>Remove</option>}
+              <select className='item-list-item-select' defaultValue={this.state.remove} onChange={this.handleItemStatusChange} data={this.state.itemid}>
+                <option value='0'>{this.state.remove == 1 ? 'return to list' : ''}</option>
+                <option value='1'>{this.state.remove == 1 ? 'removed' : 'remove'}</option>
               </select>
             );
           }
@@ -223,7 +224,7 @@ I'm lazy.  Archive is set to 1 for old items.
             return (
 
               <select className='item-list-item-select' defaultValue={this.props.status} onChange={this.handleItemStatusChange} data={this.props.itemid}>
-                <option></option>
+                <option value='0'></option>
                 <option value='2'>Reserved</option>
                 <option value='10'>Purchased</option>
                 {(() => {
