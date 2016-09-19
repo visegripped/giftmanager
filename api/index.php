@@ -210,7 +210,7 @@ function giftListGet($req) {
 		//removed items are not shown unless they've been flagged as purchased or reserved.
 		//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
 			$query = "SELECT * FROM gifts WHERE ";
-			$query .= " remove_date > :oneDayOldTS OR remove_date = 0  ";
+			$query .= " (remove_date > :oneDayOldTS OR remove_date = 0)  ";
 			$query .= " AND userid=:userid AND archive != 1 ";
 			//Don't show items that were added to this user's list by another user.
 			if($viewid == $_REQUEST['userid']) {
