@@ -205,21 +205,27 @@ function giftListGet($req) {
 	//if no viewid is specified, the list for the user logged in will be returned.
 	if($_REQUEST['viewid'])	{
 		$viewid = $_REQUEST['viewid'];
+		$removeTS = time() - (1 * 24 * 60 * 60);
 		//groupID is set here so that only users/gifts from the same group can be accessed.
 		//removed items are not shown unless they've been flagged as purchased or reserved.
 		//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
-			$query = "SELECT * FROM gifts WHERE userid=:userid and archive != 1";
-
+			$query = "SELECT * FROM gifts WHERE ";
+			$query .= " remove_date > :oneDayOldTS OR remove_date = 0  ";
+			$query .= " AND userid=:userid AND archive != 1 ";
 			//Don't show items that were added to this user's list by another user.
 			if($viewid == $_REQUEST['userid']) {
-				$query .= ' and remove != 2';
+				$query .= ' AND remove != 2 ';
 			}
+
 			$stmt = $db->prepare($query);
 			$stmt->bindValue(":userid", $viewid);
+			$stmt->bindValue(":oneDayOldTS", $removeTS);
+
 		//	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
 			if ($stmt->execute()) {
 				$i = 0;
 				$response = apiMsg(100,$req,"");
+				$response['removeTS'] = $removeTS;
 				$response['gifts'] = array();
 				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 					$i++;
@@ -243,9 +249,10 @@ function giftListGet($req) {
 function giftListPost($req){
 	$db = pdoConnect();
 
-	$stmt = $db->prepare("update vicegrip_family.gifts set remove=:remove where itemid=:itemid");
+	$stmt = $db->prepare("update vicegrip_family.gifts set remove=:remove, remove_date = :remove_date where itemid=:itemid");
 	$stmt->bindValue(":itemid", $_REQUEST['itemid']);
 	$stmt->bindValue(":remove", $_REQUEST['remove']);
+	$stmt->bindValue(":remove_date",time());
 
 	$results = $stmt->execute();
 
