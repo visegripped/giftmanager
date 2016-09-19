@@ -300,14 +300,15 @@ function giftList($req)	{
 function giftListCreate($req)	{
 	if($req['subjectUID'] && $req['item_name'])	{
 		$db = pdoConnect();
-		$sql = "INSERT INTO gifts (userid,item_name,item_link,item_desc,remove,create_date,buy_userid) VALUES (:userid,:name,:link,:item_desc,:remove,:create_date,:buy_userid)";
+		$sql = "INSERT INTO gifts (userid,item_name,item_link,item_desc,remove,create_date,buy_userid,status) VALUES (:userid,:name,:link,:item_desc,:remove,:create_date,:buy_userid,:status)";
 		$q = $db->prepare($sql);
 		$q->execute(array(
 			':userid'=>$req['subjectUID'], //TODO -> rename this to recipient
 			':name'=>$req['item_name'],
 			':link'=>$req['item_link'],
 			':item_desc'=>$req['item_desc'],
-			':remove'=> ($req['userid'] == $req['subjectUID']) ? 0 : 2,
+			':remove'=> ($req['userid'] == $req['subjectUID']) ? 0 : 2,   //when adding to another users list, ensure it doesn't show up on their UI
+			':status'=> ($req['userid'] == $req['subjectUID']) ? 0 : 10,  //when adding an item to another users list, add as purchased.
 			':create_date'=>"",
 			':buy_userid'=> $req['userid'] //###TODO -> this should be session-> userid
 			));
