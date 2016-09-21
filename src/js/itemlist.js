@@ -191,8 +191,8 @@ I'm lazy.  Archive is set to 1 for old items.
         var ItemSelectListOther = React.createClass({
           getInitialState: function() {
              return {
-                 status: '',
-                 itemid: ''
+                 status: this.props.status,
+                 itemid: this.props.itemid
              }
          },
 
@@ -202,6 +202,7 @@ I'm lazy.  Archive is set to 1 for old items.
            let newState = event.target.value;
           //  console.log("handleItemStatusChange props.itemid: " + props.itemid + " and new state: " + newState);
              this.setState({status: event.target.value},function() {
+
                $.ajax({
                  url: _this.props.ItemListUrl,
                  data : {
@@ -213,8 +214,10 @@ I'm lazy.  Archive is set to 1 for old items.
                    },
                  dataType: 'json',
                  type: 'POST',
-                 success: function(data) {
-                     this.setState({data: data});
+                 success: function(apiResponse) {
+                   if(apiResponse.msgid == 100) {
+                     this.setState(apiResponse.item);
+                   }
                  }.bind(this),
                  error: function(xhr, status, err) {
                      console.error(props.url, status, err.toString());
@@ -228,15 +231,13 @@ I'm lazy.  Archive is set to 1 for old items.
 
             return (
 
-              <select className='item-list-item-select' defaultValue={this.props.status} onChange={this.handleItemStatusChange} data={this.props.itemid}>
+              <select className='item-list-item-select' defaultValue={this.state.status} onChange={this.handleItemStatusChange} data={this.state.itemid}>
                 <option value='0'></option>
                 <option value='2'>Reserved</option>
                 <option value='10'>Purchased</option>
                 {(() => {
-                  switch (this.props.status) {
-                    case 2:   return <option value='XX'>Unreserve</option>;
-                    case 10: return <option value='XX'>Unpurchase</option>;
-                    default:      return "";
+                  if(this.state.status > 0) {
+                    return <option value='XX'>{this.state.status == 2 ? 'Unreserve' : 'unpurchase'}</option>;
                   }
                 })()}
               </select>

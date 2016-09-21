@@ -195,6 +195,7 @@ function preserveType($row)	{
 
 		if ($stmt->execute()) {
 			$response = apiMsg(100,$req,"");
+			$response['item'] = getItemByID($_REQUEST['itemid']);
 		}
 
 		return $response;
@@ -215,7 +216,12 @@ function giftListGet($req) {
 			//Don't show items that were added to this user's list by another user.
 			if($viewid == $_REQUEST['userid']) {
 				$query .= ' AND remove != 2 ';
+				$query .= ' ORDER BY status DESC'; //only order by status when looking at another users list or it'll indicate to the active user what has been purchased for them.
 			}
+			else {
+				$query .= ' ORDER BY item_name ASC'; //only order by status when looking at another users list or it'll indicate to the active user what has been purchased for them.
+			}
+
 
 			$stmt = $db->prepare($query);
 			$stmt->bindValue(":userid", $viewid);
