@@ -47,6 +47,8 @@
                 newItem.cmd = 'giftListCreate';
                 newItem.userid = thisUserID;
 
+                this.setState({item_name: '',item_desc: '',item_link: ''});
+
                 $.ajax({
                     url: this.props.ItemAddUrl,
                     dataType: 'json',
@@ -54,11 +56,6 @@
                     data: newItem,
                     success: function() {
                         dispatchEvent(customEvents.itemAdded);
-                        _this.setState({item_name: ''});
-                        _this.setState({item_desc: ''});
-                        _this.setState({item_link: ''},function(){
-                          console.log("this.state: " , _this.state);
-                        });
                     },
                     error: function(xhr, status, err) {
                         console.error(this.props.url, status, err.toString());
@@ -76,14 +73,16 @@ Once a solution is found, the labels/inputs need to be updated to all be the sam
                   <form onSubmit={this.handleCommentSubmit} className='item-add-form'>
                     <fieldset className='item-add-form-fieldset'>
 
-                      <legend className='item-add-form-fieldset-legend'>Add item to {this.state.subjectName} list</legend>
-<ItemNameInput ItemName={this.state.item_name} HandleItemNameChange={this.handleItemNameChange}  />
+                      <legend className='item-add-form-fieldset-legend'>Add item to {this.state.subjectName ? this.state.subjectName+"'s" : ""} list</legend>
+
+                      <ItemNameInput ItemName={this.state.item_name} HandleItemNameChange={this.handleItemNameChange}  />
+
                       <label className='item-add-form-fieldset-label'>
                         <input name='item_link' type="url" className='item-add-form-fieldset-label-url' placeholder="link (http://...)" defaultValue={this.state.item_url} onChange={this.handleItemLinkChange} />
                       </label>
 
                       <label className='item-add-form-fieldset-label'>
-                        <textarea name='item-desc' placeholder="optional description" className='item-add-form-fieldset-label-textarea' defaultValue={this.state.item_desc}  onChange={this.handleItemDescChange}></textarea>
+                        <textarea name='item-desc' placeholder="optional description" className='item-add-form-fieldset-label-textarea' defaultValue={this.state.item_desc} onChange={this.handleItemDescChange}></textarea>
                       </label>
 
                       <input type="submit" value="Save" className='btn btn-primary' />
