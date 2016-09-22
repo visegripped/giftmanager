@@ -38,7 +38,6 @@
              this.setState({menuVisibility: 'closed'});
              this.setState({subjectUID: user.userid});
              //customEvents.userSelected.initCustomEvent(user,true, false, user);
-             console.log(" -> userDetail: " , user);
              customEvents.userSelected.initCustomEvent("UserList.userSelected",true,true,user);
              //customEvents.userSelected.detail = user;
              dispatchEvent(customEvents.userSelected);
