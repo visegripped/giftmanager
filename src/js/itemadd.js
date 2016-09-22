@@ -39,15 +39,11 @@
               this.setState({item_link: e.target.value});
             },
 
-
             handleCommentSubmit: function(e) {
                 e.preventDefault(); //keep the form from actually submitting.
-
                 var newItem = this.state || {};
                 newItem.cmd = 'giftListCreate';
                 newItem.userid = thisUserID;
-
-                this.setState({item_name: '',item_desc: '',item_link: ''});
 
                 $.ajax({
                     url: this.props.ItemAddUrl,
@@ -56,7 +52,8 @@
                     data: newItem,
                     success: function() {
                         dispatchEvent(customEvents.itemAdded);
-                    },
+                        this.setState({item_name: '',item_desc: '',item_link: ''});
+                    }.bind(this),
                     error: function(xhr, status, err) {
                         console.error(this.props.url, status, err.toString());
                     }
@@ -95,26 +92,21 @@ Once a solution is found, the labels/inputs need to be updated to all be the sam
 
 
 
-                var ItemNameInput = React.createClass({
-                  getInitialState: function() {
-                     return {
-                         item_name: ''
-                     }
-                 },
-                  render : function(){
+        var ItemNameInput = React.createClass({
+          getInitialState: function() {
+             return {
+                 item_name: ''
+             }
+         },
+          render : function(){
 
-                    return (
-                      <label className='item-add-form-fieldset-label'>
-                        <input required='required' name='item_name' type="text" className='item-add-form-fieldset-label-text' placeholder="gift" defaultValue={this.state.item_name} onChange={this.props.HandleItemNameChange} />
-                      </label>
-                    );
-                  }
-                });
-
-
-
-
-
+            return (
+              <label className='item-add-form-fieldset-label'>
+                <input required='required' name='item_name' type="text" className='item-add-form-fieldset-label-text' placeholder="gift" defaultValue={this.state.item_name} onChange={this.props.HandleItemNameChange} />
+              </label>
+            );
+          }
+        });
 
 
         ReactDOM.render(
