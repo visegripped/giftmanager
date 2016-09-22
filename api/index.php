@@ -7,6 +7,17 @@ include "/home/vicegrip/includes/gm/db_functions.php";
 include "/home/vicegrip/includes/gm/credentials.php";
 
 
+// $status[0] = 'none';
+// $status[2] = 'reserved';
+// $status[10] = 'purchased';
+// $status[50] = 'cancelled';
+//
+// remove is set to 1 if a user removes the item from their own list
+// remove is set to 2 if an item is added to another users list (if I add an item to patricks) and status is set to purchased.  This is done so that we can NOT show items added to another persons list (like if patrick is looking at his own list).
+//
+// I'm lazy.  Archive is set to 1 for old items.
+
+
 //error handler.
 //The request is passed in instead of this function referencing $_REQUEST directly so that if a pipelined model is ever supported, the error handler consinues to work without modifying every reference to it.
 //$m is meta. error specific messaging. not required for any specific error, but used by some.
@@ -201,6 +212,7 @@ function preserveType($row)	{
 		return $response;
 	}
 
+
 function giftListGet($req) {
 	$db = pdoConnect();
 	//if no viewid is specified, the list for the user logged in will be returned.
@@ -208,14 +220,22 @@ function giftListGet($req) {
 		$viewid = $_REQUEST['viewid'];
 		$removeTS = time() - (1 * 24 * 60 * 60);
 		//groupID is set here so that only users/gifts from the same group can be accessed.
-		//removed items are not shown unless they've been flagged as purchased or reserved.
+
 		//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
 			$query = "SELECT * FROM gifts WHERE ";
-			$query .= " (remove_date > :oneDayOldTS OR remove_date = 0)  ";
-			$query .= " AND userid=:userid AND archive != 1 ";
-			//Don't show items that were added to this user's list by another user.
+
 			if($viewid == $_REQUEST['userid']) {
-				$query .= ' AND remove != 2 ';
+				$query .= " (remove_date > :oneDayOldTS OR remove_date = 0)  "; //when a user is looking at their own list, don't show items that were flagged as 'remove' more than 24 hours ago.
+				$query .= ' AND remove != 2 '; //Don't show items that were added to this user's list by another user.
+			}
+//removed items are not shown for another users list unless they've been flagged as purchased or reserved.
+			else {
+				$query .= " (remove = 0 OR (status >= 1  AND remove >= 1)) ";
+			}
+
+			$query .= " AND userid=:userid AND archive != 1 ";
+
+			if($viewid == $_REQUEST['userid']) {
 				$query .= ' ORDER BY status DESC'; //only order by status when looking at another users list or it'll indicate to the active user what has been purchased for them.
 			}
 			else {
@@ -225,7 +245,9 @@ function giftListGet($req) {
 
 			$stmt = $db->prepare($query);
 			$stmt->bindValue(":userid", $viewid);
-			$stmt->bindValue(":oneDayOldTS", $removeTS);
+			if($viewid == $_REQUEST['userid']) {
+				$stmt->bindValue(":oneDayOldTS", $removeTS);
+			}
 
 		//	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
 			if ($stmt->execute()) {
