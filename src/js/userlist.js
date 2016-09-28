@@ -82,7 +82,6 @@
          }
      });
 
-
      var User = React.createClass({
          render: function() {
           //  console.log(" -> this.props.subjectUID "+ this.props.subjectUID +" this.props.user.userid " + this.props.user.userid);
@@ -97,7 +96,7 @@
      var MenuToggleButton = React.createClass({
          render: function() {
              return (
-                 <button onClick={this.props.onButtonClick} className='user-list-button-toggle'>
+                 <button onClick={this.props.onButtonClick} className='user-list-btn-toggle'>
                  <span className='user-list-icon-users' />
                  toggle user menu
                  </button>

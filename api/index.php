@@ -5,6 +5,7 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH');
 session_start();
 include "/home/vicegrip/includes/gm/db_functions.php";
 include "/home/vicegrip/includes/gm/credentials.php";
+include "/home/vicegrip/www/gm/auth.php";
 
 
 // $status[0] = 'none';
@@ -380,11 +381,6 @@ function websiteInquiry($req)	{
 	return apiMsg(100,$req,"Your message has been sent.");
 	}
 
-function setUserSessionDetails($user)	{
-	$_SESSION['GROUPID'] = $r['groupid'];
-	$_SESSION['USERID'] = $r['userid'];
-	}
-
 function getUserDetails($email)	{
 	$db = pdoConnect();
 	$stmt = $db->prepare("SELECT * FROM users WHERE email=:email");
@@ -401,56 +397,6 @@ function getUserDetails($email)	{
 		}
 	return $r;
 	}
-
-
-function googleAuthenticate($req)	{
-	$token = $req['access_token'];
-	$url = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=".$token;
-	$gPlusResponse = file_get_contents($url);
-// Native PHP object, please
-	$jsonResponse = json_decode($gPlusResponse);
-	if($jsonResponse->{'expires_in'} > 0)	{
-		$_SESSION['VALID_SESSION'] = 'google';
-		$_SESSION['EMAIL'] = $jsonResponse->{'email'};
-
-		$userArray = getUserDetails($jsonResponse->{'email'});
-//user account exists. Get their list of parties and any other relevant info.
-		if($userArray)	{
-			setUserSessionDetails($userArray);
-			$response = apiMsg(100,$req,"Successfully retrieved user record.");
-			$response['user'] = $userArray;
-			}
-		//false will be returned if the db requests succeeded but no user account was found.
-		else if($userArray === false)	{
-			$response = apiMsg(5001,$req,"");
-//look up some info on g+ about the user.
-//			$userinfo = file_get_contents("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=".$token);
-//			$userJSON = json_decode($userinfo);
-//hhhmmm... what to do here. Auto create a new user?  for now, yes.
-//when more than one login method is available, we'll need to handle this differently.
-//			$username = explode("@",$_SESSION['EMAIL']);
-//			$addResults = mysql_query("insert into users (email, name, lastname, groupid) values (".qt($_SESSION['EMAIL']).", ".qt($userJSON->{'given_name'}).", ".qt($userJSON->{'family_name'}).", ".qt(substr($username[0],0,20)).", ".qt(date("Y")).")");
-//			if($addResults)	{
-//				$userArray = getUserDetails($jsonResponse->{'email'});
-//				setUserSessionDetails($userArray);
-//				}
-//			else	{
-//				$response = apiMsg(1003,$req,mysql_error());
-//				}
-			}
-		else	{
-			//some kind of error occurred while fetching the user details. The contents of $userArray will be the errors.
-			$response = $userArray;
-			}
-		}
-	else	{
-		//could not verify user.
-		$response = apiMsg(5000,$req,mysql_error());
-		}
-	return $response;
-	}
-
-
 
 
 //nothing but pure data is returned unless an error occurs.

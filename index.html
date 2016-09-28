@@ -7,6 +7,9 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- for google authentication - populate with your info. docs: https://developers.google.com/identity/sign-in/web/ -->
+    <meta name="google-signin-client_id" content="451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleusercontent.com">
+
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
     <!--http://v4-alpha.getbootstrap.com/getting-started/introduction/-->
@@ -19,6 +22,16 @@
     <style>
         /* CSS Document */
         body {padding-top: 80px;}
+        .g-signin2 {
+          float: right;
+        }
+        .navbar-auth {
+          text-align: right;
+          padding-top: 4px;
+        }
+        .navbar-auth-btn-signout {
+          display: none;
+        }
 
     </style>
 
@@ -34,9 +47,17 @@
 <body>
 
 
+
+
 <header class="navbar navbar-dark bg-primary navbar-fixed-top">
     <div class="container">
-        <div class="row clearfix" id="userListContainer" data-url="api/users.json"></div>
+        <div class="row clearfix">
+          <div class="col-xs-8" id="userListContainer" data-url="api/users.json"></div>
+          <div class="col-xs-4 navbar-auth">
+            <div class="navbar-auth-btn-signin g-signin2" data-onsuccess="onSignIn"></div>
+            <a href="#" onclick="signOut();" class='navbar-auth-btn-signout navbar-auth-btn-signout-google btn btn-info btn-sm'>Sign out</a>
+          </div>
+        </div>
     </div>
 </header>
 
@@ -56,11 +77,13 @@
 </footer>
 
 
-
 <script src="src/js/utilities.js"></script>
+<script src="src/js/auth.js"></script>
 <script type="text/babel" src="src/js/userlist.js"></script>
 <script type="text/babel" src="src/js/itemlist.js"></script>
 <script type="text/babel" src="src/js/itemadd.js"></script>
+
+<script src="https://apis.google.com/js/platform.js" async defer></script>
 
 </body>
 </html>

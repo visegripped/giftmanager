@@ -7,7 +7,7 @@
   height: 40px;
   margin-right: @user-list-button-size + @user-list-button-spacing;
   position: relative;
-  float:right;
+  float:left;
   overflow: visible;
 
   &-ul {
@@ -19,7 +19,8 @@
     margin: 0;
     // transition: order 1s;
     width: 100%;
-    text-align:right;
+    text-align:left;
+    text-indent: 40px;
     display: none;
     background-color: @bg-primary;
     padding-right: 15px;
@@ -53,7 +54,6 @@
     display: block;
   }
 
-
   &-icon {
     &-users {
       background: url(../../images/users.png) no-repeat;
@@ -66,14 +66,14 @@
     }
   }
 
-  &-button {
+  &-btn {
 
     &-toggle {
       outline-width: 0 ; //not too worried about accessability.
       position: absolute;
       padding:0;
       top: 4px;
-      right: -1 * (@user-list-button-size + @user-list-button-spacing);
+      left: 0; //
       padding:0;
       background-color: @bg-primary;
       border:0;
