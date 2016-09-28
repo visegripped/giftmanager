@@ -15,7 +15,7 @@ I'm lazy.  Archive is set to 1 for old items.
 
 */
 
-        const thisUserID = window.gmUtilities.getUriParamsAsObject()["userid"]; //set this after authentication.
+        let thisUserID; //set this after authentication.
         let itemListContainer = document.getElementById('itemListContainer');
         let _this;
 
@@ -50,9 +50,15 @@ I'm lazy.  Archive is set to 1 for old items.
 
             componentDidMount: function() {
                 _this = this;
-                this.loadItemListFromServer();
+
+                addEventListener("Auth.signInComplete",function(e){
+                   thisUserID = e.detail.userid;
+                   _this.setState({"subjectUID":thisUserID});
+                   _this.loadItemListFromServer();
+                },false, true);
+
                 addEventListener("UserList.userSelected",function(e){
-                  _this.setState({"subjectUID": Number(e.detail.userid)},function(){
+                    _this.setState({"subjectUID": Number(e.detail.userid)},function(){
                     _this.loadItemListFromServer();
                   });
                 },false, true);

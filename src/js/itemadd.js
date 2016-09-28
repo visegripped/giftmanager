@@ -2,7 +2,7 @@
 
         "use strict";
 
-        const thisUserID = window.gmUtilities.getUriParamsAsObject()["userid"]; //set this after authentication.
+        let thisUserID; //set this after authentication.
         let itemAddContainer = document.getElementById('itemAddContainer');
         let _this;
         var customEvents = {
@@ -23,6 +23,12 @@
 
             componentDidMount: function() {
               _this = this;
+
+              addEventListener("Auth.signInComplete",function(e){
+                 thisUserID = e.detail.userid;
+                 _this.setState({"subjectUID":thisUserID});
+              },false, true);
+
               addEventListener("UserList.userSelected",function(e){
                 _this.setState({"subjectUID": Number(e.detail.userid)});
                 _this.setState({"subjectName": e.detail.username});

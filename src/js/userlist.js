@@ -2,9 +2,10 @@
 
      "use strict";
 
-     const thisUserID = window.gmUtilities.getUriParamsAsObject()["userid"]; //set this after authentication.
+     let thisUserID; //would be better as a const.
+     let _this;
      let userListContainer = document.getElementById('userListContainer');
-     var customEvents = {
+     let customEvents = {
        userSelected : new CustomEvent("UserList.userSelected"),
        menuOpened : new CustomEvent("UserList.menuOpened"),
        menuClosed : new CustomEvent("UserList.menuClosed")
@@ -48,7 +49,12 @@
          },
 
          componentDidMount: function() {
-             this.loadUsersFromServer();
+             _this = this;
+             addEventListener("Auth.signInComplete",function(e){
+            thisUserID = e.detail.userid;
+            _this.setState({"subjectUID":thisUserID});
+            _this.loadUsersFromServer();
+             },false, true);
          },
 
          render: function() {
