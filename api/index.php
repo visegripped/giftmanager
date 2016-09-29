@@ -1,8 +1,9 @@
 <?php
+session_start();
 header('Content-type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH');
-session_start();
+
 include "/home/vicegrip/includes/gm/db_functions.php";
 include "/home/vicegrip/includes/gm/credentials.php";
 include "/home/vicegrip/www/gm/auth.php";
@@ -133,9 +134,9 @@ $commands = array(
 	);
 
 $response = array(); //what is returned by the API. either a successful response or an error.
-$cmd = $_REQUEST['cmd']; //shortcut. change to POST.
-$_SESSION['USERID'] = '58627l'; //todo -> remove this. here for testing purposes.
-$_SESSION['GROUPID'] = '1'; //todo -> remove this. here for testing purposes.
+$cmd = $_REQUEST['cmd']; //shortcut.
+$_SESSION['USERID'] = '';
+$_SESSION['GROUPID'] = '';
 
 
 //handle some high level errors.
@@ -185,7 +186,6 @@ function userList($req)	{
 			}
 		}
 	//### TODO -> need to handle error here.
-
 	$db = null; //closes the connection.
 	return $response;
 	}
@@ -262,6 +262,8 @@ function giftListGet($req) {
 					}
 				$response['userid'] = $viewid;
 				$response['rows'] = $i;
+$response['sessionUserID'] = $_SESSION['USERID'];
+
 				}
 			//### TODO -> need to handle error here.
 

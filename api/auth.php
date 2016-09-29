@@ -104,7 +104,8 @@ function googleAuthenticate($req)	{
 	}
 
   function setUserSessionDetails($user)	{
-  	$_SESSION['USERID'] = $r['userid'];
+  	$_SESSION['USERID'] = $user['userid'];
+		$_SESSION['GROUPID'] = '1';
   	}
 
 
