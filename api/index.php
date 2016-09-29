@@ -213,7 +213,7 @@ function preserveType($row)	{
 		return $response;
 	}
 
-
+//TODO -> too much if/else logic here. refactor this code so there's one if/else (userid == session.userid) and then split out to separate functions.
 function giftListGet($req) {
 	$db = pdoConnect();
 	//if no viewid is specified, the list for the user logged in will be returned.
@@ -225,7 +225,7 @@ function giftListGet($req) {
 		//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
 			$query = "SELECT * FROM gifts WHERE ";
 
-			if($viewid == $_REQUEST['userid']) {
+			if($viewid == $_SESSION['USERID']) {
 				$query .= " (remove_date > :oneDayOldTS OR remove_date = 0)  "; //when a user is looking at their own list, don't show items that were flagged as 'remove' more than 24 hours ago.
 				$query .= ' AND remove != 2 '; //Don't show items that were added to this user's list by another user.
 			}
@@ -236,7 +236,7 @@ function giftListGet($req) {
 
 			$query .= " AND userid=:userid AND archive != 1 ";
 
-			if($viewid == $_REQUEST['userid']) {
+			if($viewid == $_SESSION['USERID']) {
 				$query .= ' ORDER BY status DESC'; //only order by status when looking at another users list or it'll indicate to the active user what has been purchased for them.
 			}
 			else {
@@ -246,7 +246,7 @@ function giftListGet($req) {
 
 			$stmt = $db->prepare($query);
 			$stmt->bindValue(":userid", $viewid);
-			if($viewid == $_REQUEST['userid']) {
+			if($viewid == $_SESSION['USERID']) {
 				$stmt->bindValue(":oneDayOldTS", $removeTS);
 			}
 
@@ -345,10 +345,10 @@ function giftListCreate($req)	{
 			':name'=>$req['item_name'],
 			':link'=>$req['item_link'],
 			':item_desc'=>$req['item_desc'],
-			':remove'=> ($req['userid'] == $req['subjectUID']) ? 0 : 2,   //when adding to another users list, ensure it doesn't show up on their UI
-			':status'=> ($req['userid'] == $req['subjectUID']) ? 0 : 10,  //when adding an item to another users list, add as purchased.
+			':remove'=> ($_SESSION['USERID'] == $req['subjectUID']) ? 0 : 2,   //when adding to another users list, ensure it doesn't show up on their UI
+			':status'=> ($_SESSION['USERID'] == $req['subjectUID']) ? 0 : 10,  //when adding an item to another users list, add as purchased.
 			':create_date'=>"",
-			':buy_userid'=> $req['userid'] //###TODO -> this should be session-> userid
+			':buy_userid'=> $_SESSION['USERID']
 			));
 		$itemid = $db->lastInsertId();
 		$response = apiMsg(100,$req,"Gift added to list.");
