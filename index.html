@@ -22,15 +22,19 @@
     <style>
         /* CSS Document */
         body {padding-top: 80px;}
-        .g-signin2 {
+
+        .navbar-auth-btn-signout,
+        .navbar-auth-btn-signin {
           float: right;
+          margin-left: 4px;
         }
         .navbar-auth {
           text-align: right;
           padding-top: 4px;
         }
         .navbar-auth-btn-signout {
-          display: none;
+          margin-top: 4px;
+          width: 100px;
         }
 
     </style>
@@ -54,8 +58,14 @@
         <div class="row clearfix">
           <div class="col-xs-8" id="userListContainer" data-url="api/users.json"></div>
           <div class="col-xs-4 navbar-auth">
-            <div class="navbar-auth-btn-signin g-signin2" data-onsuccess="onSignIn"></div>
-            <a href="#" onclick="gmAuth.signOut();" class='navbar-auth-btn-signout navbar-auth-btn-signout-google btn btn-info btn-sm'>Sign out</a>
+            <div class='navbar-auth-signin'>
+              Sign in:
+              <div class="navbar-auth-btn-signin g-signin2" data-onsuccess="onGoogleSignIn"></div>
+              <div class="navbar-auth-btn-signin">
+                <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+              </div>
+            </div>
+            <a href="#" onclick="gmAuth.signOut();" class='navbar-auth-btn-signout hidden-xs-up btn btn-info btn-sm'>Sign out</a>
           </div>
         </div>
     </div>

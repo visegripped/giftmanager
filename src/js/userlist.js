@@ -51,9 +51,14 @@
          componentDidMount: function() {
              _this = this;
              addEventListener("Auth.signInComplete",function(e){
-            thisUserID = e.detail.userid;
-            _this.setState({"subjectUID":thisUserID});
-            _this.loadUsersFromServer();
+                thisUserID = e.detail.userid;
+                _this.setState({"subjectUID":thisUserID});
+                _this.loadUsersFromServer();
+             },false, true);
+
+             addEventListener("Auth.signOutComplete",function(e){
+                thisUserID = "";
+                _this.setState({"subjectUID":"","users" : []});
              },false, true);
          },
 

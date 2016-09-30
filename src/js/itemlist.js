@@ -57,6 +57,12 @@ I'm lazy.  Archive is set to 1 for old items.
                    _this.loadItemListFromServer();
                 },false, true);
 
+
+                addEventListener("Auth.signOutComplete",function(e){
+                   thisUserID = "";
+                   _this.setState({"subjectUID":"","data" : []});
+                },false, true);
+
                 addEventListener("UserList.userSelected",function(e){
                     _this.setState({"subjectUID": Number(e.detail.userid)},function(){
                     _this.loadItemListFromServer();
