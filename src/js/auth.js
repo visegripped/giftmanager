@@ -1,5 +1,3 @@
-//for google auth:
-
 window.gmAuth = (function(win,$,googleUser){
   "use strict";
 
@@ -82,6 +80,7 @@ window.gmAuth = (function(win,$,googleUser){
 
 /**
 Interface for various auth methods:
+  init: optional. executed right away.
   verify: Run as part of signIn. Performs a server side verification of client side auth.
   signIn: Run after client side auth.
   signOut: Run to de-auth a user session.
@@ -124,10 +123,33 @@ Interface for various auth methods:
 
 
   auth.facebook = {
-    verify : function() {},
+    init : function() {
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '421328891322778',
+          cookie     : true,  // enable cookies to allow the server to access the session
+          xfbml      : true,  // parse social plugins on this page
+          version    : 'v2.5' // use graph api version 2.5
+        });
+
+        FB.getLoginStatus(function(response) {
+          auth.facebook.signIn(response);
+        });
+      };
+    },
+    verify : function(facebookAuth) {
+      console.log("BEGIN auth.facebook.verify" , facebookAuth);
+      //TODO -> now do a server-side verification of the token.
+    },
     signOut : function() {},
-    signIn : function() {
+    signIn : function(response) {
       console.log("BEGIN auth.facebook.signIn");
+      if (response.status === 'connected') {
+        // Logged into your app and Facebook.
+        FB.api('/me', function(facebookUser) {
+          auth.facebook.verify(Object.assign(facebookUser,response));
+        });
+      }
     }
   }
 
@@ -135,7 +157,10 @@ Interface for various auth methods:
 
 
   bindListeners();
+  auth.facebook.init();
+
   return auth;
+
 })(window,jQuery);
 
 //google no like passing nested function in their data-onsuccess attribute. :()
@@ -144,64 +169,15 @@ function onGoogleSignIn(googleUser) {
 }
 
 
-
-
-//END google auth.
-
-
-
-
 // Facebook auth
 // https://developers.facebook.com/docs/facebook-login/web
 
 
-// This is called with the results from from FB.getLoginStatus().
-  function statusChangeCallback(response) {
-    if (response.status === 'connected') {
-      // Logged into your app and Facebook.
-      FB.api('/me', function(response) {
-        console.log('Successful login for: ' , response);
-      });
-    } else if (response.status === 'not_authorized') {
-      //FB user, not authorized
-    } else {
-      //user not logged in to FB.
-    }
-  }
-
   // This function is called when someone finishes with the Login
   // Button.  See the onlogin handler attached to it in the sample
   // code below.
-  function checkLoginState() {
-    FB.getLoginStatus(function(response) {
-      statusChangeCallback(response);
-    });
+  function checkLoginState(response) {
+    gmAuth.facebook.signIn(response);
   }
-
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '421328891322778',
-      cookie     : true,  // enable cookies to allow the server to access the session
-      xfbml      : true,  // parse social plugins on this page
-      version    : 'v2.5' // use graph api version 2.5
-    });
-
-  FB.getLoginStatus(function(response) {
-    statusChangeCallback(response);
-  });
-
-  };
-
-  // Load the SDK asynchronously
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-
-
-
 
 //END facebook auth
