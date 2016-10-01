@@ -73,7 +73,7 @@ Once a solution is found, the labels/inputs need to be updated to all be the sam
 */
             render: function() {
                 return (
-                  <form onSubmit={this.handleCommentSubmit} className='item-add-form'>
+                  <form onSubmit={this.handleCommentSubmit} className={thisUserID ? "item-add-form" : "hidden-xs-up"}>
                     <fieldset className='item-add-form-fieldset'>
 
                       <legend className='item-add-form-fieldset-legend'>Add item to {this.state.subjectName ? this.state.subjectName+"'s" : ""} list</legend>
