@@ -80,9 +80,16 @@ window.gmAuth = (function(win,$,googleUser){
   };
 
 
+/**
+Interface for various auth methods:
+  verify: Run as part of signIn. Performs a server side verification of client side auth.
+  signIn: Run after client side auth.
+  signOut: Run to de-auth a user session.
+*/
+
   auth.google = {
 
-    verify : function(tokenId,cb) {
+    verify : function(tokenId) {
       $.when(
         $.ajax({
           "url" : "http://www.visegripped.com/gm/api.php",
@@ -107,7 +114,6 @@ window.gmAuth = (function(win,$,googleUser){
     },
 
     signIn : function(googleUser) {
-      console.log("BEGIN auth.google.signIn");
       let tokenId = googleUser.Zi.id_token;
       window.gmAuth.google.verify(tokenId);
       if (googleUser.isSignedIn()) {
@@ -115,6 +121,17 @@ window.gmAuth = (function(win,$,googleUser){
       }
     }
   }
+
+
+  auth.facebook = {
+    verify : function() {},
+    signOut : function() {},
+    signIn : function() {
+      console.log("BEGIN auth.facebook.signIn");
+    }
+  }
+
+
 
 
   bindListeners();
@@ -135,29 +152,20 @@ function onGoogleSignIn(googleUser) {
 
 
 // Facebook auth
-
+// https://developers.facebook.com/docs/facebook-login/web
 
 
 // This is called with the results from from FB.getLoginStatus().
   function statusChangeCallback(response) {
-    console.log('statusChangeCallback');
-    console.log(response);
-    // The response object is returned with a status field that lets the
-    // app know the current login status of the person.
-    // Full docs on the response object can be found in the documentation
-    // for FB.getLoginStatus().
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
-      testAPI();
+      FB.api('/me', function(response) {
+        console.log('Successful login for: ' , response);
+      });
     } else if (response.status === 'not_authorized') {
-      // The person is logged into Facebook, but not your app.
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into this app.';
+      //FB user, not authorized
     } else {
-      // The person is not logged into Facebook, so we're not sure if
-      // they are logged into this app or not.
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into Facebook.';
+      //user not logged in to FB.
     }
   }
 
@@ -171,25 +179,12 @@ function onGoogleSignIn(googleUser) {
   }
 
   window.fbAsyncInit = function() {
-  FB.init({
-    appId      : '421328891322778',
-    cookie     : true,  // enable cookies to allow the server to access
-                        // the session
-    xfbml      : true,  // parse social plugins on this page
-    version    : 'v2.5' // use graph api version 2.5
-  });
-
-  // Now that we've initialized the JavaScript SDK, we call
-  // FB.getLoginStatus().  This function gets the state of the
-  // person visiting this page and can return one of three states to
-  // the callback you provide.  They can be:
-  //
-  // 1. Logged into your app ('connected')
-  // 2. Logged into Facebook, but not your app ('not_authorized')
-  // 3. Not logged into Facebook and can't tell if they are logged into
-  //    your app or not.
-  //
-  // These three cases are handled in the callback function.
+    FB.init({
+      appId      : '421328891322778',
+      cookie     : true,  // enable cookies to allow the server to access the session
+      xfbml      : true,  // parse social plugins on this page
+      version    : 'v2.5' // use graph api version 2.5
+    });
 
   FB.getLoginStatus(function(response) {
     statusChangeCallback(response);
@@ -205,17 +200,6 @@ function onGoogleSignIn(googleUser) {
     js.src = "//connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
-
-  // Here we run a very simple test of the Graph API after login is
-  // successful.  See statusChangeCallback() for when this call is made.
-  function testAPI() {
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);
-      document.getElementById('status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!';
-    });
-  }
 
 
 
