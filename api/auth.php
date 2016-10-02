@@ -109,5 +109,63 @@ function googleAuthenticate($req)	{
   	}
 
 
+	function verifyFacebook($fbResponse){
+			$r = false;
+			if($jsonResponse->{'access_token'} && $jsonResponse->{'token_type'} && $jsonResponse->{'expires_in'}) {
+				$r = true;
+			}
+			return $r;
+	};
+
+//https://davidwalsh.name/curl-download
+	function get_data($url) {
+		$ch = curl_init();
+		$timeout = 5;
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+		$data = curl_exec($ch);
+		curl_close($ch);
+		return $data;
+	}
+
+
+// facebook instructions:  https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/#exchangecode
+	function facebookAuthenticate($req)	{
+
+			$creds = getCredsJSArray('facebook');
+			//https://developers.facebook.com/docs/graph-api/securing-requests#appsecret_proof
+			$appsecret_proof= hash_hmac('sha256', $req['accessToken'],$creds['secret']);
+
+			//$url = "https://graph.facebook.com/v2.7/oauth/access_token?client_id=".$creds['appId']."&token=".$req['accessToken']."&redirect_uri=".$req['redirectUri']."&client_secret=".$creds['secret']; //&code={code-parameter}
+			$url = "https://graph.facebook.com/v2.5/me?access_token=".$req['accessToken']."&appsecret_proof=".$appsecret_proof;
+			$fbResponse = get_data($url);
+		// Native PHP object, please
+			$jsonResponse = json_decode($fbResponse);
+
+			if(verifyFacebook($jsonResponse))	{
+				$_SESSION['VALID_SESSION'] = 'facebook';
+				$_SESSION['EMAIL'] = $jsonResponse->{'email'};
+
+				$userArray = getUserDetails($jsonResponse->{'email'});
+		//user account exists. Get their list of parties and any other relevant info.
+				if($userArray['email'])	{
+					setUserSessionDetails($userArray);
+					$response = array_merge(apiMsg(100,$req,"Successfully retrieved user record."),$userArray);
+					}
+				else	{
+					//some kind of error occurred while fetching the user details. The contents of $userArray will be the errors.
+					$response = $userArray;
+					}
+				}
+			else	{
+				//could not verify user.
+				$response = apiMsg(5000,$req,mysql_error());
+				$response['fbResponse'] = $fbResponse;
+
+				}
+			return $response;
+		}
+
 
 ?>

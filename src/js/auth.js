@@ -139,7 +139,24 @@ Interface for various auth methods:
     },
     verify : function(facebookAuth) {
       console.log("BEGIN auth.facebook.verify" , facebookAuth);
-      //TODO -> now do a server-side verification of the token.
+      $.when(
+        $.ajax({
+          "url" : "http://www.visegripped.com/gm/api.php",
+          "dataType" : 'json',
+          "type" : 'POST',
+          "data" : {
+            "cmd" : "facebookAuthenticate",
+            "accessToken" : facebookAuth.authResponse.accessToken,
+            "userID" : facebookAuth.authResponse.userID,
+             "redirectUri" : "http://localhost.visegripped.com:8080/",
+            "signedRequest" : facebookAuth.authResponse.signedRequest
+          }
+        })
+      ).then(function(googleUserData){
+        _privates.authMethod = "google";
+        customEvents.signInComplete.initCustomEvent("Auth.signInComplete",true,true,googleUserData);
+        dispatchEvent(customEvents.signInComplete);
+      });
     },
     signOut : function() {},
     signIn : function(response) {

@@ -16,7 +16,11 @@ function getCredsJSArray($partner){
 			"client_x509_cert_url" => "https://www.googleapis.com/robot/v1/metadata/x509/YOURID@developer.gserviceaccount.com",
 			"client_id" => "YOURID.apps.googleusercontent.com",
 			"auth_provider_x509_cert_url" => "https://www.googleapis.com/oauth2/v1/certs"
-			)
+		),
+		"facebook" => array(
+			"appId" => "",
+			"secret" => ""
+		)
 		);
 
 		$r;

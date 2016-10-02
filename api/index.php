@@ -121,6 +121,7 @@ $commands = array(
 	"isSessionValid",
 	"logout",
 	"googleAuthenticate",
+	"facebookAuthenticate",
 
 //contact
 	"websiteInquiry",
