@@ -1,4 +1,4 @@
-window.gmAuth = (function(win,$,googleUser){
+window.gmAuth = (function gmAuth(win,$,googleUser){
   "use strict";
 
   let auth = {};
@@ -123,7 +123,9 @@ Interface for various auth methods:
 
 
   auth.facebook = {
+
     init : function() {
+
       window.fbAsyncInit = function() {
         FB.init({
           appId      : '421328891322778',
@@ -137,6 +139,7 @@ Interface for various auth methods:
         });
       };
     },
+
     verify : function(facebookAuth) {
       console.log("BEGIN auth.facebook.verify" , facebookAuth);
       $.when(
@@ -148,17 +151,26 @@ Interface for various auth methods:
             "cmd" : "facebookAuthenticate",
             "accessToken" : facebookAuth.authResponse.accessToken,
             "userID" : facebookAuth.authResponse.userID,
-             "redirectUri" : "http://localhost.visegripped.com:8080/",
-            "signedRequest" : facebookAuth.authResponse.signedRequest
+             "redirectUri" : window.location.href
           }
         })
-      ).then(function(googleUserData){
-        _privates.authMethod = "google";
-        customEvents.signInComplete.initCustomEvent("Auth.signInComplete",true,true,googleUserData);
-        dispatchEvent(customEvents.signInComplete);
+      ).then(function(facebookUserData){
+        _privates.authMethod = "facebook";
+        if(facebookUserData.type !== 'error') {
+          customEvents.signInComplete.initCustomEvent("Auth.signInComplete",true,true,facebookUserData);
+          dispatchEvent(customEvents.signInComplete);
+        } else {
+          //TODO -> throw an error here.
+        }
+
       });
     },
-    signOut : function() {},
+
+    signOut : function() {
+      window.console.log("BEGIN facebook.signOut");
+      FB.logout();
+    },
+
     signIn : function(response) {
       console.log("BEGIN auth.facebook.signIn");
       if (response.status === 'connected') {
@@ -190,11 +202,11 @@ function onGoogleSignIn(googleUser) {
 // https://developers.facebook.com/docs/facebook-login/web
 
 
-  // This function is called when someone finishes with the Login
-  // Button.  See the onlogin handler attached to it in the sample
-  // code below.
-  function checkLoginState(response) {
-    gmAuth.facebook.signIn(response);
+  // This function is called when someone finishes with the Login button
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      gmAuth.facebook.signIn(response);
+    });
   }
 
 //END facebook auth
