@@ -138,7 +138,8 @@ function googleAuthenticate($req)	{
 			$appsecret_proof= hash_hmac('sha256',$req['accessToken'],$creds['secret']);
 
 			//$url = "https://graph.facebook.com/v2.7/oauth/access_token?client_id=".$creds['appId']."&token=".$req['accessToken']."&redirect_uri=".$req['redirectUri']."&client_secret=".$creds['secret']."&appsecret_proof=".$appsecret_proof; //&code={code-parameter}
-			//$url = "https://graph.facebook.com/v2.5/me?access_token=".$req['accessToken']."&appsecret_proof=".$appsecret_proof;
+			//https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/#exchangecode -> may be a better way of token validation.
+						//$url = "https://graph.facebook.com/v2.5/me?access_token=".$req['accessToken']."&appsecret_proof=".$appsecret_proof;
 			//enable the appsecret_proof feature in facebook to help secure the app.
 			//https://developers.facebook.com/docs/graph-api/securing-requests
 			$url = "https://graph.facebook.com/v2.7/me?fields=email,name,id&access_token=".$req['accessToken']."&appsecret_proof=".$appsecret_proof;

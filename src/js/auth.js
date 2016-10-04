@@ -161,6 +161,7 @@ Interface for various auth methods:
           dispatchEvent(customEvents.signInComplete);
         } else {
           //TODO -> throw an error here.
+          window.errors.throw("#topErrors",facebookUserData);
         }
 
       });
