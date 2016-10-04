@@ -1,4 +1,4 @@
-window.errors = (function errors(win,$,googleUser){
+window.errors = (function errors(window,$){
   "use strict";
 
   let pub = {};
@@ -9,7 +9,7 @@ window.errors = (function errors(win,$,googleUser){
     'warn' : 'warning'
   };
 
-  pub.throw = function(target, errObj){
+  pub.throwMsg = function(target, errObj){
     $(target).append(pub.getErrorEle(errObj));
     if(window.console) {
       window.console.log(errObj);
@@ -17,13 +17,16 @@ window.errors = (function errors(win,$,googleUser){
   }
 
   pub.getErrorEle = function(errObj){
-    let errorEleID = Date.now() + "-" + errObj.id;
-    return "<div class='error-boxen "+pub.getClassName(errObj.type);"'><button class='"+pub.getClassName(errObj.type);"' title='dismiss'>X</button><p>"+errObj.msg+" (error ID: "+errObj.id+")</p></div>";
+    let errorEleID = Date.now() + "-" + errObj.msgid;
+    let $output = $("<div \/>",{"id" : errorEleID}).addClass("error-boxen alert alert-"+pub.getClassName(errObj.type));
+    $("<button>X</button>",{"title":"dismiss"}).addClass("error-boxen-btn-close btn btn-sm btn-"+pub.getClassName(errObj.type)).on("click",function closeMsg(){$output.hide()}).appendTo($output);
+    $output.append("<p>"+errObj.msg+"<br>[ "+errObj.type +" "+errObj.msgid+" for command " + errObj.cmd+" ]</p>");
+    return $output;
   }
 
   pub.getClassName = function(msgType) {
     let r; //what is returned.
-    swith(msgType) {
+    switch(msgType) {
       case "error":
         r = 'danger';
         break;
@@ -44,4 +47,4 @@ window.errors = (function errors(win,$,googleUser){
   };
 
   return pub;
-})();
+})(window,jQuery);

@@ -1,0 +1,10 @@
+.error-boxen {
+  margin-bottom: 24px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 18px;
+}
+.error-boxen-btn-close {
+  float: right;
+  margin: 0 0 12px 12px;
+}
