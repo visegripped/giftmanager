@@ -3,12 +3,10 @@ session_start();
 header('Content-type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH');
-
 include "/home/vicegrip/includes/gm/db_functions.php";
 include "/home/vicegrip/includes/gm/credentials.php";
 include "/home/vicegrip/www/gm/auth.php";
-
-
+//
 // $status[0] = 'none';
 // $status[2] = 'reserved';
 // $status[10] = 'purchased';
@@ -103,6 +101,7 @@ function apiMsg($msgid,$req,$m='')	{
 	if($messages[$msgid])	{
 		$r = $messages[$msgid];
 		$r[msgid] = $msgid;
+		$r["sessionID"] = $_SESSION["USERID"];
 		}
 	else	{
 		$r['msgid'] = 1;
@@ -136,16 +135,11 @@ $commands = array(
 
 $response = array(); //what is returned by the API. either a successful response or an error.
 $cmd = $_REQUEST['cmd']; //shortcut.
-$_SESSION['USERID'] = '';
-$_SESSION['GROUPID'] = '';
-
 
 //handle some high level errors.
 // ### TODO -> commented out for local testing. put this back in prior to release.
-//if(!$_SESSION['VALID_SESSION'])	{
-//	$response = apiMsg(999,$_REQUEST);
-//	}
-/*else*/if($cmd && in_array($cmd,$commands))	{
+
+if($cmd && in_array($cmd,$commands))	{
 	//command is valid.
 	if(function_exists($cmd))	{
 		$response = $cmd($_REQUEST);
@@ -244,27 +238,32 @@ function giftListGet($req) {
 				$query .= ' ORDER BY item_name ASC'; //only order by status when looking at another users list or it'll indicate to the active user what has been purchased for them.
 			}
 
-
 			$stmt = $db->prepare($query);
 			$stmt->bindValue(":userid", $viewid);
 			if($viewid == $_SESSION['USERID']) {
 				$stmt->bindValue(":oneDayOldTS", $removeTS);
 			}
 
+// echo $query."\nsession id: ".$_SESSION['USERID']
+
 		//	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
 			if ($stmt->execute()) {
 				$i = 0;
 				$response = apiMsg(100,$req,"");
 				$response['removeTS'] = $removeTS;
-				$response['gifts'] = array();
-				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-					$i++;
-					$response['gifts'][] = preserveType($row);
-					}
-				$response['userid'] = $viewid;
-				$response['rows'] = $i;
-$response['sessionUserID'] = $_SESSION['USERID'];
+				if($stmt->rowCount()) {
+					$response['gifts'] = array();
+					while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+						$i++;
+						$response['gifts'][] = preserveType($row);
+						}
+				}
 
+				$response['viewid'] = $viewid;
+				// $response['userid'] = $_SESSION['USERID'];
+				// $response['groupid'] = $_SESSION['GROUPID'];
+				// $response['validSession'] = $_SESSION['VALID_SESSION'];
+				$response['rows'] = $i;
 				}
 			//### TODO -> need to handle error here.
 

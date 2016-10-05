@@ -26,8 +26,7 @@ I'm lazy.  Archive is set to 1 for old items.
                     url: this.props.ItemListUrl,
                     data : {
                       "cmd" : "giftList",
-                      "viewid" : this.state.subjectUID,
-                      "userid" : thisUserID
+                      "viewid" : this.state.subjectUID
                     },
                     type: 'GET',
                     dataType: 'json',
@@ -135,20 +134,6 @@ I'm lazy.  Archive is set to 1 for old items.
             }
         });
 
-        // var ItemMessage = React.createClass({
-        //
-        //
-        //     render: function() {
-        //       // console.log("this: " , this);
-        //         return (
-        //                 <div className={'list-group-item status-'+this.props.item.status}>
-        //
-        //                 </div>
-        //         );
-        //     }
-        // });
-
-
         var ItemSelectListSelf = React.createClass({
 
           //todo -> clean this up. get url generation into a function so that updates are less likely to break something.
@@ -165,7 +150,6 @@ I'm lazy.  Archive is set to 1 for old items.
                         "cmd" : "giftList",
                         "viewid" : _this.state.subjectUID,
                         "itemid" : props.itemid,
-                        "userid" : thisUserID,
                         "remove": newState
                       },
                     dataType: 'json',

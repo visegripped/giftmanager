@@ -113,10 +113,15 @@ Interface for various auth methods:
     },
 
     signIn : function(googleUser) {
+      window.console.log('BEGIN auth.google.signIn');
       let tokenId = googleUser.Zi.id_token;
-      window.gmAuth.google.verify(tokenId);
-      if (googleUser.isSignedIn()) {
+      if (tokenId && googleUser.isSignedIn()) {
+        window.console.log("user signed in to google");
         var profile = googleUser.getBasicProfile();
+        window.gmAuth.google.verify(tokenId);
+      }
+      else {
+        window.console.log("google user is not signed in or no valid token. ");
       }
     }
   }
@@ -179,6 +184,8 @@ Interface for various auth methods:
         FB.api('/me', function(facebookUser) {
           auth.facebook.verify(Object.assign(facebookUser,response));
         });
+      } else {
+          console.log("recognized as a FB user, but no valid session created");
       }
     }
   }
