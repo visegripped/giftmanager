@@ -1,0 +1,10 @@
+.msg-boxen {
+  margin-bottom: 24px;
+  padding: 12px;
+  font-size: 16px;
+  line-height: 22px;
+}
+.msg-boxen-btn-close {
+  float: right;
+  margin: 0 0 12px 12px;
+}
