@@ -22,6 +22,7 @@ I'm lazy.  Archive is set to 1 for old items.
         var ItemList = React.createClass({
 
             loadItemListFromServer: function() {
+              window.console.log("BEGIN loadItemListFromServer");
                 $.ajax({
                     url: this.props.ItemListUrl,
                     data : {
@@ -32,7 +33,16 @@ I'm lazy.  Archive is set to 1 for old items.
                     dataType: 'json',
                     cache: false,
                     success: function(data) {
-                        this.setState({data: data.gifts});
+                      window.console.log("BEGIN loadItemListFromServer.success");
+                        if(data && data.type == 'success') {
+                          data.gifts = data.gifts || [];
+                          this.setState({data: data.gifts});
+                        }
+                        else {
+                          window.msgs.throwMsg("#topMessages",data);
+                          //this.setState({data: []]});
+                        }
+
                     }.bind(this),
                     error: function(xhr, status, err) {
                         console.error(this.props.ItemListUrl, status, err.toString());

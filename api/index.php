@@ -1,6 +1,6 @@
 <?php
 session_start();
-header('Content-type: application/json');
+header('Content-Type: application/json; Charset=UTF-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH');
 include "/home/vicegrip/includes/gm/db_functions.php";
@@ -218,7 +218,7 @@ function giftListGet($req) {
 		//groupID is set here so that only users/gifts from the same group can be accessed.
 
 		//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
-			$query = "SELECT * FROM gifts WHERE ";
+			$query = "SELECT itemid, item_name FROM gifts WHERE ";
 
 			if($viewid == $_SESSION['USERID']) {
 				$query .= " (remove_date > :oneDayOldTS OR remove_date = 0)  "; //when a user is looking at their own list, don't show items that were flagged as 'remove' more than 24 hours ago.
@@ -247,24 +247,22 @@ function giftListGet($req) {
 // echo $query."\nsession id: ".$_SESSION['USERID']
 
 		//	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
+		// echo $query;
+		// echo "recipient: ".$viewid;
 			if ($stmt->execute()) {
-				$i = 0;
+//				echo "got into the execute!";
 				$response = apiMsg(100,$req,"");
-				$response['removeTS'] = $removeTS;
-				if($stmt->rowCount()) {
-					$response['gifts'] = array();
-					while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-						$i++;
-						$response['gifts'][] = preserveType($row);
-						}
+				$result = $stmt->fetchAll();
+				$response['itemCount'] = $stmt->rowCount();
+				// // $response['removeTS'] = $removeTS;
+				if($response['itemCount'] > 0) {
+					$response['gifts'] = $result;
 				}
-
 				$response['viewid'] = $viewid;
-				// $response['userid'] = $_SESSION['USERID'];
-				// $response['groupid'] = $_SESSION['GROUPID'];
-				// $response['validSession'] = $_SESSION['VALID_SESSION'];
-				$response['rows'] = $i;
-				}
+				$response['query'] = $query;
+			} else {
+				$response = apiMsg(1003,$req,"query = ".$query); //todo -> take query out prior to release
+			}
 			//### TODO -> need to handle error here.
 
 			$db = null; //closes the connection.
