@@ -130,7 +130,7 @@ I'm lazy.  Archive is set to 1 for old items.
                                 {this.props.item.item_name}
                             </div>
                             <div className='col-xs-2 item-list-item-btns'>
-                                <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? 'btn btn-info btn-sm'  : 'hidden-xs-up'}>L</a>
+                                <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? 'btn btn-secondary btn-sm item-list-item-btns-link'  : 'hidden-xs-up'}></a>
                             </div>
                             <div className='col-xs-12 col-sm-2'>
                                 {this.props.subjectUID == thisUserID ? <ItemSelectListSelf status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} /> : <ItemSelectListOther status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} />}

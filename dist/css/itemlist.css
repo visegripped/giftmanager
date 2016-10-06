@@ -10,6 +10,15 @@
 .item-list-item-btns {
   text-align: right;
 }
+.item-list-item-btns-link {
+  background-image: url('../../images/link-new-window-14x14.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 12px 12px;
+  height: 24px;
+  width: 24px;
+  display: block;
+}
 .item-list-item-select {
   width: 100%;
   margin-top: 12px;
