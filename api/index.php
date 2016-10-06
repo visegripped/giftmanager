@@ -236,7 +236,11 @@ function giftListGet($req) {
 		//groupID is set here so that only users/gifts from the same group can be accessed.
 
 		//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
-			$query = "SELECT itemid, item_name FROM gifts WHERE ";
+			$query = "SELECT itemid, item_name, item_link, item_desc";
+			if($viewid != $_SESSION['USERID']) {
+				$query .= ", status , buy_userid"; //this info is only pertinent if you are looking at another users list. Otherwise, you can find out what you are getting
+				}
+			$query .= " FROM gifts WHERE ";
 
 			if($viewid == $_SESSION['USERID']) {
 				$query .= " (remove_date > :oneDayOldTS OR remove_date = 0)  "; //when a user is looking at their own list, don't show items that were flagged as 'remove' more than 24 hours ago.
