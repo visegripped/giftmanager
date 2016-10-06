@@ -92,9 +92,7 @@ function apiMsg($msgid,$req,$m='')	{
 		"msg" => "For command user, invalid request method [".$_SERVER['REQUEST_METHOD']."]. Must be get or post.", "type" => "error"
 		); //valid error for calls that support GET and POST.
 
-	$messages[2001] =  array(
-		"msg" => "For command user, no userid associated with session. User command can only be used on user in focus.", "type" => "error"
-		); //valid error for calls that support GET and POST.
+
 
 
 
@@ -117,7 +115,6 @@ function apiMsg($msgid,$req,$m='')	{
 
 $commands = array(
 // auth
-	"isSessionValid",
 	"logout",
 	"googleAuthenticate",
 	"facebookAuthenticate",
@@ -136,21 +133,42 @@ $commands = array(
 $response = array(); //what is returned by the API. either a successful response or an error.
 $cmd = $_REQUEST['cmd']; //shortcut.
 
+//When the api is refactored, the commands array should contain properties about what is required.  ex: 'logout' : {'requiresSession' : false}
+function commandRequiresSession($command) {
+	$r = true;
+	if($command == 'logout' || $command == 'googleAuthenticate' || $command == 'facebookAuthenticate') {
+		$r = false;
+	}
+	return $r;
+}
+
+function commandIsValid($command,$commandArr) {
+	$r = false;
+	if($command && in_array($command,$commandArr) && function_exists($command)) {
+		$r = true;
+	}
+	return $r;
+}
+
 //handle some high level errors.
 // ### TODO -> commented out for local testing. put this back in prior to release.
-
-if($cmd && in_array($cmd,$commands))	{
-	//command is valid.
-	if(function_exists($cmd))	{
-		$response = $cmd($_REQUEST);
+if(commandIsValid($cmd,$commands))	{
+		if(commandRequiresSession($cmd) && $_SESSION['USERID']) {
+			$response = $cmd($_REQUEST);
 		}
-	else	{
-		$response = apiMsg(1002,$_REQUEST);
+		else if(!commandRequiresSession($cmd)) {
+			$response = $cmd($_REQUEST);
+		}
+		else {
+			$response = apiMsg(999,$_REQUEST);
 		}
 	}
 elseif(!$cmd)	{
 	$response = apiMsg(1005,$_REQUEST);
 	}
+elseif(!function_exists($cmd)) {
+	$response = apiMsg(1002,$_REQUEST);
+}
 //to get here, the cmd IS specified but not in the commands array
 elseif($cmd)	{
 	$response = apiMsg(1001,$_REQUEST);
