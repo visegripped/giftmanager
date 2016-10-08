@@ -1,0 +1,26 @@
+/* CSS Document */
+body {
+  padding-top: 80px;
+  font-size: 14px;
+}
+@media screen and (min-width: 992px) {
+  body {
+    font-size: 16px;
+  }
+}
+.g-signin2 {
+  margin-top: 2px;
+}
+.navbar-auth {
+  text-align: right;
+  padding-top: 4px;
+}
+.navbar-auth-btn-signout,
+.navbar-auth-btn-signin {
+  float: right;
+  margin-left: 4px;
+}
+.navbar-auth-btn-signout {
+  margin-top: 4px;
+  width: 100px;
+}

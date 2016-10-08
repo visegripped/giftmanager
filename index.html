@@ -15,30 +15,11 @@
     <!--http://v4-alpha.getbootstrap.com/getting-started/introduction/-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY" crossorigin="anonymous">
     <!-- todo: concatenate all the css files -->
+    <link rel="stylesheet" href="dist/css/gm.css">
     <link rel="stylesheet" href="dist/css/userlist.css">
     <link rel="stylesheet" href="dist/css/itemlist.css">
     <link rel="stylesheet" href="dist/css/itemadd.css">
     <link rel="stylesheet" href="dist/css/messages.css">
-
-    <style>
-        /* CSS Document */
-        body {padding-top: 80px; font-size: 14px;}
-
-        .navbar-auth-btn-signout,
-        .navbar-auth-btn-signin {
-          float: right;
-          margin-left: 4px;
-        }
-        .navbar-auth {
-          text-align: right;
-          padding-top: 4px;
-        }
-        .navbar-auth-btn-signout {
-          margin-top: 4px;
-          width: 100px;
-        }
-
-    </style>
 
     <script src="bower_components/react/react.js"></script>
     <script src="bower_components/react/react-dom.js"></script>
@@ -61,7 +42,7 @@
           <div class="col-xs-4 navbar-auth">
             <div class='navbar-auth-signin'>
               Sign in:
-              <div class="navbar-auth-btn-signin g-signin2" data-onsuccess="onGoogleSignIn"></div>
+              <div class="navbar-auth-btn-signin g-signin2" data-onsuccess="onGoogleSignIn" data-width="65" data-height="22"></div>
               <div class="navbar-auth-btn-signin">
                 <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
                 <!-- <div class="fb-login-button" data-max-rows="1" data-size="icon" data-show-faces="false" data-auto-logout-link="false"></div> -->
