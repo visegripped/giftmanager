@@ -228,71 +228,64 @@ function preserveType($row)	{
 
 //TODO -> too much if/else logic here. refactor this code so there's one if/else (userid == session.userid) and then split out to separate functions.
 function giftListGet($req) {
-	$db = pdoConnect();
 	//if no viewid is specified, the list for the user logged in will be returned.
 	if($_REQUEST['viewid'])	{
-		$viewid = $_REQUEST['viewid'];
-		$removeTS = time() - (1 * 24 * 60 * 60);
-		//groupID is set here so that only users/gifts from the same group can be accessed.
+			$db = pdoConnect();
+			$viewid = $_REQUEST['viewid'];
+			$removeTS = time() - (1 * 24 * 60 * 60);
 
-		//	$stmt = $db->prepare("SELECT * FROM gifts WHERE userid=:userid and groupid=:groupid and (received_on >= now() or received_on = 0) and (removed = 0 or status > 0)");
-			$query = "SELECT itemid, item_name, item_link, item_desc";
+			$query = "SELECT itemid, item_name, item_link, item_desc, remove, remove_date ";
 			if($viewid != $_SESSION['USERID']) {
-				$query .= ", status , buy_userid"; //this info is only pertinent if you are looking at another users list. Otherwise, you can find out what you are getting
-				}
+					$query .= ", status , buy_userid"; //this info is only pertinent if you are looking at another users list. Otherwise, you can find out what you are getting
+			}
 			$query .= " FROM gifts WHERE ";
 
 			if($viewid == $_SESSION['USERID']) {
-				$query .= " (remove_date > :oneDayOldTS OR remove_date = 0)  "; //when a user is looking at their own list, don't show items that were flagged as 'remove' more than 24 hours ago.
-				$query .= ' AND remove != 2 '; //Don't show items that were added to this user's list by another user.
+					$query .= " (remove_date > :oneDayOldTS OR remove_date = 0)  "; //when a user is looking at their own list, don't show items that were flagged as 'remove' more than 24 hours ago.
+					$query .= ' AND remove != 2 '; //Don't show items that were added to this user's list by another user.
 			}
 //removed items are not shown for another users list unless they've been flagged as purchased or reserved.
 			else {
-				$query .= " (remove = 0 OR (status >= 1  AND remove >= 1)) ";
+					$query .= " (remove = 0 OR (status >= 1  AND remove >= 1)) ";
 			}
 
 			$query .= " AND userid=:userid AND archive != 1 ";
 
 			if($viewid == $_SESSION['USERID']) {
-				$query .= ' ORDER BY status DESC'; //only order by status when looking at another users list or it'll indicate to the active user what has been purchased for them.
+					$query .= ' ORDER BY status DESC'; //only order by status when looking at another users list or it'll indicate to the active user what has been purchased for them.
 			}
 			else {
-				$query .= ' ORDER BY item_name ASC'; //only order by status when looking at another users list or it'll indicate to the active user what has been purchased for them.
+					$query .= ' ORDER BY item_name ASC'; //only order by status when looking at another users list or it'll indicate to the active user what has been purchased for them.
 			}
 
 			$stmt = $db->prepare($query);
 			$stmt->bindValue(":userid", $viewid);
 			if($viewid == $_SESSION['USERID']) {
-				$stmt->bindValue(":oneDayOldTS", $removeTS);
+					$stmt->bindValue(":oneDayOldTS", $removeTS);
 			}
 
-// echo $query."\nsession id: ".$_SESSION['USERID']
-
-		//	$stmt->bindValue(":groupid", $_SESSION['GROUPID'] ||  1);  //WARNING! the '1' is here just for testing.
-		// echo $query;
-		// echo "recipient: ".$viewid;
 			if ($stmt->execute()) {
 //				echo "got into the execute!";
-				$response = apiMsg(100,$req,"");
-				$result = $stmt->fetchAll();
-				$response['itemCount'] = $stmt->rowCount();
-				// // $response['removeTS'] = $removeTS;
-				if($response['itemCount'] > 0) {
-					$response['gifts'] = $result;
-				}
-				$response['viewid'] = $viewid;
-				$response['query'] = $query;
+					$response = apiMsg(100,$req,"");
+					//$result = $stmt->fetchAll(); //this returned the contents of each item in a row twice, once an an array and once as an object.
+					//$response['itemCount'] = $stmt->rowCount();
+					$response['removeTS'] = $removeTS;
+					$response['gifts'] = array();
+					//if($response['itemCount'] > 0) {
+						//$response['gifts'] = $result;
+							while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+	 								$response['gifts'][] = preserveType($row);
+	 						}
+					//}
+					$response['viewid'] = $viewid;
 			} else {
-				$response = apiMsg(1003,$req,"query = ".$query); //todo -> take query out prior to release
+					$response = apiMsg(1003,$req,"query = ".$query); //todo -> take query out prior to release
 			}
-			//### TODO -> need to handle error here.
-
 			$db = null; //closes the connection.
 		}
 		else {
-			$response = apiMsg(1007,$req,"viewid is required.");
+				$response = apiMsg(1007,$req,"viewid is required.");
 		}
-
 
 	return $response;
 }
