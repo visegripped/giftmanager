@@ -22,7 +22,7 @@ module.exports = function(grunt) {
           theme : {
             expand : true,
             flatten : true,
-            src : ["src/less/itemlist.less","src/less/userlist.less","src/less/itemadd.less","src/less/messages.less"],
+            src : ["src/less/*.less"],
             dest : "dist/css/",
             ext : ".css"
           }
@@ -36,15 +36,57 @@ module.exports = function(grunt) {
               interrupt : false
             }
           }
-        }
+	  },
+
+
+	  concat: {
+	      js: {
+	        src: ['src/js/*.js'],
+	        dest: 'dist/js/gm.js',
+			options: {
+				stripBanners: true
+		    }
+	      },
+	      css: {
+	        src: ['dist/css/*.css'],
+	        dest: 'dist/css/gm.css',
+	      },
+	  },
+
+
+	  uglify: {
+		  js: {
+			  options: {
+				  sourceMap: false, //set to true once we're building a sourcemap file.
+				//   sourceMapName: 'dest/js/sourcemap.map'
+			  },
+			  files: {
+			  	'dist/js/gm.min.js': ['dist/js/gm.js']
+			  }
+		  },
+		  css: {
+			  options: {
+				  sourceMap: false, //set to true once we're building a sourcemap file.
+				//   sourceMapName: 'dest/js/sourcemap.map'
+			  },
+			  files: {
+				'dist/css/gm.min.css': ['dist/css/gm.css']
+			  }
+		  }
+	  }
+
 
     });
 
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.registerTask('default',['connect','less','watch']);
+
+	grunt.registerTask('release',['less','concat','uglify']);
 
 
 };

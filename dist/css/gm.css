@@ -1,0 +1,156 @@
+/* CSS Document */
+body {
+  padding-top: 80px;
+  font-size: 14px;
+}
+@media screen and (min-width: 992px) {
+  body {
+    font-size: 16px;
+  }
+}
+.g-signin2 {
+  margin-top: 2px;
+}
+.navbar-auth {
+  text-align: right;
+  padding-top: 4px;
+}
+.navbar-auth-btn-signout,
+.navbar-auth-btn-signin {
+  float: right;
+  margin-left: 4px;
+}
+.navbar-auth-btn-signout {
+  margin-top: 4px;
+  width: 100px;
+}
+
+.item-add-form-fieldset {
+  margin: 20px auto;
+}
+.item-add-form-fieldset-hint {
+  font-size: .7rem;
+  color: #666;
+}
+.item-add-form-fieldset-label {
+  display: block;
+  margin: 0 0 10px 0;
+}
+.item-add-form-fieldset-label-text,
+.item-add-form-fieldset-label-url,
+.item-add-form-fieldset-label-textarea {
+  display: block;
+  width: 100%;
+}
+.item-add-form-fieldset-label-textarea {
+  height: 140px;
+}
+
+.item-list.list-group .list-group-item:nth-child(even) {
+  background: #EFEFEF;
+}
+.item-list.list-group .list-group-item:nth-child(odd) {
+  background: #FFF;
+}
+.item-list-item-desc {
+  margin: 12px 0 0 0;
+}
+.item-list-item-btns {
+  text-align: right;
+}
+.item-list-item-btns-link {
+  background-image: url('../../images/link-new-window-14x14.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 12px 12px;
+  height: 24px;
+  width: 24px;
+  display: block;
+}
+.item-list-item-select {
+  width: 100%;
+  margin-top: 12px;
+}
+@media only screen and (min-width: 550px) {
+  .item-list-item-select {
+    margin-top: 0;
+  }
+}
+
+.msg-boxen {
+  margin-bottom: 24px;
+  padding: 12px;
+  font-size: 16px;
+  line-height: 22px;
+}
+.msg-boxen-btn-close {
+  float: right;
+  margin: 0 0 12px 12px;
+}
+
+.user-list {
+  width: 250px;
+  height: 40px;
+  margin-right: 33px;
+  position: relative;
+  float: left;
+  overflow: visible;
+}
+.user-list-ul {
+  display: flex;
+  flex-flow: column;
+}
+.user-list-item {
+  margin: 0;
+  width: 100%;
+  text-align: left;
+  text-indent: 40px;
+  display: none;
+  background-color: #0275d8;
+  padding-right: 15px;
+  order: 2;
+}
+.user-list .user-list-item + .user-list-item {
+  margin-left: 0;
+}
+.user-list-item:hover {
+  background-color: #025aa5;
+}
+.user-list-item-active {
+  display: block;
+  order: 1;
+  opacity: 1;
+}
+.user-list-item-active:hover {
+  cursor: default;
+  background-color: #0275d8;
+  opacity: 1;
+}
+.user-list-item .nav-item {
+  float: none;
+}
+.user-list-open .user-list-item {
+  display: block;
+}
+.user-list-icon-users {
+  background: url(../../images/users.png) no-repeat;
+  background-size: contain;
+  display: block;
+  margin: 3px;
+  height: 22px;
+  width: 22px;
+}
+.user-list-btn-toggle {
+  outline-width: 0 ;
+  position: absolute;
+  top: 4px;
+  left: 0;
+  padding: 0;
+  background-color: #0275d8;
+  border: 0;
+  margin: 0;
+  text-indent: 28px;
+  width: 28px;
+  height: 28px;
+  overflow: hidden;
+}
