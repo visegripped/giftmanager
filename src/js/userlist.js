@@ -5,11 +5,7 @@
      let thisUserID; //would be better as a const.
      let _this;
      let userListContainer = document.getElementById('userListContainer');
-     let customEvents = {
-       userSelected : new CustomEvent("UserList.userSelected"),
-       menuOpened : new CustomEvent("UserList.menuOpened"),
-       menuClosed : new CustomEvent("UserList.menuClosed")
-     };
+     let customEvents = {};
 
      var UserMenu = React.createClass({
 
@@ -36,13 +32,21 @@
          },
 
          handleUserChange : function(user) {
+		 	window.console.log("BEGIN userlist.handleUserChange. change to: " , user);
              this.setState({menuVisibility: 'closed'});
-             this.setState({subjectUID: user.userid});
-			 window.console.log("BEGIN userlist.handleUserChange. change to: " , user);
-             //customEvents.userSelected.initCustomEvent(user,true, false, user);
-             customEvents.userSelected.initCustomEvent("UserList.userSelected",true,true,user);
-             //customEvents.userSelected.detail = user;
-             dispatchEvent(customEvents.userSelected);
+             this.setState({subjectUID: user.userid},function(){
+				 let detail = {
+					 "userid" : user.userid,
+					 "username" : user.username,
+					 "subjectUID" : _this.state.subjectUID
+				 }
+				  //customEvents.userSelected.initCustomEvent(user,true, false, user);
+				 //TODO -> this is not working in iOS. user is getting set only the first time.
+				  customEvents.userSelected.initCustomEvent("UserList.userSelected",true,true,detail);
+				  //customEvents.userSelected.detail = user;
+				  dispatchEvent(customEvents.userSelected);
+			 });
+
          },
 
          toggleMenuVisibility: function() {
@@ -51,6 +55,20 @@
 
          componentDidMount: function() {
              _this = this;
+
+			 customEvents = {
+		       userSelected : new CustomEvent("UserList.userSelected",{
+				   "detail" : {
+					   "state" : _this.state,
+					   "userid" : "",
+					   "username" : ""
+				   }
+			   }),
+		       menuOpened : new CustomEvent("UserList.menuOpened"),
+		       menuClosed : new CustomEvent("UserList.menuClosed")
+		     };
+
+
              addEventListener("Auth.signInComplete",function(e){
                 thisUserID = e.detail.userid;
                 _this.setState({"subjectUID":thisUserID});

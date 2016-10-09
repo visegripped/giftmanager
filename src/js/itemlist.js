@@ -74,10 +74,10 @@ I'm lazy.  Archive is set to 1 for old items.
                 },false, true);
 
                 addEventListener("UserList.userSelected",function(e){
-					 window.console.log("BEGIN addEventListener.Userlist.handleUserChange. change to: " , e.detail.userid);
+					 window.console.log("BEGIN addEventListener.Userlist.handleUserChange. change to: " ,  e.detail);
                     _this.setState({"subjectUID": Number(e.detail.userid)},function(){
-                    _this.loadItemListFromServer();
-                  });
+                    	_this.loadItemListFromServer();
+                  	});
                 },false, true);
 
                 addEventListener("itemAdded",function(e){
