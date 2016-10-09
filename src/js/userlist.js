@@ -38,6 +38,7 @@
          handleUserChange : function(user) {
              this.setState({menuVisibility: 'closed'});
              this.setState({subjectUID: user.userid});
+			 window.console.log("BEGIN userlist.handleUserChange. change to: " , user);
              //customEvents.userSelected.initCustomEvent(user,true, false, user);
              customEvents.userSelected.initCustomEvent("UserList.userSelected",true,true,user);
              //customEvents.userSelected.detail = user;

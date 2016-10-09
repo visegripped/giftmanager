@@ -22,7 +22,7 @@ I'm lazy.  Archive is set to 1 for old items.
         var ItemList = React.createClass({
 
             loadItemListFromServer: function() {
-              window.console.log("BEGIN loadItemListFromServer");
+              window.console.log("BEGIN loadItemListFromServer for " + this.state.subjectUID);
                 $.ajax({
                     url: this.props.ItemListUrl,
                     data : {
@@ -37,6 +37,7 @@ I'm lazy.  Archive is set to 1 for old items.
                         if(data && data.type == 'success') {
                           data.gifts = data.gifts || [];
                           this.setState({data: data.gifts});
+  	                      window.console.log(" -> items: " + data.gifts.length);
                         }
                         else {
                           window.msgs.throwMsg("#topMessages",data);
@@ -73,6 +74,7 @@ I'm lazy.  Archive is set to 1 for old items.
                 },false, true);
 
                 addEventListener("UserList.userSelected",function(e){
+					 window.console.log("BEGIN addEventListener.Userlist.handleUserChange. change to: " , e.detail.userid);
                     _this.setState({"subjectUID": Number(e.detail.userid)},function(){
                     _this.loadItemListFromServer();
                   });
@@ -88,6 +90,7 @@ I'm lazy.  Archive is set to 1 for old items.
             },
 
             render: function() {
+				window.console.log("BEGIN itemlist.render");
                 return (
 
                         <div className="item-list">
