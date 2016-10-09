@@ -35,14 +35,14 @@
 		 	window.console.log("BEGIN userlist.handleUserChange. change to: " , user);
              this.setState({menuVisibility: 'closed'});
              this.setState({subjectUID: user.userid},function(){
-				 let detail = {
-					 "userid" : user.userid,
-					 "username" : user.username,
-					 "subjectUID" : _this.state.subjectUID
-				 }
+				//  let detail = {
+				// 	 "userid" : user.userid,
+				// 	 "username" : user.username,
+				// 	 "subjectUID" : _this.state.subjectUID
+				//  }
 				  //customEvents.userSelected.initCustomEvent(user,true, false, user);
 				 //TODO -> this is not working in iOS. user is getting set only the first time.
-				  customEvents.userSelected.initCustomEvent("UserList.userSelected",true,true,detail);
+				  //customEvents.userSelected.initCustomEvent("UserList.userSelected",true,true,detail);
 				  //customEvents.userSelected.detail = user;
 				  dispatchEvent(customEvents.userSelected);
 			 });
@@ -59,8 +59,8 @@
 			 customEvents = {
 		       userSelected : new CustomEvent("UserList.userSelected",{
 				   "detail" : {
-					   "state" : _this.state,
-					   "userid" : "",
+					   "state" : _this.state.subjectUID,
+					   "userid" : _this.state.subjectUID,
 					   "username" : ""
 				   }
 			   }),
