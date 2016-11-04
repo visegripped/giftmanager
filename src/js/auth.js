@@ -9,7 +9,7 @@ window.gmAuth = (function gmAuth(win,$,googleUser){
   };
 
   let bindListeners = function bindListeners() {
-    window.console.log("BEGIN bindListeners");
+    // window.console.log("BEGIN bindListeners");
     addEventListener("Auth.signInComplete",function(e){
       console.log("BEGIN listener for signInComplete");
       auth.ux.signIn.hide();
@@ -17,7 +17,7 @@ window.gmAuth = (function gmAuth(win,$,googleUser){
     },false, true);
 
     addEventListener("Auth.signOutComplete",function(e){
-      console.log("BEGIN listener for signOutComplete");
+    //   console.log("BEGIN listener for signOutComplete");
       auth.ux.signIn.show();
       auth.ux.signOut.hide();
     },false, true);
@@ -113,10 +113,10 @@ Interface for various auth methods:
     },
 
     signIn : function(googleUser) {
-      window.console.log('BEGIN auth.google.signIn');
+    //   window.console.log('BEGIN auth.google.signIn');
       let tokenId = googleUser.Zi.id_token;
       if (tokenId && googleUser.isSignedIn()) {
-        window.console.log("user signed in to google");
+        // window.console.log("user signed in to google");
         var profile = googleUser.getBasicProfile();
         window.gmAuth.google.verify(tokenId);
       }
@@ -146,7 +146,7 @@ Interface for various auth methods:
     },
 
     verify : function(facebookAuth) {
-      console.log("BEGIN auth.facebook.verify" , facebookAuth);
+    //   console.log("BEGIN auth.facebook.verify" , facebookAuth);
       $.when(
         $.ajax({
           "url" : "http://www.visegripped.com/gm/api.php",
@@ -173,12 +173,12 @@ Interface for various auth methods:
     },
 
     signOut : function() {
-      window.console.log("BEGIN facebook.signOut");
+    //   window.console.log("BEGIN facebook.signOut");
       FB.logout();
     },
 
     signIn : function(response) {
-      console.log("BEGIN auth.facebook.signIn");
+    //   console.log("BEGIN auth.facebook.signIn");
       if (response.status === 'connected') {
         // Logged into your app and Facebook.
         FB.api('/me', function(facebookUser) {

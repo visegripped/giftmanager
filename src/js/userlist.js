@@ -32,7 +32,7 @@
          },
 
          handleUserChange : function(user) {
-		 	window.console.log("BEGIN userlist.handleUserChange. change to: " , user);
+			// 	window.console.log("BEGIN userlist.handleUserChange. change to: " , user);
              this.setState({menuVisibility: 'closed'});
              this.setState({subjectUID: user.userid},function(){
 				 let detail = {

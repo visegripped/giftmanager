@@ -50,7 +50,6 @@
                 var newItem = this.state || {};
                 newItem.cmd = 'giftListCreate';
                 newItem.userid = thisUserID;
-
                 $.ajax({
                     url: this.props.ItemAddUrl,
                     dataType: 'json',
@@ -58,9 +57,15 @@
                     data: newItem,
                     success: function() {
                         dispatchEvent(customEvents.itemAdded);
-                        this.setState({item_name: '',item_desc: '',item_link: ''});
+                        _this.setState({item_name: '',item_desc: '',item_link: ''},function(){
+							React.renderComponent();
+						});
                     }.bind(this),
                     error: function(xhr, status, err) {
+						_this.setState({item_name: '',item_desc: '',item_link: ''},function(){
+							React.renderComponent();
+						});
+						window.console.log("_this: " , _this);
                         console.error(this.props.url, status, err.toString());
                     }
                 });
@@ -108,7 +113,7 @@ Once a solution is found, the labels/inputs need to be updated to all be the sam
 
             return (
               <label className='item-add-form-fieldset-label'>
-                <input required='required' name='item_name' type="text" className='item-add-form-fieldset-label-text' placeholder="gift" defaultValue={this.state.item_name} onChange={this.props.HandleItemNameChange} />
+                <input required={true} name='item_name' type="text" className='item-add-form-fieldset-label-text' placeholder="gift"  onChange={this.props.HandleItemNameChange} />
               </label>
             );
           }
