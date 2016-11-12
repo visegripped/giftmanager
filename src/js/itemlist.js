@@ -136,7 +136,7 @@ I'm lazy.  Archive is set to 1 for old items.
                                 <a href={this.props.item.item_link} target='_blank' className={this.props.item.item_link ? 'btn btn-secondary btn-sm item-list-item-btns-link'  : 'hidden-xs-up'}></a>
                             </div>
                             <div className='col-xs-12 col-sm-2'>
-                                {this.props.subjectUID == thisUserID ? <ItemSelectListSelf status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} /> : <ItemSelectListOther status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} />}
+                                {this.props.subjectUID == thisUserID ? <ItemSelectListSelf status={this.props.item.status} remove={this.props.item.remove} itemid={this.props.item.itemid} /> : <ItemSelectListOther status={this.props.item.status} remove={this.props.item.remove} buy_userid={this.props.item.buy_userid} itemid={this.props.item.itemid} />}
                             </div>
                             <p className='col-xs-12 item-list-item-desc'>
                               {this.props.item.item_desc}
@@ -201,6 +201,7 @@ I'm lazy.  Archive is set to 1 for old items.
           getInitialState: function() {
              return {
                  status: this.props.status,
+	             buy_userid: this.props.buy_userid,
                  itemid: this.props.itemid
              }
          },
@@ -237,15 +238,16 @@ I'm lazy.  Archive is set to 1 for old items.
 
 
           render : function(){
-
+			  console.log("this.state.buy_userid: " + this.state.buy_userid + " and thisUserID: " +thisUserID );
+			  let isDisabled = (this.state.status > 0 && this.state.buy_userid !== thisUserID) ? "disabled" : "";
             return (
 
-              <select className='item-list-item-select' defaultValue={this.state.status} onChange={this.handleItemStatusChange} data={this.state.itemid}>
+              <select className='item-list-item-select' disabled={isDisabled} defaultValue={this.state.status} onChange={this.handleItemStatusChange} data={this.state.itemid}>
                 <option value='0'></option>
                 <option value='2'>Reserved</option>
                 <option value='10'>Purchased</option>
                 {(() => {
-                  if(this.state.status > 0) {
+                  if(this.state.status > 0 && this.state.buy_userid === thisUserID) {
                     return <option value='XX'>{this.state.status == 2 ? 'Unreserve' : 'unpurchase'}</option>;
                   }
                 })()}

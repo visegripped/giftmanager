@@ -214,9 +214,10 @@ function preserveType($row)	{
 	function giftListUpdate($req){
 		$db = pdoConnect();
 
-		$stmt = $db->prepare("update vicegrip_family.gifts set status=:status where itemid=:itemid");
+		$stmt = $db->prepare("update vicegrip_family.gifts set status=:status, buy_userid=:buy_userid where itemid=:itemid");
 		$stmt->bindValue(":itemid", $_REQUEST['itemid']);
 		$stmt->bindValue(":status", $_REQUEST['status']);
+		$stmt->bindValue(":buy_userid", $_SESSION["USERID"]);
 
 		if ($stmt->execute()) {
 			$response = apiMsg(100,$req,"");
