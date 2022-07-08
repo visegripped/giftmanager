@@ -1,25 +1,19 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
+    <>
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <div>Logged in as $user</div> {/* link this to their view */}
+        <div>Edit list for: $users</div>
       </header>
-    </div>
+      <main>
+        {/* list and add form will go here. stacked at mobile, side by side at > tablet. */}
+      </main>
+      <footer>
+      </footer>
+    </>
   );
 }
 
