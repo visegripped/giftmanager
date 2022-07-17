@@ -21,7 +21,7 @@ BasicUsage.args = {
     { value: 'sometingElse', label: 'something else' },
     { value: 'sometingMore', label: 'something more' },
   ],
-  onChange: (event: Object, props: Object) => {
+  onChange: (event: object, props: object) => {
     console.log(' -> props: ', props);
   },
 };

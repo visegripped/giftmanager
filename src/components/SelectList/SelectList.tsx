@@ -10,11 +10,11 @@ interface SelectListProps {
   options: OptionProps[];
   cssClasses: string;
   disabled: boolean;
-  onChange: Function;
+  onChange(changeEvent: object, props: object): void;
 }
 
 const SelectList = (props: SelectListProps) => {
-  const { options = [], cssClasses, disabled, onChange = () => {} } = props;
+  const { options = [], cssClasses, disabled, onChange } = props;
   const selectChangeHandler = (changeEvent: React.ChangeEvent<HTMLSelectElement>) => {
     onChange(changeEvent, props);
   };
