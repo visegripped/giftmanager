@@ -4,14 +4,19 @@ import './Button.css';
 interface ButtonProps {
   text: string;
   cssClasses: string;
-  children: string;
+  disabled: boolean;
+  priority: 'primary' | 'secondary' | 'ghost';
+  onClick: Function;
 }
 
 const Button = (props: ButtonProps) => {
-  const { text, cssClasses } = props;
-  const className = `button ${cssClasses}`;
+  const { text, cssClasses, disabled, priority, onClick = () => {} } = props;
+  const buttonClickHandler = (clickEvent: React.MouseEvent<HTMLButtonElement>) => {
+    onClick(clickEvent, props);
+  }
+  const className = `button ${priority} ${cssClasses}`;
   return (
-    <button className={ className } >{ text }</button>
+    <button className={className} disabled={disabled} data-testid='button' onClick={buttonClickHandler} >{text}</button>
   );
 }
 

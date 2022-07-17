@@ -16,10 +16,25 @@ const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />;
 export const Primary = Template.bind({});
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 Primary.args = {
-  text: 'Submit',
+  text: 'Primary button',
+  priority: 'primary',
 };
 
 export const Secondary = Template.bind({});
 Secondary.args = {
-  text: 'Another button',
+  text: 'Secondary button',
+  priority: 'secondary',
+};
+
+export const Ghost = Template.bind({});
+Ghost.args = {
+  text: 'Ghost button',
+  priority: 'ghost',
+};
+
+export const Disabled = Template.bind({});
+Disabled.args = {
+  text: 'Disabled button',
+  priority: 'primary',
+  disabled: true,
 };
