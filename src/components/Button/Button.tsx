@@ -16,7 +16,7 @@ const Button = (props: ButtonProps) => {
   }
   const className = `button ${priority} ${cssClasses}`;
   return (
-    <button className={className} disabled={disabled} data-testid='button' onClick={buttonClickHandler} >{text}</button>
+    <button className={className} disabled={disabled} data-testid='Button' onClick={buttonClickHandler} >{text}</button>
   );
 }
 

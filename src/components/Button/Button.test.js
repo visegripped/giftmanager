@@ -8,7 +8,7 @@ describe("Button", () => {
       counter += 1;
     };
     render(<Button onClick={testForClick} />);
-    const renderedButton = screen.getByTestId("button");
+    const renderedButton = screen.getByTestId("Button");
     fireEvent.click(renderedButton);
     expect(counter).toEqual(1);
   });
@@ -21,7 +21,7 @@ describe("Button", () => {
         disabled={false}
       />
     );
-    const renderedButton = screen.getByTestId("button");
+    const renderedButton = screen.getByTestId("Button");
     expect(renderedButton).toMatchSnapshot();
   });
 });
