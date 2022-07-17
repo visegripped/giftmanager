@@ -10,17 +10,17 @@ interface SelectListProps {
   options: OptionProps[];
   cssClasses: string;
   disabled: boolean;
-  onSelect: Function;
+  onChange: Function;
 }
 
 const SelectList = (props: SelectListProps) => {
-  const { options = [], cssClasses, disabled, onSelect = () => { } } = props;
-  const selectChangeHandler = (clickEvent: React.MouseEvent<HTMLSelectElement>) => {
-    onSelect(clickEvent, props);
+  const { options = [], cssClasses, disabled, onChange = () => { } } = props;
+  const selectChangeHandler = (changeEvent: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(changeEvent, props);
   }
   const className = `selectList ${cssClasses}`;
   return (
-    <select className={className} disabled={disabled} data-testid='SelectList' onSelect={selectChangeHandler} >
+    <select className={className} disabled={disabled} data-testid='SelectList' onChange={selectChangeHandler} >
       {options.map((option) => {
         const { value, label } = option;
         return (<option value={value} key={value}>{label || value}</option>);

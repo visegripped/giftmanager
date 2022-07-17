@@ -17,6 +17,12 @@ const Template: ComponentStory<typeof SelectList> = (args) => <SelectList {...ar
 export const BasicUsage = Template.bind({});
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 BasicUsage.args = {
-  options : [],
-  onSelect: () => {}
+  options: [
+    { value: 'someting', label: 'something' },
+    { value: 'sometingElse', label: 'something else' },
+    { value: 'sometingMore', label: 'something more' },
+  ],
+  onChange: (event: Object, props: Object) => {
+    console.log(' -> props: ', props);
+  }
 };

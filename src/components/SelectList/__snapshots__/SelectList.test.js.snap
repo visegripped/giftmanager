@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SelectList snapshot matches 1`] = `
+<select
+  class="selectList test classes"
+  data-testid="SelectList"
+>
+  <option
+    value="someting"
+  >
+    something
+  </option>
+  <option
+    value="sometingElse"
+  >
+    something else
+  </option>
+  <option
+    value="sometingMore"
+  >
+    something more
+  </option>
+</select>
+`;

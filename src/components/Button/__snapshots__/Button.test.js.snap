@@ -3,7 +3,7 @@
 exports[`Button snapshot matches 1`] = `
 <button
   class="button secondary test classes"
-  data-testid="button"
+  data-testid="Button"
 >
   click me
 </button>

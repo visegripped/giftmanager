@@ -1,21 +1,28 @@
 import { render, fireEvent, screen } from "@testing-library/react";
 import SelectList from "./index";
 
+const sampleOptions = [
+  { value: 'someting', label: 'something' },
+  { value: 'sometingElse', label: 'something else' },
+  { value: 'sometingMore', label: 'something more' },
+];
+
 describe("SelectList", () => {
-  test("onSelect is executed properly", () => {
+  test("onChange is executed properly", () => {
     let counter = 0;
     const testForClick = () => {
       counter += 1;
     };
-    render(<SelectList onSelect={testForClick} />);
+    render(<SelectList options={sampleOptions} onChange={testForClick} />);
     const renderedSelectList = screen.getByTestId("SelectList");
-    fireEvent.click(renderedSelectList);
+    fireEvent.change(renderedSelectList, { target: { value: 1 } });
     expect(counter).toEqual(1);
   });
   test("snapshot matches", () => {
     render(
       <SelectList
         cssClasses="test classes"
+        options={sampleOptions} 
         disabled={false}
       />
     );
