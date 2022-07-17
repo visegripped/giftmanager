@@ -14,18 +14,22 @@ interface SelectListProps {
 }
 
 const SelectList = (props: SelectListProps) => {
-  const { options = [], cssClasses, disabled, onChange = () => { } } = props;
+  const { options = [], cssClasses, disabled, onChange = () => {} } = props;
   const selectChangeHandler = (changeEvent: React.ChangeEvent<HTMLSelectElement>) => {
     onChange(changeEvent, props);
-  }
+  };
   const className = `selectList ${cssClasses}`;
   return (
-    <select className={className} disabled={disabled} data-testid='SelectList' onChange={selectChangeHandler} >
+    <select className={className} disabled={disabled} data-testid="SelectList" onChange={selectChangeHandler}>
       {options.map((option) => {
         const { value, label } = option;
-        return (<option value={value} key={value}>{label || value}</option>);
+        return (
+          <option value={value} key={value}>
+            {label || value}
+          </option>
+        );
       })}
-    </select >
+    </select>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
@@ -24,5 +23,5 @@ BasicUsage.args = {
   ],
   onChange: (event: Object, props: Object) => {
     console.log(' -> props: ', props);
-  }
+  },
 };

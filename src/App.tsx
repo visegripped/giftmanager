@@ -8,11 +8,8 @@ function App() {
         <div>Logged in as $user</div> {/* link this to their view */}
         <div>Edit list for: $users</div>
       </header>
-      <main>
-        {/* list and add form will go here. stacked at mobile, side by side at > tablet. */}
-      </main>
-      <footer>
-      </footer>
+      <main>{/* list and add form will go here. stacked at mobile, side by side at > tablet. */}</main>
+      <footer></footer>
     </>
   );
 }
