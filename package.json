@@ -24,7 +24,9 @@
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
     "prettier": "prettier 'src/**/*.tsx'",
-    "prettier:fix": "prettier --write 'src/**/*.tsx'"
+    "prettier:fix": "prettier --write 'src/**/*.tsx'",
+    "eslint": "eslint 'src/**/*.ts'",
+    "eslint:fix": "eslint --fix 'src/**/*.ts'"
   },
   "eslintConfig": {
     "extends": [
@@ -65,7 +67,15 @@
     "@storybook/preset-create-react-app": "^4.1.2",
     "@storybook/react": "^6.5.9",
     "@storybook/testing-library": "^0.0.13",
+    "@typescript-eslint/eslint-plugin": "5.30.6",
+    "@typescript-eslint/parser": "5.30.6",
     "babel-plugin-named-exports-order": "^0.0.2",
+    "eslint": "8.20.0",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.0",
+    "eslint-plugin-react": "^7.30.1",
     "prettier": "2.7.1",
     "prop-types": "^15.8.1",
     "webpack": "^5.73.0"
