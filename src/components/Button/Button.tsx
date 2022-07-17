@@ -6,7 +6,7 @@ interface ButtonProps {
   cssClasses: string;
   disabled: boolean;
   priority: 'primary' | 'secondary' | 'ghost';
-  onClick: Function;
+  onClick(clickEvent: object, props: object): void;
 }
 
 const Button = (props: ButtonProps) => {

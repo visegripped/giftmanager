@@ -25,7 +25,7 @@
     "build-storybook": "build-storybook -s public",
     "prettier": "prettier 'src/**/*.tsx'",
     "prettier:fix": "prettier --write 'src/**/*.tsx'",
-    "eslint": "eslint 'src/**/*.ts'",
+    "eslint": "eslint 'src/**/*.tsx'",
     "eslint:fix": "eslint --fix 'src/**/*.ts'"
   },
   "eslintConfig": {
