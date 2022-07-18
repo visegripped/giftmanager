@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Nav snapshot matches 1`] = `
+<nav
+  class="selectList test classes"
+  data-testid="Nav"
+>
+  <ul>
+    <li>
+      <a
+        href="/mylist"
+      >
+        My list
+      </a>
+    </li>
+    <li>
+      <a
+        href="/theirlist"
+      >
+        Their list
+      </a>
+    </li>
+    <li>
+      <a
+        href="/"
+      >
+        Home
+      </a>
+    </li>
+  </ul>
+</nav>
+`;

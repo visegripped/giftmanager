@@ -8,8 +8,8 @@ interface OptionProps {
 
 interface SelectListProps {
   options: OptionProps[];
-  cssClasses: string;
-  disabled: boolean;
+  cssClasses?: string;
+  disabled?: boolean;
   onChange(changeEvent: object, props: object): void;
 }
 
