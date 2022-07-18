@@ -1,4 +1,6 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
+import Nav from './components/Nav/';
 import './App.css';
 
 function App() {
@@ -6,9 +8,11 @@ function App() {
     <>
       <header className="App-header">
         <div>Logged in as $user</div> {/* link this to their view */}
-        <div>Edit list for: $users</div>
+        <Nav cssClasses="" />
       </header>
-      <main>{/* list and add form will go here. stacked at mobile, side by side at > tablet. */}</main>
+      <main>
+        <Outlet />
+      </main>
       <footer></footer>
     </>
   );
