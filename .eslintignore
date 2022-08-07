@@ -1,2 +1,5 @@
-**/*.json
-*.json
+test / fixtures ** /app/bcilpu;
+node_modules;
+logs;
+run;
+coverage;
