@@ -14,7 +14,9 @@ interface HeaderProps {
   onCreateAccount: () => void;
 }
 
-export const Header = ({ user, onLogin, onLogout, onCreateAccount }: HeaderProps) => (
+export const Header = (
+  { user }: HeaderProps, // these were props. , onLogin, onLogout, onCreateAccount
+) => (
   <header>
     <div className="wrapper">
       <div>

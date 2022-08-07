@@ -8,7 +8,7 @@ export default {
   component: MyList,
 } as ComponentMeta<typeof MyList>;
 
-const Template: ComponentStory<typeof MyList> = (args) => (
+const Template: ComponentStory<typeof MyList> = () => (
   <BrowserRouter>
     <MyList />
   </BrowserRouter>

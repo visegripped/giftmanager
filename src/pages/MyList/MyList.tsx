@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 // import { isTemplateSpan } from 'typescript';
 
 interface ItemsProps {
@@ -9,11 +9,11 @@ interface ItemsProps {
   remove: number;
 }
 
-interface ItemProps {
-  items: ItemsProps[];
-}
+// interface ItemProps {
+//   items: ItemsProps[];
+// }
 
-const [myListOfItems, setValue] = useState([]);
+const [myListOfItems] = useState([]);
 
 // const handleItemStatusChange = (changeEvent: React.ChangeEvent, props: ItemsProps) => {
 //   console.log(' -> handleItemStatusChange triggered.');
