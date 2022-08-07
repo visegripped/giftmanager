@@ -21,7 +21,7 @@ const SelectList = (props: SelectListProps) => {
   const className = `selectList ${cssClasses}`;
   return (
     <select className={className} disabled={disabled} data-testid="SelectList" onChange={selectChangeHandler}>
-      {options.map((option) => {
+      {options.map((option: OptionProps) => {
         const { value, label } = option;
         return (
           <option value={value} key={value}>

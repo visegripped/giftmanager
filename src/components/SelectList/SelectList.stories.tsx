@@ -24,3 +24,12 @@ BasicUsage.args = {
     console.log(' -> props: ', props);
   },
 };
+
+// export const UserList = Template.bind({});
+// // More on args: https://storybook.js.org/docs/react/writing-stories/args
+// BasicUsage.args = {
+//   options: userListResponse.users,
+//   onChange: (event: object, props: object) => {
+//     console.log(' -> props: ', props);
+//   },
+// };

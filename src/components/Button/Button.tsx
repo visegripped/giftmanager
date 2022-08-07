@@ -3,9 +3,9 @@ import './Button.css';
 
 interface ButtonProps {
   text: string;
-  cssClasses: string;
-  disabled: boolean;
-  priority: 'primary' | 'secondary' | 'ghost';
+  cssClasses?: string;
+  disabled?: boolean;
+  priority?: 'primary' | 'secondary' | 'ghost';
   onClick(clickEvent: object, props: object): void;
 }
 
