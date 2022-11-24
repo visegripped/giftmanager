@@ -2,9 +2,9 @@ import { render, fireEvent, screen } from '@testing-library/react';
 import SelectList from './index';
 
 const sampleOptions = [
-  { value: 'someting', label: 'something' },
-  { value: 'sometingElse', label: 'something else' },
-  { value: 'sometingMore', label: 'something more' },
+  { value: 'something', label: 'something' },
+  { value: 'somethingElse', label: 'something else' },
+  { value: 'somethingMore', label: 'something more' },
 ];
 
 describe('SelectList', () => {
@@ -19,7 +19,7 @@ describe('SelectList', () => {
     expect(counter).toEqual(1);
   });
   test('snapshot matches', () => {
-    render(<SelectList cssClasses="test classes" options={sampleOptions} disabled={false} />);
+    render(<SelectList cssClasses="test classes" options={sampleOptions} disabled={false} selected="something" />);
     const renderedSelectList = screen.getByTestId('SelectList');
     expect(renderedSelectList).toMatchSnapshot();
   });

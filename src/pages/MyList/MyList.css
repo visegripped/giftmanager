@@ -1,0 +1,31 @@
+
+.list--container {
+  width: 80vw;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.list--header {
+  background: #666666;
+  color: #fff;
+  font-weight: bold;
+}
+
+.list--body {
+  border-bottom: 1px solid #ccc;
+}
+
+.list--body tr:nth-child(even) {
+  background: #FFFFFF;
+}
+
+.list--head_status,
+.list--body_status {
+  text-align: right;
+  vertical-align: top;
+}
+
+.list--item_desc {
+  font-size: 14px;
+}

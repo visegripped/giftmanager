@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './Nav.css';
 
 interface NavProps {
   cssClasses?: string;
@@ -7,19 +8,19 @@ interface NavProps {
 
 const Nav = (props: NavProps) => {
   const { cssClasses } = props;
-  const className = `selectList ${cssClasses}`;
+  const className = `${cssClasses}`;
   return (
     <nav className={className} data-testid="Nav">
-      <ul>
-        <li>
+      <ul className="nav-list">
+        <li className="nav-item">
           <Link to="/mylist">My list</Link>
         </li>
-        <li>
+        <li className="nav-item">
           <Link to="/theirlist">Their list</Link>
         </li>
-        <li>
+        {/* <li className='nav-item'>
           <Link to="/">Home</Link>
-        </li>
+        </li> */}
       </ul>
     </nav>
   );

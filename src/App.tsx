@@ -7,13 +7,15 @@ function App() {
   return (
     <>
       <header className="App-header">
-        <div>Logged in as $user</div> {/* link this to their view */}
-        <Nav cssClasses="" />
+        <div>GiftManager</div>
+        <Nav cssClasses="App-header__nav" />
+        <div className="App-header__login">Logged in as $user</div> {/* link this to their view */}
       </header>
-      <main>
+
+      <main className="App-main">
         <Outlet />
       </main>
-      <footer></footer>
+      <footer className="App-footer"></footer>
     </>
   );
 }

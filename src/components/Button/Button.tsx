@@ -10,7 +10,15 @@ interface ButtonProps {
 }
 
 const Button = (props: ButtonProps) => {
-  const { text, cssClasses, disabled, priority, onClick = () => {} } = props;
+  const {
+    text,
+    cssClasses,
+    disabled,
+    priority,
+    onClick = () => {
+      return '';
+    },
+  } = props;
   const buttonClickHandler = (clickEvent: React.MouseEvent<HTMLButtonElement>) => {
     onClick(clickEvent, props);
   };
