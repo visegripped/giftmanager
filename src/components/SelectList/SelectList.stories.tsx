@@ -20,7 +20,16 @@ BasicUsage.args = {
     { value: 'sometingElse', label: 'something else' },
     { value: 'sometingMore', label: 'something more' },
   ],
-  onChange: (event: object, props: object) => {
-    console.log(' -> props: ', props);
+  onChange: (event: object, uuid: string | number) => {
+    console.log(' -> uuid: ', uuid);
   },
 };
+
+// export const UserList = Template.bind({});
+// // More on args: https://storybook.js.org/docs/react/writing-stories/args
+// BasicUsage.args = {
+//   options: userListResponse.users,
+//   onChange: (event: object, props: object) => {
+//     console.log(' -> props: ', props);
+//   },
+// };

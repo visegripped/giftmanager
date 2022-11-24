@@ -2,7 +2,7 @@ import React from 'react';
 import './SelectList.css';
 
 interface OptionProps {
-  value: string;
+  value: string | number;
   label: string;
 }
 
@@ -10,21 +10,29 @@ interface SelectListProps {
   options: OptionProps[];
   cssClasses?: string;
   disabled?: boolean;
-  onChange(changeEvent: object, props: object): void;
+  uuid: string | number;
+  selected?: string | number;
+  onChange(changeEvent: object, uuid: string | number): void;
 }
 
 const SelectList = (props: SelectListProps) => {
-  const { options = [], cssClasses, disabled, onChange } = props;
+  const { options = [], cssClasses, disabled, uuid, onChange, selected } = props;
   const selectChangeHandler = (changeEvent: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange(changeEvent, props);
+    onChange(changeEvent, uuid);
   };
   const className = `selectList ${cssClasses}`;
   return (
-    <select className={className} disabled={disabled} data-testid="SelectList" onChange={selectChangeHandler}>
-      {options.map((option) => {
+    <select
+      className={className}
+      disabled={disabled}
+      data-testid="SelectList"
+      onChange={selectChangeHandler}
+      value={selected}
+    >
+      {options.map((option: OptionProps) => {
         const { value, label } = option;
         return (
-          <option value={value} key={value}>
+          <option value={value} key={`${uuid}_${value}`}>
             {label || value}
           </option>
         );

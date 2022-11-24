@@ -1,0 +1,27 @@
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  display: inline-block;
+  margin:0;
+  padding:0;
+}
+
+.nav-item > a {
+  padding: 0 1vw;
+  margin: 0 1vw;
+  background: #efefef;
+  border: 1px solid #ccc;
+  border-bottom-width: 0;
+  text-decoration: none;
+  display: block;
+  border-radius: .5vh;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  bottom: -1px;
+  position: relative;
+  font-size: 1.5vh;
+}
