@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Nav from './components/Nav/';
-import NotificationProvider from './context/NotificationContext';
+import { NotificationProvider } from './context/NotificationContext';
 import './App.css';
 
 function App() {

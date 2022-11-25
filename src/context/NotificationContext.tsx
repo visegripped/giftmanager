@@ -1,9 +1,12 @@
 // https://felixgerschau.com/react-typescript-context/
-import React, { createContext, useState } from 'react';
+import React, { createContext, FC, useState } from 'react';
 
 interface INotificationContext {
   messages: string; // TODO: will need to be an object eventually.
   setMessage: (message: string) => void;
+}
+interface INotificationProvider {
+  children: React.ReactNode;
 }
 
 const defaultState = {
@@ -15,7 +18,7 @@ const defaultState = {
 
 const NotificationContext = createContext<INotificationContext>(defaultState);
 
-export const NotificationProvider = (children: JSX.Element) => {
+export const NotificationProvider: FC<INotificationProvider> = ({ children }) => {
   const [messages, setMessages] = useState([]);
   return (
     <NotificationContext.Provider
