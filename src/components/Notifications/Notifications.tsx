@@ -1,7 +1,7 @@
 import React from 'react';
 import './Notifications.css';
 import { IMessage } from '../../context/NotificationContext';
-import 'Notifications.css';
+import './Notifications.css';
 
 interface NotificationsProps {
   cssClasses?: string;
