@@ -7,8 +7,8 @@
 
 
 .list--header {
-  background: #666666;
-  color: #fff;
+  background-color: var(--BackgroundColorReversed);
+  color: var(--fontColorReversed);
   font-weight: bold;
 }
 

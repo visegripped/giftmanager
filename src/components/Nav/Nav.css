@@ -11,9 +11,9 @@
 }
 
 .nav-item > a {
+  background-color: var(--backgroundColorContent);
   padding: 0 1vw;
   margin: 0 1vw;
-  background: #efefef;
   border: 1px solid #ccc;
   border-bottom-width: 0;
   text-decoration: none;

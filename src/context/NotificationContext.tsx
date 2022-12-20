@@ -5,14 +5,14 @@ import { v4 as getUUID } from 'uuid';
 export interface IMessage {
   type: 'error' | 'critical' | 'info';
   report: string;
-  id: string;
+  id?: string;
   meta?: object; //
 }
 
 interface INotificationContext {
   messages: IMessage[];
   removeMessage?: (messageId: string) => void;
-  addMessage?: (message: IMessage) => void;
+  addMessage: (message: IMessage) => void;
 }
 interface INotificationProvider {
   children: React.ReactNode;
@@ -20,9 +20,12 @@ interface INotificationProvider {
 
 const defaultState = {
   messages: [],
+  addMessage: (message: IMessage) => {
+    console.log('heck?', message.report);
+  },
 };
 
-const NotificationContext = createContext<INotificationContext>(defaultState);
+export const NotificationContext = createContext<INotificationContext>(defaultState);
 
 const removeMessageById = (messageArray: IMessage[], id: string) => {
   return messageArray.filter((el) => el.id !== id);

@@ -1,10 +1,30 @@
+:root {
+  --fontColor: #333;
+  --fontColorReversed: #FFF;
+  --backgroundColorContent: #fff;
+  --BackgroundColorReversed: #282c34;
+  --fontColorLink: teal;
+}
+
+.dark {
+    --fontColor: #FFF;
+    --fontColorReversed: #333;
+    --backgroundColorContent: #blue;
+    --BackgroundColorReversed: #FFF;
+    --fontColorLink: teal;
+}
+
+a {
+  color: var(--fontColorLink);
+}
+
 .App-header {
-  background-color: #282c34;
+  background-color: var(--BackgroundColorReversed);
+  color: var(--fontColorReversed);
   display: flex;
   flex-direction: row;
   align-items: baseline;
   font-size: 2vmin;
-  color: white;
   justify-content: space-between;
   padding: .5vh 2vw 0;
 }
@@ -19,10 +39,19 @@
 }
 
 .App-main {
+  background-color: var(--backgroundColorContent);
+  color: var(--fontColor);
   min-height: 50vh;
   padding: 1.5vh 2vw;
 }
+
 .App-footer {
-  background-color: #282c34;
-  min-height: 1vh;
+  background-color: var(--BackgroundColorReversed);
+  color: var(--fontColorReversed);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 1.3vmin;
+  justify-content: right;
+  padding: .5vh 2vw;
 }

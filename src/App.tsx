@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Nav from './components/Nav/';
-import { NotificationProvider } from './context/NotificationContext';
+import { NotificationProvider, NotificationContext, IMessage } from './context/NotificationContext';
 import './App.css';
+import ThemeContext from './context/ThemeContext';
+import ToggleDarkMode from './components/ToggleDarkMode';
 
 function App() {
+  const { messages } = useContext(NotificationContext);
+  const [dark, setDark] = useState(false);
+  const toggleDark = () => {
+    setDark(!dark);
+  };
+
+  useEffect(() => {
+    console.log(' -> dark: ', dark);
+  }, [dark]);
   return (
-    <>
+    <div className={dark ? 'dark' : 'none'}>
       <NotificationProvider>
         <header className="App-header">
           <div>GiftManager</div>
@@ -15,11 +26,26 @@ function App() {
         </header>
 
         <main className="App-main">
+          <div>
+            {messages.map((message: IMessage) => {
+              console.log(' -> found at least 1 message');
+              return <div>{message.report}</div>;
+            })}
+          </div>
           <Outlet />
         </main>
-        <footer className="App-footer"></footer>
+        <ThemeContext.Provider
+          value={{
+            dark,
+            toggleDark,
+          }}
+        >
+          <footer className="App-footer">
+            <ToggleDarkMode />
+          </footer>
+        </ThemeContext.Provider>
       </NotificationProvider>
-    </>
+    </div>
   );
 }
 
