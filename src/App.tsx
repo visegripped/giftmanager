@@ -17,7 +17,7 @@ function App() {
     console.log(' -> dark: ', dark);
   }, [dark]);
   return (
-    <div className={dark ? 'dark' : 'none'}>
+    <div className={`App-container ${dark ? 'dark' : 'none'}`}>
       <NotificationProvider>
         <header className="App-header">
           <div>GiftManager</div>

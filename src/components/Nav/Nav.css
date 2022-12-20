@@ -13,15 +13,13 @@
 .nav-item > a {
   background-color: var(--backgroundColorContent);
   padding: 0 1vw;
-  margin: 0 1vw;
-  border: 1px solid #ccc;
-  border-bottom-width: 0;
+  margin: 0 .5vw;
   text-decoration: none;
   display: block;
   border-radius: .5vh;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  bottom: -1px;
+  bottom: -2px;
   position: relative;
   font-size: 1.5vh;
 }

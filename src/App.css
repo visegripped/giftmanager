@@ -8,14 +8,16 @@
 
 .dark {
     --fontColor: #FFF;
-    --fontColorReversed: #333;
-    --backgroundColorContent: #blue;
-    --BackgroundColorReversed: #FFF;
-    --fontColorLink: teal;
+    --backgroundColorContent: #000;
 }
 
-a {
-  color: var(--fontColorLink);
+#root {
+  height: 100%;
+}
+.App-container {
+  height: 100%;
+  background-color: var(--backgroundColorContent);
+  color: var(--fontColor);
 }
 
 .App-header {
@@ -39,8 +41,6 @@ a {
 }
 
 .App-main {
-  background-color: var(--backgroundColorContent);
-  color: var(--fontColor);
   min-height: 50vh;
   padding: 1.5vh 2vw;
 }
