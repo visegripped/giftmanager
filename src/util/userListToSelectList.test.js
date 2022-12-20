@@ -1,5 +1,5 @@
 import userListToSelectList from './userListToSelectList';
-import sampleUserList from '../../test/response-usersGet.json';
+import sampleUserList from '../test/response-usersGet.json';
 
 describe('userListToSelectList', () => {
   test('returns an empty array when not passed a param', () => {
