@@ -14,8 +14,8 @@ function App() {
   };
 
   useEffect(() => {
-    console.log(' -> dark: ', dark);
-  }, [dark]);
+    console.log(' -> messages: ', messages);
+  }, [messages]);
   return (
     <div className={`App-container ${dark ? 'dark' : 'none'}`}>
       <NotificationProvider>

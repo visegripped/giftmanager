@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useThemeContext } from '../../context/ThemeContext';
 import './ToggleDarkMode.css';
 
 const ToggleDarkMode = () => {
   const { dark, toggleDark } = useThemeContext();
-  const [isChecked, setIsChecked] = useState(dark);
-  const handleOnChange = (e: React.FormEvent<HTMLInputElement>) => {
-    e.preventDefault();
+  const handleOnChange = () => {
     toggleDark();
   };
 
-  useEffect(() => {
-    setIsChecked(dark);
-  }, [dark]);
-
   return (
     <label>
-      <input type="checkbox" name="darkMode" onChange={handleOnChange} checked={isChecked} />
+      <input type="checkbox" name="darkMode" onChange={handleOnChange} checked={dark} />
       Enable dark mode
     </label>
   );
