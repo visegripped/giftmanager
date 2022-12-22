@@ -1,24 +1,35 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Nav from './components/Nav/';
-import { NotificationProvider, NotificationContext, IMessage } from './context/NotificationContext';
+import { NotificationContext, IMessage } from './context/NotificationContext';
+import Notifications from './components/Notifications';
 import './App.css';
 import ThemeContext from './context/ThemeContext';
 import ToggleDarkMode from './components/ToggleDarkMode';
+import { v4 as getUUID } from 'uuid';
 
 function App() {
-  const { messages } = useContext(NotificationContext);
   const [dark, setDark] = useState(false);
+  const [messages, setMessages] = useState<IMessage[]>([]);
   const toggleDark = () => {
     setDark(!dark);
   };
+  const addMessage = (message: IMessage) => {
+    console.log(' -> addMessage was triggered', message);
+    message.id = getUUID();
+    messages.push(message);
+    console.log(' -> message: ', message);
+    setMessages(messages);
+  };
 
-  useEffect(() => {
-    console.log(' -> messages: ', messages);
-  }, [messages]);
   return (
     <div className={`App-container ${dark ? 'dark' : 'none'}`}>
-      <NotificationProvider>
+      <NotificationContext.Provider
+        value={{
+          messages,
+          addMessage,
+        }}
+      >
         <header className="App-header">
           <div>GiftManager</div>
           <Nav cssClasses="App-header__nav" />
@@ -26,12 +37,7 @@ function App() {
         </header>
 
         <main className="App-main">
-          <div>
-            {messages.map((message: IMessage) => {
-              console.log(' -> found at least 1 message');
-              return <div>{message.report}</div>;
-            })}
-          </div>
+          <Notifications />
           <Outlet />
         </main>
         <ThemeContext.Provider
@@ -44,7 +50,7 @@ function App() {
             <ToggleDarkMode />
           </footer>
         </ThemeContext.Provider>
-      </NotificationProvider>
+      </NotificationContext.Provider>
     </div>
   );
 }

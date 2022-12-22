@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import SelectList from '../../components/SelectList';
-import NotificationContext from '../../context/NotificationContext';
+import { useNotificationContext } from '../../context/NotificationContext';
 // import { isTemplateSpan } from 'typescript';
 import './MyList.css';
 
@@ -22,7 +22,7 @@ interface ResponseProps {
 const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
   const newValue = updateEvent.target.value;
   console.log('This is the updated list: ', itemid, newValue);
-  const { addMessage } = useContext(NotificationContext);
+  const { addMessage } = useNotificationContext();
   const cmd = 'myListUpdateStatus';
 
   if (newValue === '-1') {
@@ -80,28 +80,28 @@ const getStatusChoices = (itemRemoved: number) => {
 
 const MyList = () => {
   const [myListOfItems, updateMyListOfItems] = useState([]);
-  const { addMessage } = useContext(NotificationContext);
-  // const [myListOfItems] = useState([]);
+  // Take a look at toggleDarkMode.tsx Has a useThemeContext
+  const { addMessage } = useNotificationContext();
 
   React.useEffect(() => {
+    console.log(' -> MyList useEffect was triggered');
     const cmd = 'myListGets';
     fetch(`https://www.visegripped.com/family/api.php?cmd=${cmd}`)
       .then((response) => {
         return response.json();
       })
       .then((response: ResponseProps) => {
+        console.log(' got to response. ', response);
         if (response.type !== 'success') {
-          addMessage({
-            report: response.msg,
-            type: 'error',
-          });
-          throw new Error(response.statusText);
+          // this throw will trigger the catch.
+          throw new Error(response.msg);
         }
         updateMyListOfItems(response.items);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log(' got to catch', error);
         addMessage({
-          report: `Request to execute ${cmd} failed.`,
+          report: `Request to execute ${cmd} failed. ${error}`,
           type: 'error',
         });
         throw new Error();

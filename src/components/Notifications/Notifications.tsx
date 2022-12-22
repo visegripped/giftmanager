@@ -1,12 +1,7 @@
 import React from 'react';
 import './Notifications.css';
-import { IMessage } from '../../context/NotificationContext';
+import { IMessage, useNotificationContext } from '../../context/NotificationContext';
 import './Notifications.css';
-
-interface NotificationsProps {
-  cssClasses?: string;
-  messages: [];
-}
 
 export const Message = (props: IMessage) => {
   const { type, report, id } = props;
@@ -25,11 +20,10 @@ export const Message = (props: IMessage) => {
   );
 };
 
-const Notifications = (props: NotificationsProps) => {
-  const { cssClasses, messages } = props;
-  const className = `Notifications ${cssClasses}`;
+const Notifications = () => {
+  const { messages } = useNotificationContext();
   return (
-    <section className={className}>
+    <section>
       {messages.map((message: IMessage) => {
         return <Message {...message} />;
       })}
