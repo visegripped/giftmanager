@@ -1,63 +1,31 @@
 // https://felixgerschau.com/react-typescript-context/
 import { createContext, useContext } from 'react';
-// import { v4 as getUUID } from 'uuid';
 
 export interface IMessage {
   type: 'error' | 'critical' | 'info';
   report: string;
   id?: string;
-  meta?: object; //
+  meta?: object;
 }
 
 interface INotificationContext {
   messages: IMessage[];
-  removeMessage?: (messageId: string) => void;
+  removeMessage: (messageId: string) => void;
   addMessage: (message: IMessage) => void;
 }
-// interface INotificationProvider {
-//   children: React.ReactNode;
-// }
 
 const defaultState = {
   messages: [],
   addMessage: (message: IMessage) => {
-    console.log('heck?', message.report);
+    console.log('default addMessage triggered.', message.report);
+  },
+  removeMessage: (messageId: string) => {
+    console.log('default removeMessage triggered.', messageId);
   },
 };
 
 export const NotificationContext = createContext<INotificationContext>(defaultState);
 
 export const useNotificationContext = () => useContext(NotificationContext);
-
-// const removeMessageById = (messageArray: IMessage[], id: string) => {
-//   return messageArray.filter((el) => el.id !== id);
-// };
-
-// export const NotificationProvider: FC<INotificationProvider> = ({ children }) => {
-//   const [messages, setMessages] = useState<IMessage[]>([]);
-//   const addMessage = (message: IMessage) => {
-//     if (message.report) {
-//       message.id = getUUID();
-//       messages.push(message);
-//       setMessages(messages);
-//     }
-//   };
-//   const removeMessage = (messageId: string) => {
-//     console.log(`Remove message ${messageId}`);
-//     removeMessageById(messages, messageId);
-//   };
-
-//   return (
-//     <NotificationContext.Provider
-//       value={{
-//         messages: [],
-//         addMessage,
-//         removeMessage,
-//       }}
-//     >
-//       {children}
-//     </NotificationContext.Provider>
-//   );
-// };
 
 export default NotificationContext;

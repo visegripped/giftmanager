@@ -22,12 +22,18 @@ function App() {
     setMessages(messages);
   };
 
+  const removeMessageById = (id: string) => {
+    const reducedMessages = messages.filter((el) => el.id !== id);
+    setMessages(reducedMessages);
+  };
+
   return (
     <div className={`App-container ${dark ? 'dark' : 'none'}`}>
       <NotificationContext.Provider
         value={{
           messages,
           addMessage,
+          removeMessage: removeMessageById,
         }}
       >
         <header className="App-header">

@@ -38,3 +38,10 @@ Disabled.args = {
   priority: 'primary',
   disabled: true,
 };
+
+export const Error = Template.bind({});
+Disabled.args = {
+  text: 'Error button',
+  priority: 'error',
+  disabled: false,
+};

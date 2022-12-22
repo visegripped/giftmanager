@@ -101,7 +101,7 @@ const MyList = () => {
       .catch((error) => {
         console.log(' got to catch', error);
         addMessage({
-          report: `Request to execute ${cmd} failed. ${error}`,
+          report: `Request to execute ${cmd} failed. \n${error}`,
           type: 'error',
         });
         throw new Error();

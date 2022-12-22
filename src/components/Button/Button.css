@@ -32,3 +32,9 @@
   background: #efefef;
   color: #333;
 }
+
+.error {
+  border: 1px solid #900;
+  background: #600;
+  color: #fff;
+}
