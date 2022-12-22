@@ -84,28 +84,23 @@ const MyList = () => {
   const { addMessage } = useNotificationContext();
 
   React.useEffect(() => {
-    console.log(' -> MyList useEffect was triggered');
     const cmd = 'myListGets';
     fetch(`https://www.visegripped.com/family/api.php?cmd=${cmd}`)
       .then((response) => {
         return response.json();
       })
       .then((response: ResponseProps) => {
-        console.log(' got to response. ', response);
         if (response.type !== 'success') {
-          // this throw will trigger the catch.
-          throw new Error(response.msg);
+          throw new Error(response.msg); // this throw will trigger the catch.
         }
         updateMyListOfItems(response.items);
       })
       .catch((error) => {
-        console.log(' got to catch', error);
         addMessage({
           report: `Request to execute ${cmd} failed. \n${error}`,
           type: 'error',
         });
         throw new Error();
-        // need to log this to the server someplace.
       });
   }, []);
 

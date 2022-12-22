@@ -15,14 +15,13 @@ function App() {
     setDark(!dark);
   };
   const addMessage = (message: IMessage) => {
-    console.log(' -> addMessage was triggered', message);
     message.id = getUUID();
-    messages.push(message);
-    console.log(' -> message: ', message);
-    setMessages(messages);
+    const updatedMessages = [...messages]; // clone and push or the state change doesn't work right.
+    updatedMessages.push(message);
+    setMessages(updatedMessages);
   };
 
-  const removeMessageById = (id: string) => {
+  const removeMessage = (id: string) => {
     const reducedMessages = messages.filter((el) => el.id !== id);
     setMessages(reducedMessages);
   };
@@ -33,7 +32,7 @@ function App() {
         value={{
           messages,
           addMessage,
-          removeMessage: removeMessageById,
+          removeMessage,
         }}
       >
         <header className="App-header">

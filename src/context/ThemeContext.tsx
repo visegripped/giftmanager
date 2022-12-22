@@ -1,9 +1,9 @@
-import React from 'react';
+import { createContext, useContext } from 'react';
 
 const defaultState = {
   dark: false,
   toggleDark: () => {
-    console.log('stuff');
+    console.log('default context toggleDark executed');
   },
 };
 
@@ -12,8 +12,8 @@ interface IThemeContext {
   toggleDark: () => void;
 }
 
-export const ThemeContext = React.createContext<IThemeContext>(defaultState);
+export const ThemeContext = createContext<IThemeContext>(defaultState);
 
-export const useThemeContext = () => React.useContext(ThemeContext);
+export const useThemeContext = () => useContext(ThemeContext);
 
 export default ThemeContext;

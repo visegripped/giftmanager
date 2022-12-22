@@ -28,6 +28,7 @@ export const Message = (props: IMessage) => {
 
 const Notifications = () => {
   const { messages } = useNotificationContext();
+  console.log(` Notifications messages.length: ${messages.length}`);
   return (
     <section>
       {messages.map((message: IMessage) => {
