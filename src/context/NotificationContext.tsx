@@ -2,7 +2,7 @@
 import { createContext, useContext } from 'react';
 
 export interface IMessage {
-  type: 'error' | 'critical' | 'info';
+  type: 'error' | 'warn' | 'info';
   report: string;
   id?: string;
   meta?: object;

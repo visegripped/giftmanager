@@ -84,7 +84,7 @@ const MyList = () => {
   const { addMessage } = useNotificationContext();
 
   React.useEffect(() => {
-    const cmd = 'myListGets';
+    const cmd = 'myListGet';
     fetch(`https://www.visegripped.com/family/api.php?cmd=${cmd}`)
       .then((response) => {
         return response.json();

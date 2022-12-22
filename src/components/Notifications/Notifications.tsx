@@ -15,13 +15,9 @@ export const Message = (props: IMessage) => {
   return (
     <div className={`message ${type}`}>
       <pre className="message--pre">{report}</pre>
-      <Button
-        cssClasses={`button message--button message--button--${type}`}
-        priority={type}
-        id={id}
-        onClick={handleClick}
-        text="X"
-      />
+      <Button theme={type} id={id} onClick={handleClick}>
+        <b>X</b>
+      </Button>
     </div>
   );
 };

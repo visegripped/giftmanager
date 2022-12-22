@@ -10,7 +10,7 @@ export default {
 } as ComponentMeta<typeof ToggleDarkMode>;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof ToggleDarkMode> = (args) => <ToggleDarkMode />;
+const Template: ComponentStory<typeof ToggleDarkMode> = () => <ToggleDarkMode />;
 
 export const BasicUsage = Template.bind({});
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
