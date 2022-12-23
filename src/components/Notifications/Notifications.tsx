@@ -21,7 +21,7 @@ export const Message = (props: IMessage) => {
     removeMessage(messageId);
   };
   return (
-    <div className={`message message--${type}`}>
+    <div className={`message message--${type}`} data-testid="Message">
       <div className="message--iconContainer">
         <span className="message--icon">{String.fromCharCode(icons[type])}</span>
       </div>
@@ -37,9 +37,8 @@ export const Message = (props: IMessage) => {
 
 const Notifications = () => {
   const { messages } = useNotificationContext();
-  console.log(` Notifications messages.length: ${messages.length}`);
   return (
-    <section>
+    <section data-testid="Notifications">
       {messages.map((message: IMessage) => {
         return <Message key={message.id} {...message} />;
       })}

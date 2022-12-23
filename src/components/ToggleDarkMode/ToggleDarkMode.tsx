@@ -7,9 +7,8 @@ const ToggleDarkMode = () => {
   const handleOnChange = () => {
     toggleDark();
   };
-  console.log('enable dark mode rendered');
   return (
-    <label>
+    <label data-testid="ToggleDarkMode">
       <input type="checkbox" name="darkMode" onChange={handleOnChange} checked={dark} />
       Enable dark mode
     </label>
