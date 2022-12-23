@@ -8,35 +8,35 @@
   --buttonFontColor: var(--standardStateColor);
 }
 
-.secondary.error {
+.secondary.button--error {
   --buttonFontColor: var(--errorStateColor);
 }
-.secondary.warn {
+.secondary.button--warn {
   --buttonFontColor: var(--warnStateColor);
 }
-.secondary.info {
+.secondary.button--info {
   --buttonFontColor: var(--infoStateColor);
 }
-.secondary.success {
+.secondary.button--success {
   --buttonFontColor: var(--successStateColor);
 }
 
-.error {
+.button--error {
   --buttonBorderColor: var(--errorStateColor);
   --buttonBgColor: var(--errorStateColor);
 }
 
-.warn {
+.button--warn {
   --buttonBorderColor: var(--warnStateColor);
   --buttonBgColor: var(--warnStateColor);
 }
 
-.info {
+.button--info {
   --buttonBorderColor: var(--infoStateColor);
   --buttonBgColor: var(--infoStateColor);
 }
 
-.success {
+.button--success {
   --buttonBorderColor: var(--successStateColor);
   --buttonBgColor: var(--successStateColor);
 }

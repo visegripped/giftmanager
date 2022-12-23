@@ -1,24 +1,39 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import Notifications from './index';
-// import { IMessage } from '../../context/NotificationContext';
+import { Message } from './Notifications';
 
-// const sampleMessages: IMessage[] = ;
-
-// More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
-  title: 'component/Notifications',
-  component: Notifications,
-  // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
-} as ComponentMeta<typeof Notifications>;
+  title: 'component/Message',
+  component: Message,
+} as ComponentMeta<typeof Message>;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof Notifications> = () => <Notifications />;
+const Template: ComponentStory<typeof Message> = (args) => <Message {...args} />;
 
 export const BasicUsage = Template.bind({});
-// More on args: https://storybook.js.org/docs/react/writing-stories/args
-BasicUsage.args = {
-  messages: [
-    // { id: '1234-abcd-error', type: 'error', report: 'this is an error notification.' },
-  ],
-};
+BasicUsage.decorators = [
+  () => {
+    return (
+      <>
+        <Message type="info" report="This is an example of the info message." />
+        <Message type="standard" report="This is an example of the standard message." />
+        <Message type="error" report="This is an example of the error message." />
+        <Message type="warn" report="This is an example of the warn message." />
+        <Message type="success" report="This is an example of the success message." />
+      </>
+    );
+  },
+];
+
+// export const DarkUsage = Template.bind({});
+// DarkUsage.decorators = [
+//   () => {
+//     return <div className='dark'>
+//       <Message type='info' report='This is an example of the info message.' />
+//       <Message type='standard' report='This is an example of the standard message.' />
+//       <Message type='error' report='This is an example of the error message.' />
+//       <Message type='warn' report='This is an example of the warn message.' />
+//       <Message type='success' report='This is an example of the success message.' />
+//     </div>
+//   }
+// ]

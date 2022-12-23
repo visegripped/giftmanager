@@ -6,17 +6,17 @@ exports[`SelectList snapshot matches 1`] = `
   data-testid="SelectList"
 >
   <option
-    value="someting"
+    value="something"
   >
     something
   </option>
   <option
-    value="sometingElse"
+    value="somethingElse"
   >
     something else
   </option>
   <option
-    value="sometingMore"
+    value="somethingMore"
   >
     something more
   </option>

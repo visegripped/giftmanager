@@ -1,37 +1,82 @@
+:root {
+  --messageStateColor: var(--standardStateColor);
+  --messageIconFontSize: 1.6em;
+  --messageIconLineHeight: 1.1em;
+}
+
+.message.message--info {
+  --messageStateColor:var(--infoStateColor);
+  --messageIconFontSize: 1.9em;
+  --messageIconLineHeight: .8em;
+}
+
+
+.message.message--error {
+  --messageStateColor:var(--errorStateColor);
+  --messageIconFontSize: 1.9em;
+  --messageIconLineHeight: .8em;
+}
+
+.message.message--success {
+  --messageStateColor:var(--successStateColor);
+}
+
+.message.message--warn {
+  --messageStateColor:var(--warnStateColor);
+}
+
+
 .message {
-  padding: 20px;
+  padding: 1em 1em 1em 1.4em;
   text-align: left;
-  border: 1px solid;
+  border-left-width: .5em;
+  border-left-style: solid;
   position: relative;
-  border-radius: 4px;
-  margin-bottom: 8px;
+  border-radius: var(--borderRadius);
+  margin-bottom: 1em;
+  background: #fff;
+  border-left-color: var(--messageStateColor);
 }
 
-.message.info {
-  background: lightblue;
-  border-color: darkblue;
+.message--iconContainer {
+  width:  1.9em;
+  height: 1.9em;
+  position: absolute;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: .4em;
+  top: 0; left: -1.6em; bottom: 0;
+  border-radius: 50%;
+  text-align: center;
+  background-color: #fff;
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--messageStateColor);
+  color: var(--messageStateColor);
 }
 
-.message.warn {
-  background: lightgoldenrodyellow;
-  border-color: darkorange
-}
-
-.message.error {
-  background: lightpink;
-  border-color: darkred;
+.message--icon {
+  /* background-color: teal; */
+  display: block;
+  font-size: var(--messageIconFontSize);
+  line-height: var(--messageIconLineHeight);
 }
 
 .message--pre {
-  font-size: 14px;
+  font-size: 1.1em;
   color: #333;
   overflow-x: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
+  padding: 0;
+  margin:0;
 }
 
-.message--button {
+.message--buttonContainer {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0; bottom: 0;
+  right: 1em;
+  height: 40px;
 }

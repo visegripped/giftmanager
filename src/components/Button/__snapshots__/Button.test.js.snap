@@ -2,9 +2,7 @@
 
 exports[`Button snapshot matches 1`] = `
 <button
-  class="button secondary test classes"
+  class="button secondary standard"
   data-testid="Button"
->
-  click me
-</button>
+/>
 `;

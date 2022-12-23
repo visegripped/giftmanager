@@ -65,6 +65,7 @@ picture {
 
 /* Inherit fonts for inputs and buttons */
 input,
+pre,
 button,
 textarea,
 select {

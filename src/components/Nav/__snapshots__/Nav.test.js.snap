@@ -2,29 +2,28 @@
 
 exports[`Nav snapshot matches 1`] = `
 <nav
-  class="selectList test classes"
+  class="test classes"
   data-testid="Nav"
 >
-  <ul>
-    <li>
+  <ul
+    class="nav-list"
+  >
+    <li
+      class="nav-item"
+    >
       <a
         href="/mylist"
       >
         My list
       </a>
     </li>
-    <li>
+    <li
+      class="nav-item"
+    >
       <a
         href="/theirlist"
       >
         Their list
-      </a>
-    </li>
-    <li>
-      <a
-        href="/"
-      >
-        Home
       </a>
     </li>
   </ul>

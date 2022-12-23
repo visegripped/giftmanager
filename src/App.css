@@ -17,8 +17,8 @@ TODO:
 
   /* tokens */
   --fontColor: var(--greyDark);
-  --backgroundColorContent: #fff;
-  --fontColorReversed: #FFF;
+  --backgroundColorContent: var(--greyLight);
+  --fontColorReversed: var(--greyLight);
   --BackgroundColorReversed: #0d1118; /* needs to be darker than greyDark */
   --borderRadius: 8px;
   

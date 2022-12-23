@@ -4,7 +4,7 @@ import './Button.css';
 export interface ButtonProps {
   children: React.ReactNode;
   disabled?: boolean;
-  theme?: 'standard' | 'error' | 'warn' | 'info';
+  theme?: 'standard' | 'error' | 'warn' | 'info' | 'success';
   priority?: 'primary' | 'secondary';
   onClick(clickEvent: object, props: object): void;
   id?: string;
@@ -15,7 +15,7 @@ const Button = (props: ButtonProps) => {
   const buttonClickHandler = (clickEvent: React.MouseEvent<HTMLButtonElement>) => {
     onClick(clickEvent, props);
   };
-  const className = `button ${priority} ${theme}`;
+  const className = `button ${priority} button--${theme}`;
   return (
     <button id={id} className={className} disabled={disabled} data-testid="Button" onClick={buttonClickHandler}>
       {children}
