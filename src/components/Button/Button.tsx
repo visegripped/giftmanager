@@ -5,7 +5,7 @@ export interface ButtonProps {
   children: React.ReactNode;
   disabled?: boolean;
   theme?: 'standard' | 'error' | 'warn' | 'info';
-  priority?: 'primary' | 'secondary' | 'ghost';
+  priority?: 'primary' | 'secondary';
   onClick(clickEvent: object, props: object): void;
   id?: string;
 }

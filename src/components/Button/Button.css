@@ -1,13 +1,60 @@
+:root {
+  --buttonBorderColor: var(--standardStateColor);
+  --buttonBgColor: var(--standardStateColor);
+  --buttonFontColor: #fff;
+}
+
+.secondary {
+  --buttonFontColor: var(--standardStateColor);
+}
+
+.secondary.error {
+  --buttonFontColor: var(--errorStateColor);
+}
+.secondary.warn {
+  --buttonFontColor: var(--warnStateColor);
+}
+.secondary.info {
+  --buttonFontColor: var(--infoStateColor);
+}
+.secondary.success {
+  --buttonFontColor: var(--successStateColor);
+}
+
+.error {
+  --buttonBorderColor: var(--errorStateColor);
+  --buttonBgColor: var(--errorStateColor);
+}
+
+.warn {
+  --buttonBorderColor: var(--warnStateColor);
+  --buttonBgColor: var(--warnStateColor);
+}
+
+.info {
+  --buttonBorderColor: var(--infoStateColor);
+  --buttonBgColor: var(--infoStateColor);
+}
+
+.success {
+  --buttonBorderColor: var(--successStateColor);
+  --buttonBgColor: var(--successStateColor);
+}
+
 .button {
-  border-radius: 8px;
+  border-radius: var(--borderRadius);
   padding: 4px 12px;
   font-size: 1rem;
-  opacity: .8;
   cursor: pointer;
+  border-width: 2px;
+  border-style: solid;
+  color: var(--buttonFontColor);
+  border-color: var(--buttonBorderColor);
+  background-color: var(--buttonBgColor);
 }
 
 .button:hover {
-  opacity: 1;
+  opacity: .9;
 }
 
 .button:disabled {
@@ -15,26 +62,8 @@
   cursor: auto;
 }
 
-.primary {
-  background: rgb(254, 127, 0);
-  border: 1px solid rgb(254, 127, 0);
-  color: #fff;
-}
+
 
 .secondary {
-  border: 1px solid rgb(254, 127, 0);
-  color: rgb(254, 127, 0);
   background: #fff;
-}
-
-.ghost {
-  border: 1px solid #ccc;
-  background: #efefef;
-  color: #333;
-}
-
-.error {
-  border: 1px solid #900;
-  background: #600;
-  color: #fff;
 }

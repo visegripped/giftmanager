@@ -15,13 +15,13 @@ export default {
 const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />;
 
 const getButtonsByPriority = (priority: ButtonProps['priority']) => {
-  const themes = ['standard', 'info', 'warn', 'error', ''];
+  const themes: ButtonProps['theme'][] = ['standard', 'info', 'warn', 'error'];
   return (
     <>
-      {themes.map((theme) => {
+      {themes.map((theme: ButtonProps['theme']) => {
         return (
           <Button priority={priority} theme={theme} onClick={() => null}>
-            Secondary {theme}
+            {priority} {theme}
           </Button>
         );
       })}
@@ -41,12 +41,6 @@ export const Secondary = Template.bind({});
 Secondary.decorators = [
   () => {
     return getButtonsByPriority('secondary');
-  },
-];
-export const Ghost = Template.bind({});
-Ghost.decorators = [
-  () => {
-    return getButtonsByPriority('ghost');
   },
 ];
 

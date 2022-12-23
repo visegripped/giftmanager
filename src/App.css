@@ -1,14 +1,43 @@
+/*
+TODO:
+ - define color palette
+ - define tokens that leverage the color palette
+ - update buttons and notifications to leverage theme.
+ - make sure it all works in light and dark mode.
+*/
+
 :root {
-  --fontColor: #333;
-  --fontColorReversed: #FFF;
+  /* palette - only refer to these from tokens. */
+  --redDark: rgb(141, 27, 27);
+  --orangeDark: rgb(195, 110, 7);
+  --greenDark: rgb(81, 104, 42);
+  --greyDark: #252a32;
+  --blueDark: rgb(22, 42, 152);
+  --greyLight: #EFEFEF;
+
+  /* tokens */
+  --fontColor: var(--greyDark);
   --backgroundColorContent: #fff;
-  --BackgroundColorReversed: #282c34;
-  --fontColorLink: teal;
+  --fontColorReversed: #FFF;
+  --BackgroundColorReversed: #0d1118; /* needs to be darker than greyDark */
+  --borderRadius: 8px;
+  
+  --fontColorLink: var(--greenDark);
+
+  --errorStateColor: var(--redDark);
+  --warnStateColor: var(--orangeDark);
+  --infoStateColor: var(--greyDark);
+  --successStateColor: var(--greenDark);
+  --standardStateColor: var(--blueDark);
+
+  --panelBorderColor: var(--greyLight);
+  
 }
 
 .dark {
     --fontColor: #FFF;
     --backgroundColorContent: #000;
+    --panelBorderColor: var(--greyDark);
 }
 
 #root {
