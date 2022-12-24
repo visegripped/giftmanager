@@ -1,31 +1,24 @@
 import React from 'react';
 import './Button.css';
 
-interface ButtonProps {
-  text: string;
-  cssClasses?: string;
+export interface ButtonProps {
+  children: React.ReactNode;
   disabled?: boolean;
-  priority?: 'primary' | 'secondary' | 'ghost';
+  theme?: 'standard' | 'error' | 'warn' | 'info' | 'success';
+  priority?: 'primary' | 'secondary';
   onClick(clickEvent: object, props: object): void;
+  id?: string;
 }
 
 const Button = (props: ButtonProps) => {
-  const {
-    text,
-    cssClasses,
-    disabled,
-    priority,
-    onClick = () => {
-      return '';
-    },
-  } = props;
+  const { children, id, disabled, priority = 'primary', onClick = () => null, theme = 'standard' } = props;
   const buttonClickHandler = (clickEvent: React.MouseEvent<HTMLButtonElement>) => {
     onClick(clickEvent, props);
   };
-  const className = `button ${priority} ${cssClasses}`;
+  const className = `button ${priority} button--${theme}`;
   return (
-    <button className={className} disabled={disabled} data-testid="Button" onClick={buttonClickHandler}>
-      {text}
+    <button id={id} className={className} disabled={disabled} data-testid="Button" onClick={buttonClickHandler}>
+      {children}
     </button>
   );
 };

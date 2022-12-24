@@ -5,6 +5,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: #efefef;
 }
+
+body, html {
+  height: 100%;
+}
+
 /* Box sizing rules */
 *,
 *::before,
@@ -48,7 +53,7 @@ body {
 /* A elements that don't have a class get default styles */
 a:not([class]) {
   text-decoration-skip-ink: auto;
-  color: darkgreen;
+  color: var(--fontColorLink);
 }
 
 /* Make images easier to work with */
@@ -60,6 +65,7 @@ picture {
 
 /* Inherit fonts for inputs and buttons */
 input,
+pre,
 button,
 textarea,
 select {

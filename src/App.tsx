@@ -1,13 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Nav from './components/Nav/';
-import { NotificationProvider } from './context/NotificationContext';
+import { NotificationContext, IMessage } from './context/NotificationContext';
+import Notifications from './components/Notifications';
 import './App.css';
+import ThemeContext from './context/ThemeContext';
+import ToggleDarkMode from './components/ToggleDarkMode';
+import { v4 as getUUID } from 'uuid';
 
 function App() {
+  const [dark, setDark] = useState(false);
+  const [messages, setMessages] = useState<IMessage[]>([]);
+  const toggleDark = () => {
+    setDark(!dark);
+  };
+  const addMessage = (message: IMessage) => {
+    message.id = getUUID();
+    const updatedMessages = [...messages]; // clone and push or the state change doesn't work right.
+    updatedMessages.push(message);
+    setMessages(updatedMessages);
+  };
+
+  const removeMessage = (id: string) => {
+    const reducedMessages = messages.filter((el) => el.id !== id);
+    setMessages(reducedMessages);
+  };
+
   return (
-    <>
-      <NotificationProvider>
+    <div className={`App-container ${dark ? 'dark' : 'none'}`}>
+      <NotificationContext.Provider
+        value={{
+          messages,
+          addMessage,
+          removeMessage,
+        }}
+      >
         <header className="App-header">
           <div>GiftManager</div>
           <Nav cssClasses="App-header__nav" />
@@ -15,11 +42,21 @@ function App() {
         </header>
 
         <main className="App-main">
+          <Notifications />
           <Outlet />
         </main>
-        <footer className="App-footer"></footer>
-      </NotificationProvider>
-    </>
+        <ThemeContext.Provider
+          value={{
+            dark,
+            toggleDark,
+          }}
+        >
+          <footer className="App-footer">
+            <ToggleDarkMode />
+          </footer>
+        </ThemeContext.Provider>
+      </NotificationContext.Provider>
+    </div>
   );
 }
 

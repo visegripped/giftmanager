@@ -1,37 +1,46 @@
 import React from 'react';
 import './Notifications.css';
-import { IMessage } from '../../context/NotificationContext';
+import { IMessage, useNotificationContext } from '../../context/NotificationContext';
+import Button from '../../components/Button';
 import './Notifications.css';
-
-interface NotificationsProps {
-  cssClasses?: string;
-  messages: [];
-}
 
 export const Message = (props: IMessage) => {
   const { type, report, id } = props;
+  const { removeMessage } = useNotificationContext();
+  /* https://www.toptal.com/designers/htmlarrows/symbols/ */
+  const icons = {
+    warn: 9785,
+    success: 9786,
+    error: 9760,
+    info: 9881,
+    standard: 9755,
+  };
   const handleClick = (clickEvent: React.SyntheticEvent<HTMLButtonElement>) => {
-    const messageId = clickEvent.currentTarget?.dataset?.messageid;
-    // removeMessage(messageId);
+    const messageId = clickEvent.currentTarget?.id;
     console.log(`Click triggered for removing ${messageId}`);
+    removeMessage(messageId);
   };
   return (
-    <div className={`message ${type}`}>
-      <pre className="message--pre">{report}</pre>
-      <button className={`button message--button message--button--${type}`} data-messageid={id} onClick={handleClick}>
-        X
-      </button>
+    <div className={`message message--${type}`} data-testid="Message">
+      <div className="message--iconContainer">
+        <span className="message--icon">{String.fromCharCode(icons[type])}</span>
+      </div>
+      <pre className="message--pre ">{report}</pre>
+      <div className="message--buttonContainer">
+        <Button theme={type} id={id} onClick={handleClick}>
+          <b>&#x2716;</b>
+        </Button>
+      </div>
     </div>
   );
 };
 
-const Notifications = (props: NotificationsProps) => {
-  const { cssClasses, messages } = props;
-  const className = `Notifications ${cssClasses}`;
+const Notifications = () => {
+  const { messages } = useNotificationContext();
   return (
-    <section className={className}>
+    <section data-testid="Notifications">
       {messages.map((message: IMessage) => {
-        return <Message {...message} />;
+        return <Message key={message.id} {...message} />;
       })}
     </section>
   );

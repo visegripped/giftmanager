@@ -1,10 +1,61 @@
+/*
+TODO:
+ - define color palette
+ - define tokens that leverage the color palette
+ - update buttons and notifications to leverage theme.
+ - make sure it all works in light and dark mode.
+*/
+
+:root {
+  /* palette - only refer to these from tokens. */
+  --redDark: rgb(141, 27, 27);
+  --orangeDark: rgb(195, 110, 7);
+  --greenDark: rgb(81, 104, 42);
+  --greyDark: #252a32;
+  --blueDark: rgb(22, 42, 152);
+  --greyLight: #EFEFEF;
+
+  /* tokens */
+  --fontColor: var(--greyDark);
+  --backgroundColorContent: var(--greyLight);
+  --fontColorReversed: var(--greyLight);
+  --BackgroundColorReversed: #0d1118; /* needs to be darker than greyDark */
+  --borderRadius: 8px;
+  
+  --fontColorLink: var(--greenDark);
+
+  --errorStateColor: var(--redDark);
+  --warnStateColor: var(--orangeDark);
+  --infoStateColor: var(--greyDark);
+  --successStateColor: var(--greenDark);
+  --standardStateColor: var(--blueDark);
+
+  --panelBorderColor: var(--greyLight);
+  
+}
+
+.dark {
+    --fontColor: #FFF;
+    --backgroundColorContent: #000;
+    --panelBorderColor: var(--greyDark);
+}
+
+#root {
+  height: 100%;
+}
+.App-container {
+  height: 100%;
+  background-color: var(--backgroundColorContent);
+  color: var(--fontColor);
+}
+
 .App-header {
-  background-color: #282c34;
+  background-color: var(--BackgroundColorReversed);
+  color: var(--fontColorReversed);
   display: flex;
   flex-direction: row;
   align-items: baseline;
   font-size: 2vmin;
-  color: white;
   justify-content: space-between;
   padding: .5vh 2vw 0;
 }
@@ -22,7 +73,14 @@
   min-height: 50vh;
   padding: 1.5vh 2vw;
 }
+
 .App-footer {
-  background-color: #282c34;
-  min-height: 1vh;
+  background-color: var(--BackgroundColorReversed);
+  color: var(--fontColorReversed);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 1.3vmin;
+  justify-content: right;
+  padding: .5vh 2vw;
 }

@@ -1,58 +1,31 @@
 // https://felixgerschau.com/react-typescript-context/
-import React, { createContext, FC, useState } from 'react';
-import { v4 as getUUID } from 'uuid';
+import { createContext, useContext } from 'react';
 
 export interface IMessage {
-  type: 'error' | 'critical' | 'info';
+  type: 'error' | 'warn' | 'info' | 'standard' | 'success';
   report: string;
-  id: string;
-  meta?: object; //
+  id?: string;
+  meta?: object;
 }
 
 interface INotificationContext {
   messages: IMessage[];
-  removeMessage?: (messageId: string) => void;
-  addMessage?: (message: IMessage) => void;
-}
-interface INotificationProvider {
-  children: React.ReactNode;
+  removeMessage: (messageId: string) => void;
+  addMessage: (message: IMessage) => void;
 }
 
 const defaultState = {
   messages: [],
+  addMessage: (message: IMessage) => {
+    console.log('default addMessage triggered.', message.report);
+  },
+  removeMessage: (messageId: string) => {
+    console.log('default removeMessage triggered.', messageId);
+  },
 };
 
-const NotificationContext = createContext<INotificationContext>(defaultState);
+export const NotificationContext = createContext<INotificationContext>(defaultState);
 
-const removeMessageById = (messageArray: IMessage[], id: string) => {
-  return messageArray.filter((el) => el.id !== id);
-};
-
-export const NotificationProvider: FC<INotificationProvider> = ({ children }) => {
-  const [messages, setMessages] = useState<IMessage[]>([]);
-  const addMessage = (message: IMessage) => {
-    if (message.report) {
-      message.id = getUUID();
-      messages.push(message);
-      setMessages(messages);
-    }
-  };
-  const removeMessage = (messageId: string) => {
-    console.log(`Remove message ${messageId}`);
-    removeMessageById(messages, messageId);
-  };
-
-  return (
-    <NotificationContext.Provider
-      value={{
-        messages: [],
-        addMessage,
-        removeMessage,
-      }}
-    >
-      {children}
-    </NotificationContext.Provider>
-  );
-};
+export const useNotificationContext = () => useContext(NotificationContext);
 
 export default NotificationContext;

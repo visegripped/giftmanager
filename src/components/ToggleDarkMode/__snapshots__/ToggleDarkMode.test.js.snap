@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ToggleDarkMode snapshot matches 1`] = `
+<label
+  data-testid="ToggleDarkMode"
+>
+  <input
+    name="darkMode"
+    type="checkbox"
+  />
+  Enable dark mode
+</label>
+`;

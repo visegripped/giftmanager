@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SelectList from '../../components/SelectList';
+import { useNotificationContext } from '../../context/NotificationContext';
 // import { isTemplateSpan } from 'typescript';
 import './MyList.css';
 
@@ -14,29 +15,42 @@ interface ItemsProps {
 interface ResponseProps {
   items: [];
   type: string;
+  msg: string;
   statusText: string;
 }
 
 const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
   const newValue = updateEvent.target.value;
   console.log('This is the updated list: ', itemid, newValue);
+  const { addMessage } = useNotificationContext();
+  const cmd = 'myListUpdateStatus';
+
   if (newValue === '-1') {
     // do nothing. was set to 'no change'
   } else {
-    fetch(`https://www.visegripped.com/family/api.php?cmd=myListUpdateStatus&status=${newValue}&itemid=${itemid}`)
+    fetch(`https://www.visegripped.com/family/api.php?cmd=${cmd}&status=${newValue}&itemid=${itemid}`)
       .then((response) => {
         return response.json();
       })
       .then((response: ResponseProps) => {
-        console.log(' -> API response: ', response);
         if (response.type !== 'success') {
+          addMessage({
+            report: response.statusText,
+            type: 'error',
+          });
           throw new Error(response.statusText);
         }
-        // report a successfully updated status change.
+        addMessage({
+          report: 'Successfully updated list.',
+          type: 'info',
+        });
       })
       .catch((response) => {
+        addMessage({
+          report: `Request to execute ${cmd} failed.`,
+          type: 'error',
+        });
         throw new Error(response.statusText);
-        // need to log this to the server someplace.
       });
   }
 };
@@ -66,23 +80,27 @@ const getStatusChoices = (itemRemoved: number) => {
 
 const MyList = () => {
   const [myListOfItems, updateMyListOfItems] = useState([]);
-  // const [myListOfItems] = useState([]);
+  // Take a look at toggleDarkMode.tsx Has a useThemeContext
+  const { addMessage } = useNotificationContext();
 
   React.useEffect(() => {
-    fetch('https://www.visegripped.com/family/api.php?cmd=myListGet')
+    const cmd = 'myListGet';
+    fetch(`https://www.visegripped.com/family/api.php?cmd=${cmd}`)
       .then((response) => {
         return response.json();
       })
       .then((response: ResponseProps) => {
-        console.log(' -> API response: ', response);
         if (response.type !== 'success') {
-          throw new Error(response.statusText);
+          throw new Error(response.msg); // this throw will trigger the catch.
         }
         updateMyListOfItems(response.items);
       })
-      .catch((response) => {
-        throw new Error(response.statusText);
-        // need to log this to the server someplace.
+      .catch((error) => {
+        addMessage({
+          report: `Request to execute ${cmd} failed. \n${error}`,
+          type: 'error',
+        });
+        throw new Error();
       });
   }, []);
 
