@@ -18,9 +18,6 @@ const Nav = (props: NavProps) => {
         <li className="nav-item">
           <Link to="/theirlist">Their list</Link>
         </li>
-        {/* <li className='nav-item'>
-          <Link to="/">Home</Link>
-        </li> */}
       </ul>
     </nav>
   );
