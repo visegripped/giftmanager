@@ -23,18 +23,32 @@ export const AuthButton = () => {
   const { tokenId, setAuth } = useAuthContext();
   const { addMessage } = useNotificationContext();
 
-  // const setToken = (tokenId: string, email: string) => {
-  //   sessionStorage.setItem("tokenId", tokenId);
-  //   sessionStorage.setItem("userId", email);
-  //   setAuth({ "tokenId": tokenId, "userId": email });
-  // };
+  const setToken = (tokenId = '', email = '') => {
+    sessionStorage.setItem('tokenId', tokenId);
+    sessionStorage.setItem('userId', email);
+    setAuth({ tokenId: tokenId, userId: email });
+  };
 
-  const onLoginSuccess = (authResponse: GoogleLoginResponse | GoogleLoginResponseOffline) => {
+  const parseSuccessResponse = (authResponse: GoogleLoginResponseOffline | GoogleLoginResponse) => {
+    let result, token, email;
+    if ('profileObj' in authResponse) {
+      result = authResponse.profileObj;
+      email = result.email;
+    }
+    if ('tokenId' in authResponse) {
+      token = authResponse.tokenId;
+    }
+    return {
+      token,
+      email,
+    };
+  };
+
+  const onLoginSuccess = (authResponse: GoogleLoginResponseOffline | GoogleLoginResponse) => {
     console.log('Auth Success: currentUser:', authResponse);
-    // const { tokenId, profileObj } = authResponse;
-    // const { email } = profileObj;
-    // setToken(tokenId, email);
-    // refreshAuthTokenBeforeExpiration(authResponse);
+    const { token, email } = parseSuccessResponse(authResponse);
+    setToken(token, email);
+    refreshAuthTokenBeforeExpiration(authResponse);
   };
 
   const onLoginFailure = (authResponse: ResponseProps) => {
@@ -50,24 +64,31 @@ export const AuthButton = () => {
     sessionStorage.setItem('tokenId', '');
     sessionStorage.setItem('userId', '');
     setAuth({ tokenId: '', userId: '' });
+    addMessage({
+      report: 'You have been logged out',
+      type: 'info',
+    });
   };
 
-  // const refreshAuthTokenBeforeExpiration = (res: ResponseProps) => {
-  //   // Timing to renew access token
-  //   let durationBetweenAutoRefresh =
-  //     (res.tokenObj.expires_in || 3600 - 5 * 60) * 1000;
-  //   const refreshToken = async () => {
-  //     const newAuthRes = await res.reloadAuthResponse();
-  //     console.log(" - - - > newAuthRes: ", newAuthRes);
-  //     const { tokenId, profileObj } = newAuthRes;
-  //     const { email } = profileObj;
-  //     durationBetweenAutoRefresh =
-  //       (newAuthRes.expires_in || 3600 - 5 * 60) * 1000;
-  //     setToken(tokenId, email);
-  //     setTimeout(refreshToken, durationBetweenAutoRefresh);
-  //   };
-  //   setTimeout(refreshToken, durationBetweenAutoRefresh);
-  // };
+  const refreshAuthTokenBeforeExpiration = (authResponse: GoogleLoginResponseOffline | GoogleLoginResponse) => {
+    let refreshRate = 3600 - 5 * 60;
+    if ('tokenObj' in authResponse) {
+      refreshRate = authResponse?.tokenObj?.expires_in;
+    }
+    // Timing to renew access token
+    let durationBetweenAutoRefresh = refreshRate * 1000;
+    const refreshToken = async () => {
+      if ('reloadAuthResponse' in authResponse) {
+        const newAuthRes = await authResponse.reloadAuthResponse();
+        console.log(' - - - > newAuthRes: ', newAuthRes);
+        const { token, email } = parseSuccessResponse(authResponse);
+        durationBetweenAutoRefresh = (newAuthRes.expires_in || 3600 - 5 * 60) * 1000;
+        setToken(token, email);
+        setTimeout(refreshToken, durationBetweenAutoRefresh);
+      }
+    };
+    setTimeout(refreshToken, durationBetweenAutoRefresh);
+  };
 
   return tokenId ? (
     <GoogleLogout clientId={clientId} buttonText="Logout" onLogoutSuccess={onLogoutSuccess}></GoogleLogout>
