@@ -61,7 +61,7 @@ function App() {
         >
           <header className="App-header">
             <div>GiftManager</div>
-            <Nav cssClasses="App-header__nav" />
+            {tokenId ? <Nav cssClasses="App-header__nav" /> : <></>}
             <div className="App-header__login">
               <AuthButton />
             </div>{' '}
@@ -70,7 +70,15 @@ function App() {
 
           <main className="App-main">
             <Notifications />
-            <Outlet />
+            {tokenId ? (
+              <Outlet />
+            ) : (
+              <>
+                <h1>Welcome. Please log in to continue</h1>
+                <br />
+                <AuthButton />
+              </>
+            )}
           </main>
           <ThemeContext.Provider
             value={{
