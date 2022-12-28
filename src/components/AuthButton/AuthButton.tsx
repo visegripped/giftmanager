@@ -4,6 +4,8 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useNotificationContext } from '../../context/NotificationContext';
 import './AuthButton.css';
 
+// Will need to migrate this over to https://developers.google.com/identity/gsi/web/guides/client-library
+
 interface ResponseProps {
   profileObj: {
     email: string;
@@ -21,6 +23,7 @@ const clientId = '451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleuserc
 
 export const AuthButton = () => {
   const { tokenId, setAuth } = useAuthContext();
+  console.log(' -> tokenId: ', tokenId);
   const { addMessage } = useNotificationContext();
 
   const setToken = (tokenId = '', email = '') => {

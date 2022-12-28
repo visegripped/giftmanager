@@ -1,3 +1,10 @@
+:root {
+  --altTableBgColor: #fff;
+}
+
+.dark {
+  --altTableBgColor: var(--greyDark);
+}
 
 .list--container {
   width: 80vw;
@@ -17,7 +24,7 @@
 }
 
 .list--body tr:nth-child(even) {
-  background: #FFFFFF;
+  background: var(--altTableBgColor);
 }
 
 .list--head_status,
