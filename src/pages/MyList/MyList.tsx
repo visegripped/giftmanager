@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SelectList from '../../components/SelectList';
 import { useNotificationContext } from '../../context/NotificationContext';
-// import { isTemplateSpan } from 'typescript';
+import { useAuthContext } from '../../context/AuthContext';
 import './MyList.css';
 
 interface ItemsProps {
@@ -82,10 +82,18 @@ const MyList = () => {
   const [myListOfItems, updateMyListOfItems] = useState([]);
   // Take a look at toggleDarkMode.tsx Has a useThemeContext
   const { addMessage } = useNotificationContext();
+  const { tokenId } = useAuthContext();
 
   React.useEffect(() => {
     const cmd = 'myListGet';
-    fetch(`https://www.visegripped.com/family/api.php?cmd=${cmd}`)
+    const formData = new FormData();
+    formData.append('tokenId', tokenId);
+    formData.append('cmd', cmd);
+
+    fetch(`https://www.visegripped.com/family/api.php`, {
+      body: formData,
+      method: 'post',
+    })
       .then((response) => {
         return response.json();
       })

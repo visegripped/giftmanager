@@ -13,13 +13,14 @@ TODO:
   --greenDark: rgb(81, 104, 42);
   --greyDark: #252a32;
   --blueDark: rgb(22, 42, 152);
+  --greenLight: rgb(161, 193, 107);
   --greyLight: #EFEFEF;
 
   /* tokens */
   --fontColor: var(--greyDark);
   --backgroundColorContent: var(--greyLight);
   --fontColorReversed: var(--greyLight);
-  --BackgroundColorReversed: #0d1118; /* needs to be darker than greyDark */
+  --BackgroundColorReversed: #242a35; /* needs to be darker than greyDark */
   --borderRadius: 8px;
   
   --fontColorLink: var(--greenDark);
@@ -38,6 +39,7 @@ TODO:
     --fontColor: #FFF;
     --backgroundColorContent: #000;
     --panelBorderColor: var(--greyDark);
+    --fontColorLink: var(--greenLight);
 }
 
 #root {

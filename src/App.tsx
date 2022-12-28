@@ -2,15 +2,24 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Nav from './components/Nav/';
 import { NotificationContext, IMessage } from './context/NotificationContext';
+import ThemeContext from './context/ThemeContext';
+import AuthContext, { IAuthUpdate } from './context/AuthContext';
 import Notifications from './components/Notifications';
 import './App.css';
-import ThemeContext from './context/ThemeContext';
 import ToggleDarkMode from './components/ToggleDarkMode';
+import AuthButton from './components/AuthButton';
 import { v4 as getUUID } from 'uuid';
 
 function App() {
   const [dark, setDark] = useState(false);
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const tokenId = sessionStorage.getItem('tokenId') || '';
+  const userId = sessionStorage.getItem('userId') || '';
+  const [Auth, setAuth] = useState({
+    tokenId,
+    userId,
+  });
+
   const toggleDark = () => {
     setDark(!dark);
   };
@@ -26,6 +35,14 @@ function App() {
     setMessages(reducedMessages);
   };
 
+  const updateAuth = (valObj: IAuthUpdate) => {
+    const updatedAuth = {
+      ...Auth,
+      ...valObj,
+    };
+    setAuth(updatedAuth);
+  };
+
   return (
     <div className={`App-container ${dark ? 'dark' : 'none'}`}>
       <NotificationContext.Provider
@@ -35,26 +52,45 @@ function App() {
           removeMessage,
         }}
       >
-        <header className="App-header">
-          <div>GiftManager</div>
-          <Nav cssClasses="App-header__nav" />
-          <div className="App-header__login">Logged in as $user</div> {/* link this to their view */}
-        </header>
-
-        <main className="App-main">
-          <Notifications />
-          <Outlet />
-        </main>
-        <ThemeContext.Provider
+        <AuthContext.Provider
           value={{
-            dark,
-            toggleDark,
+            tokenId,
+            userId,
+            setAuth: updateAuth,
           }}
         >
-          <footer className="App-footer">
-            <ToggleDarkMode />
-          </footer>
-        </ThemeContext.Provider>
+          <header className="App-header">
+            <div>GiftManager</div>
+            {tokenId ? <Nav cssClasses="App-header__nav" /> : <></>}
+            <div className="App-header__login">
+              <AuthButton />
+            </div>{' '}
+            {/* link this to their view */}
+          </header>
+
+          <main className="App-main">
+            <Notifications />
+            {tokenId ? (
+              <Outlet />
+            ) : (
+              <>
+                <h1>Welcome. Please log in to continue</h1>
+                <br />
+                <AuthButton />
+              </>
+            )}
+          </main>
+          <ThemeContext.Provider
+            value={{
+              dark,
+              toggleDark,
+            }}
+          >
+            <footer className="App-footer">
+              <ToggleDarkMode />
+            </footer>
+          </ThemeContext.Provider>
+        </AuthContext.Provider>
       </NotificationContext.Provider>
     </div>
   );
