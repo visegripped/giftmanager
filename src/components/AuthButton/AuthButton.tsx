@@ -23,7 +23,6 @@ const clientId = '451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleuserc
 
 export const AuthButton = () => {
   const { tokenId, setAuth } = useAuthContext();
-  console.log(' -> tokenId: ', tokenId);
   const { addMessage } = useNotificationContext();
 
   const setToken = (tokenId = '', email = '') => {
@@ -75,9 +74,11 @@ export const AuthButton = () => {
 
   const refreshAuthTokenBeforeExpiration = (authResponse: GoogleLoginResponseOffline | GoogleLoginResponse) => {
     let refreshRate = 3600 - 5 * 60;
+    console.log(' BEGIN refresh method');
     if ('tokenObj' in authResponse) {
       refreshRate = authResponse?.tokenObj?.expires_in;
     }
+    console.log(` -> refreshRate: ${refreshRate} `);
     // Timing to renew access token
     let durationBetweenAutoRefresh = refreshRate * 1000;
     const refreshToken = async () => {
@@ -92,6 +93,10 @@ export const AuthButton = () => {
     };
     setTimeout(refreshToken, durationBetweenAutoRefresh);
   };
+
+  React.useEffect(() => {
+    console.log(' -> auth button use effect.');
+  }, []);
 
   return tokenId ? (
     <GoogleLogout clientId={clientId} buttonText="Logout" onLogoutSuccess={onLogoutSuccess}></GoogleLogout>

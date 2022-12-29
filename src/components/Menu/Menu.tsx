@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Menu.css';
 
-interface MenuItemProps {
+export interface MenuItemProps {
   link: string;
   value: string;
 }
