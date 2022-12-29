@@ -18,8 +18,10 @@ const Menu = (props: MenuProps) => {
       {items.map((item: MenuItemProps) => {
         const { link, value } = item;
         return (
-          <li className="menu-item">
-            <Link to={link}>{value}</Link>
+          <li className="menu-item" key={value}>
+            <Link to={link} key={value}>
+              {value}
+            </Link>
           </li>
         );
       })}

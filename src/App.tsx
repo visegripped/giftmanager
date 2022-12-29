@@ -54,16 +54,14 @@ function App() {
       get user detail of who is logged in.
       get full user list for nav++ 
       */
-      console.log(' -> tokenId is set. Do stuff.');
       const cmd = 'usersGet';
       fetchData(cmd, tokenId)
         .then((response: ResponseProps) => {
-          console.log(' -> response: ', response);
-          const userList: MenuItemProps[] = [];
-          // typescript didn't like map here. :/
-          response.users.forEach((user: UserResponseProps) => {
-            userList.push({ link: '#', value: `${user.firstName}` });
-          });
+          const userList: MenuItemProps[] = response.users
+            .map((user: UserResponseProps) => {
+              return { link: `/theirlist?userid=${user.userid}`, value: `${user.firstName} ${user.lastName}` };
+            })
+            .sort((a, b) => a.value.localeCompare(b.value));
           setUsers(userList);
         })
         .catch((error) => {

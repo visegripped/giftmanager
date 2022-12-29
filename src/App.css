@@ -22,6 +22,7 @@ TODO:
   --fontColorReversed: var(--greyLight);
   --BackgroundColorReversed: #242a35; /* needs to be darker than greyDark */
   --borderRadius: 8px;
+  --borderColor: rgb(222, 222, 222);
   
   --fontColorLink: var(--greenDark);
 
@@ -32,7 +33,7 @@ TODO:
   --standardStateColor: var(--blueDark);
 
   --panelBorderColor: var(--greyLight);
-  
+  --borderColor: rgb(42, 42, 42);
 }
 
 .dark {

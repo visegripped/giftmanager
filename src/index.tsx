@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import NoPage from './pages/NoPage';
 import MyList from './pages/MyList';
-import EditOtherList from './pages/TheirList';
+import EditOtherList from './pages/TheirList/TheirList';
 import './index.css';
 import App from './App';
 // import reportWebVitals from './reportWebVitals';
