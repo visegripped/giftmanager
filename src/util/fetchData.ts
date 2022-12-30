@@ -14,11 +14,14 @@ export interface UserResponseProps {
 }
 
 export interface ItemsResponseProps {
+  archive: number;
+  buy_userid?: number;
   itemid: number;
   item_name: string;
   item_link?: string;
   item_desc?: string;
   remove: number;
+  status: number;
 }
 
 export const fetchData = (cmd: string, token: string, queryParams: { [key: string]: string | Blob } = {}) => {

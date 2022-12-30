@@ -1,13 +1,13 @@
 import React from 'react';
 import './SelectList.css';
 
-interface OptionProps {
+export interface SelectListOptionProps {
   value: string | number;
   label: string;
 }
 
 interface SelectListProps {
-  options: OptionProps[];
+  options: SelectListOptionProps[];
   cssClasses?: string;
   disabled?: boolean;
   uuid: string | number;
@@ -29,7 +29,7 @@ const SelectList = (props: SelectListProps) => {
       onChange={selectChangeHandler}
       value={selected}
     >
-      {options.map((option: OptionProps) => {
+      {options.map((option: SelectListOptionProps) => {
         const { value, label } = option;
         return (
           <option value={value} key={`${uuid}_${value}`}>

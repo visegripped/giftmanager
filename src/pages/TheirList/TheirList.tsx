@@ -4,7 +4,7 @@ import { useNotificationContext } from '../../context/NotificationContext';
 import { useAuthContext } from '../../context/AuthContext';
 import { useParams } from 'react-router-dom';
 import { ResponseProps, ItemsResponseProps, fetchData } from '../../util/fetchData';
-import { getStatusChoices } from '../../util/getStatusChoices';
+import { getStatusChoicesForTheirList, getPrettyStatus } from '../../util/status';
 
 const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
   const newValue = updateEvent.target.value;
@@ -12,23 +12,29 @@ const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: s
 };
 
 const TheirList = () => {
-  const { userId } = useParams();
-  console.log(` - - - - - > userId: ${userId}`);
+  const { userId } = useParams() || '';
   const [myListOfItems, updateMyListOfItems] = useState([]);
   // Take a look at toggleDarkMode.tsx Has a useThemeContext
   const { addMessage } = useNotificationContext();
   const { tokenId } = useAuthContext();
   React.useEffect(() => {
     if (userId) {
+      updateMyListOfItems([]); // blank the list out to indicate something is happening.
       const cmd = 'theirListGet';
       fetchData(cmd, tokenId, {
         theirUserId: userId.toString(),
       })
         .then((response: ResponseProps) => {
-          updateMyListOfItems(response.items);
+          if (!response.items.length) {
+            addMessage({
+              report: 'This user has no items on their list.  Slacker.',
+              type: 'info',
+            });
+          } else {
+            updateMyListOfItems(response.items);
+          }
         })
         .catch((error) => {
-          updateMyListOfItems([]);
           addMessage({
             report: `Request to execute ${cmd} failed. \n${error}`,
             type: 'error',
@@ -50,7 +56,9 @@ const TheirList = () => {
         </thead>
         <tbody className="list--body">
           {myListOfItems.map((item: ItemsResponseProps) => {
-            const { item_name, itemid, item_desc, item_link, remove } = item;
+            const { item_name, itemid, item_desc, item_link, remove, buy_userid, status } = item;
+            const optionChoices = getStatusChoicesForTheirList(userId, item);
+
             return (
               <tr key={`${itemid}_${item_name}`}>
                 <td>
@@ -64,12 +72,13 @@ const TheirList = () => {
                   <div className="list--item_desc">{item_desc}</div>
                 </td>
                 <td className="list--body_status">
-                  <SelectList
-                    options={getStatusChoices(remove)}
-                    onChange={updateList}
-                    selected={remove}
-                    uuid={itemid}
-                  />
+                  {optionChoices.length ? (
+                    <SelectList options={optionChoices} onChange={updateList} selected={remove} uuid={itemid} />
+                  ) : (
+                    <div>
+                      {getPrettyStatus(status)} by {buy_userid}
+                    </div>
+                  )}
                 </td>
               </tr>
             );
