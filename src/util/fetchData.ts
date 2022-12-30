@@ -13,7 +13,15 @@ export interface UserResponseProps {
   lastName: string;
 }
 
-export const fetchData = (cmd: string, token: string, queryParams: { [key: string]: string } = {}) => {
+export interface ItemsResponseProps {
+  itemid: number;
+  item_name: string;
+  item_link?: string;
+  item_desc?: string;
+  remove: number;
+}
+
+export const fetchData = (cmd: string, token: string, queryParams: { [key: string]: string | Blob } = {}) => {
   if (!cmd || !token) {
     Promise.resolve({
       msg: `Token [${token}] and/or cmd [${cmd}] were left blank in fetchData.  Both are required.`,

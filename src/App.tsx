@@ -59,7 +59,7 @@ function App() {
         .then((response: ResponseProps) => {
           const userList: MenuItemProps[] = response.users
             .map((user: UserResponseProps) => {
-              return { link: `/theirlist?userid=${user.userid}`, value: `${user.firstName} ${user.lastName}` };
+              return { link: `/theirlist/${user.userid}`, value: `${user.firstName} ${user.lastName}` };
             })
             .sort((a, b) => a.value.localeCompare(b.value));
           setUsers(userList);

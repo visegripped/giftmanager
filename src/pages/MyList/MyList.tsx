@@ -2,22 +2,8 @@ import React, { useState } from 'react';
 import SelectList from '../../components/SelectList';
 import { useNotificationContext } from '../../context/NotificationContext';
 import { useAuthContext } from '../../context/AuthContext';
+import { ResponseProps, ItemsResponseProps } from '../../util/fetchData';
 import './MyList.css';
-
-interface ItemsProps {
-  itemid: number;
-  item_name: string;
-  item_link?: string;
-  item_desc?: string;
-  remove: number;
-}
-
-interface ResponseProps {
-  items: [];
-  type: string;
-  msg: string;
-  statusText: string;
-}
 
 const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
   const newValue = updateEvent.target.value;
@@ -114,6 +100,7 @@ const MyList = () => {
 
   return (
     <section className="list--container">
+      <h1>Edit your list:</h1>
       <table className="list--table">
         <thead>
           <tr className="list--header">
@@ -122,7 +109,7 @@ const MyList = () => {
           </tr>
         </thead>
         <tbody className="list--body">
-          {myListOfItems.map((item: ItemsProps) => {
+          {myListOfItems.map((item: ItemsResponseProps) => {
             const { item_name, itemid, item_desc, item_link, remove } = item;
             return (
               <tr key={`${itemid}_${item_name}`}>

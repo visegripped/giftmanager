@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import NoPage from './pages/NoPage';
 import MyList from './pages/MyList';
-import EditOtherList from './pages/TheirList/TheirList';
+import EditOtherList from './pages/TheirList';
 import './index.css';
 import App from './App';
 // import reportWebVitals from './reportWebVitals';
@@ -17,7 +17,7 @@ root.render(
       <Route path="/" element={<App />}>
         <Route index element={<Home />} />
         <Route path="mylist" element={<MyList />} />
-        <Route path="theirlist" element={<EditOtherList />} />
+        <Route path="theirlist/:userId" element={<EditOtherList />} />
         <Route path="*" element={<NoPage />} />
       </Route>
     </Routes>
