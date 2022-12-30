@@ -1,4 +1,4 @@
-import { getPrettyStatus, getStatusChoicesForTheirList } from './status';
+import { getPrettyStatus, getStatusChoicesForTheirList, getStatusChoicesForMyList } from './status';
 
 describe('getPrettyStatus', () => {
   test("returns 'Unknown status' when not passed any arguments", () => {
@@ -12,6 +12,27 @@ describe('getPrettyStatus', () => {
   test("returns 'Unknown status' when not passed any arguments", () => {
     const value = getPrettyStatus(5);
     expect(value).toEqual('Reserved');
+  });
+});
+
+describe('getStatusChoicesForMyList', () => {
+  test('returns a single, empty option when no arguments are passed', () => {
+    const value = getStatusChoicesForMyList();
+    expect(value).toEqual([{ label: '', value: '' }]);
+  });
+  test('returns an empty and cancel option when remove is set to 0', () => {
+    const value = getStatusChoicesForMyList(0);
+    expect(value).toEqual([
+      { label: '', value: '' },
+      { label: 'Cancel', value: 1 },
+    ]);
+  });
+  test('returns cancelled and uncancel options when remove is set to 1', () => {
+    const value = getStatusChoicesForMyList(1);
+    expect(value).toEqual([
+      { label: 'Cancelled', value: 1 },
+      { label: 'Uncancel', value: 0 },
+    ]);
   });
 });
 

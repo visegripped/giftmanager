@@ -3,6 +3,7 @@ import SelectList from '../../components/SelectList';
 import { useNotificationContext } from '../../context/NotificationContext';
 import { useAuthContext } from '../../context/AuthContext';
 import { ResponseProps, ItemsResponseProps } from '../../util/fetchData';
+import { getStatusChoicesForMyList } from '../../util/status';
 import './MyList.css';
 
 const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
@@ -39,29 +40,6 @@ const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: s
         throw new Error(response.statusText);
       });
   }
-};
-
-const getStatusChoices = (itemRemoved: number) => {
-  const statusChoices = [
-    {
-      label: 'no change',
-      value: -1,
-    },
-  ];
-
-  if (itemRemoved === 0) {
-    statusChoices.push({
-      label: 'cancelled',
-      value: 1,
-    });
-  } else {
-    statusChoices.push({
-      label: 'uncancel',
-      value: 0,
-    });
-  }
-
-  return statusChoices;
 };
 
 const MyList = () => {
@@ -112,7 +90,7 @@ const MyList = () => {
           {myListOfItems.map((item: ItemsResponseProps) => {
             const { item_name, itemid, item_desc, item_link, remove } = item;
             return (
-              <tr key={`${itemid}_${item_name}`}>
+              <tr key={`${itemid}_${item_name}`} className={remove === 1 ? 'list--row-removed' : 'list--row'}>
                 <td>
                   {item_link ? (
                     <a href="${item_link}" target="_blank">
@@ -125,7 +103,7 @@ const MyList = () => {
                 </td>
                 <td className="list--body_status">
                   <SelectList
-                    options={getStatusChoices(remove)}
+                    options={getStatusChoicesForMyList(remove)}
                     onChange={updateList}
                     selected={remove}
                     uuid={itemid}

@@ -52,3 +52,35 @@ export const getStatusChoicesForTheirList = (myUserId: number | string | undefin
 
   return statusChoices;
 };
+
+export const getStatusChoicesForMyList = (itemRemoved: number) => {
+  const statusChoices: SelectListOptionProps[] = [];
+
+  if (itemRemoved === 1) {
+    statusChoices.push(
+      {
+        label: 'Cancelled',
+        value: 1,
+      },
+      {
+        label: 'Uncancel',
+        value: 0,
+      },
+    );
+    return statusChoices;
+  }
+
+  statusChoices.push({
+    label: '',
+    value: '',
+  });
+
+  if (itemRemoved === 0) {
+    statusChoices.push({
+      label: 'Cancel',
+      value: 1,
+    });
+  }
+
+  return statusChoices;
+};
