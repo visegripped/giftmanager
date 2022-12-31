@@ -23,7 +23,7 @@
   border-bottom: 1px solid #ccc;
 }
 
-.list--body tr:nth-child(even) {
+.list--row:nth-child(even) {
   background: var(--altTableBgColor);
 }
 
@@ -31,6 +31,10 @@
 .list--body_status {
   text-align: right;
   vertical-align: top;
+}
+
+.list--row-removed {
+  background: rgb(255, 212, 212);
 }
 
 .list--item_desc {

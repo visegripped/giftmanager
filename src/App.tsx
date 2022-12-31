@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Nav from './components/Nav/';
 import { NotificationContext, IMessage } from './context/NotificationContext';
@@ -9,10 +9,15 @@ import './App.css';
 import ToggleDarkMode from './components/ToggleDarkMode';
 import AuthButton from './components/AuthButton';
 import { v4 as getUUID } from 'uuid';
+import { fetchData, ResponseProps, UserResponseProps } from './util/fetchData';
+import { MenuItemProps } from './components/Menu/Menu';
 
 function App() {
   const [dark, setDark] = useState(false);
+  const [users, setUsers] = useState<MenuItemProps[]>([]);
   const [messages, setMessages] = useState<IMessage[]>([]);
+  // Need to upgrade the API for session storage to support TTL.
+  // ex: https://www.sohamkamani.com/javascript/localstorage-with-ttl-expiry/
   const tokenId = sessionStorage.getItem('tokenId') || '';
   const userId = sessionStorage.getItem('userId') || '';
   const [Auth, setAuth] = useState({
@@ -43,6 +48,30 @@ function App() {
     setAuth(updatedAuth);
   };
 
+  useEffect(() => {
+    if (tokenId) {
+      /*
+      get user detail of who is logged in.
+      get full user list for nav++ 
+      */
+      const cmd = 'usersGet';
+      fetchData(cmd, tokenId)
+        .then((response: ResponseProps) => {
+          const userList: MenuItemProps[] = response.users
+            .map((user: UserResponseProps) => {
+              return { link: `/theirlist/${user.userid}`, value: `${user.firstName} ${user.lastName}` };
+            })
+            .sort((a, b) => a.value.localeCompare(b.value));
+          setUsers(userList);
+        })
+        .catch((error) => {
+          addMessage({
+            report: `Request to execute ${cmd} failed. \n${error}`,
+            type: 'error',
+          });
+        });
+    }
+  }, [tokenId]);
   return (
     <div className={`App-container ${dark ? 'dark' : 'none'}`}>
       <NotificationContext.Provider
@@ -61,7 +90,7 @@ function App() {
         >
           <header className="App-header">
             <div>GiftManager</div>
-            {tokenId ? <Nav cssClasses="App-header__nav" /> : <></>}
+            {tokenId ? <Nav cssClasses="App-header__nav" users={users} /> : <></>}
             <div className="App-header__login">
               <AuthButton />
             </div>{' '}

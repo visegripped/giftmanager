@@ -23,7 +23,6 @@ const clientId = '451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleuserc
 
 export const AuthButton = () => {
   const { tokenId, setAuth } = useAuthContext();
-  console.log(' -> tokenId: ', tokenId);
   const { addMessage } = useNotificationContext();
 
   const setToken = (tokenId = '', email = '') => {
@@ -48,14 +47,12 @@ export const AuthButton = () => {
   };
 
   const onLoginSuccess = (authResponse: GoogleLoginResponseOffline | GoogleLoginResponse) => {
-    console.log('Auth Success: currentUser:', authResponse);
     const { token, email } = parseSuccessResponse(authResponse);
     setToken(token, email);
     refreshAuthTokenBeforeExpiration(authResponse);
   };
 
   const onLoginFailure = (authResponse: ResponseProps) => {
-    console.log(' - - - - - > authResponse: ', authResponse);
     addMessage({
       type: 'error',
       report: authResponse.message,
@@ -83,7 +80,6 @@ export const AuthButton = () => {
     const refreshToken = async () => {
       if ('reloadAuthResponse' in authResponse) {
         const newAuthRes = await authResponse.reloadAuthResponse();
-        console.log(' - - - > newAuthRes: ', newAuthRes);
         const { token, email } = parseSuccessResponse(authResponse);
         durationBetweenAutoRefresh = (newAuthRes.expires_in || 3600 - 5 * 60) * 1000;
         setToken(token, email);
@@ -93,17 +89,21 @@ export const AuthButton = () => {
     setTimeout(refreshToken, durationBetweenAutoRefresh);
   };
 
-  return tokenId ? (
-    <GoogleLogout clientId={clientId} buttonText="Logout" onLogoutSuccess={onLogoutSuccess}></GoogleLogout>
-  ) : (
-    <GoogleLogin
-      clientId={clientId}
-      buttonText="Login"
-      onSuccess={onLoginSuccess}
-      onFailure={onLoginFailure}
-      cookiePolicy={'single_host_origin'}
-      isSignedIn={true}
-    />
+  return (
+    <span data-testid="AuthButton">
+      {tokenId ? (
+        <GoogleLogout clientId={clientId} buttonText="Logout" onLogoutSuccess={onLogoutSuccess}></GoogleLogout>
+      ) : (
+        <GoogleLogin
+          clientId={clientId}
+          buttonText="Login"
+          onSuccess={onLoginSuccess}
+          onFailure={onLoginFailure}
+          cookiePolicy={'single_host_origin'}
+          isSignedIn={true}
+        />
+      )}
+    </span>
   );
 };
 

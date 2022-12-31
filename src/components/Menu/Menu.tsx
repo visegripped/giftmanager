@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Menu.css';
 
-interface MenuItemProps {
+export interface MenuItemProps {
   link: string;
   value: string;
 }
@@ -12,14 +12,16 @@ interface MenuProps {
 }
 
 const Menu = (props: MenuProps) => {
-  const { items } = props;
+  const { items = [] } = props;
   return (
     <menu data-testid="Menu">
       {items.map((item: MenuItemProps) => {
         const { link, value } = item;
         return (
-          <li className="menu-item">
-            <Link to={link}>{value}</Link>
+          <li className="menu-item" key={value}>
+            <Link to={link} key={value}>
+              {value}
+            </Link>
           </li>
         );
       })}

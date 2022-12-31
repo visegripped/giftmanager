@@ -17,7 +17,7 @@ root.render(
       <Route path="/" element={<App />}>
         <Route index element={<Home />} />
         <Route path="mylist" element={<MyList />} />
-        <Route path="theirlist" element={<EditOtherList />} />
+        <Route path="theirlist/:userId" element={<EditOtherList />} />
         <Route path="*" element={<NoPage />} />
       </Route>
     </Routes>

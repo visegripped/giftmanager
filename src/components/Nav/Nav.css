@@ -8,6 +8,7 @@
   display: inline-block;
   margin:0;
   padding:0;
+  position: relative;
 }
 
 .nav-item > a {
@@ -22,4 +23,40 @@
   bottom: -2px;
   position: relative;
   font-size: 1.5vh;
+}
+
+.nav-menu-container {
+  font-size: 1.1vh;
+  border-width: 1px;
+  border-color: var(--borderColor);
+  border-style: solid;
+  border-bottom-width: 0;
+  position: absolute;
+  top: 100%;
+  width: 200px;
+  background-color: var(--backgroundColorContent);
+  display: none;
+}
+
+.nav-menu-container--visible {
+  display: block;
+}
+
+.nav-menu-container menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-menu-container a {
+  border-bottom-width: 1px;
+  border-bottom-color: var(--borderColor);
+  border-bottom-style: solid;
+  display: block;
+  padding: 8px;
+}
+
+.nav-menu-container a:hover {
+  color: var(--backgroundColorContent);
+  background-color: var(--fontColorLink);
 }
