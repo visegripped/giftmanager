@@ -24,6 +24,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:coverage": "yarn test --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
@@ -32,6 +33,13 @@
     "lint": "yarn run eslint",
     "eslint": "eslint 'src/**/*.tsx'",
     "eslint:fix": "eslint --fix 'src/**/*.ts'"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!<rootDir>/node_modules/",
+      "!src/**/*.stories.{js,jsx,ts,tsx}"
+    ]
   },
   "eslintConfig": {
     "extends": [

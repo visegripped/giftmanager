@@ -25,6 +25,13 @@ exports[`Nav snapshot matches 1`] = `
       >
         Their list
       </a>
+      <div
+        class="nav-menu-container nav-menu-container--hidden"
+      >
+        <menu
+          data-testid="Menu"
+        />
+      </div>
     </li>
   </ul>
 </nav>

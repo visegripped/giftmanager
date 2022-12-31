@@ -47,14 +47,12 @@ export const AuthButton = () => {
   };
 
   const onLoginSuccess = (authResponse: GoogleLoginResponseOffline | GoogleLoginResponse) => {
-    console.log('Auth Success: currentUser:', authResponse);
     const { token, email } = parseSuccessResponse(authResponse);
     setToken(token, email);
     refreshAuthTokenBeforeExpiration(authResponse);
   };
 
   const onLoginFailure = (authResponse: ResponseProps) => {
-    console.log(' - - - - - > authResponse: ', authResponse);
     addMessage({
       type: 'error',
       report: authResponse.message,
@@ -74,17 +72,14 @@ export const AuthButton = () => {
 
   const refreshAuthTokenBeforeExpiration = (authResponse: GoogleLoginResponseOffline | GoogleLoginResponse) => {
     let refreshRate = 3600 - 5 * 60;
-    console.log(' BEGIN refresh method');
     if ('tokenObj' in authResponse) {
       refreshRate = authResponse?.tokenObj?.expires_in;
     }
-    console.log(` -> refreshRate: ${refreshRate} `);
     // Timing to renew access token
     let durationBetweenAutoRefresh = refreshRate * 1000;
     const refreshToken = async () => {
       if ('reloadAuthResponse' in authResponse) {
         const newAuthRes = await authResponse.reloadAuthResponse();
-        console.log(' - - - > newAuthRes: ', newAuthRes);
         const { token, email } = parseSuccessResponse(authResponse);
         durationBetweenAutoRefresh = (newAuthRes.expires_in || 3600 - 5 * 60) * 1000;
         setToken(token, email);
@@ -94,21 +89,21 @@ export const AuthButton = () => {
     setTimeout(refreshToken, durationBetweenAutoRefresh);
   };
 
-  React.useEffect(() => {
-    console.log(' -> auth button use effect.');
-  }, []);
-
-  return tokenId ? (
-    <GoogleLogout clientId={clientId} buttonText="Logout" onLogoutSuccess={onLogoutSuccess}></GoogleLogout>
-  ) : (
-    <GoogleLogin
-      clientId={clientId}
-      buttonText="Login"
-      onSuccess={onLoginSuccess}
-      onFailure={onLoginFailure}
-      cookiePolicy={'single_host_origin'}
-      isSignedIn={true}
-    />
+  return (
+    <span data-testid="AuthButton">
+      {tokenId ? (
+        <GoogleLogout clientId={clientId} buttonText="Logout" onLogoutSuccess={onLogoutSuccess}></GoogleLogout>
+      ) : (
+        <GoogleLogin
+          clientId={clientId}
+          buttonText="Login"
+          onSuccess={onLoginSuccess}
+          onFailure={onLoginFailure}
+          cookiePolicy={'single_host_origin'}
+          isSignedIn={true}
+        />
+      )}
+    </span>
   );
 };
 

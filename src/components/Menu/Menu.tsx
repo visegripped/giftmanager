@@ -12,7 +12,7 @@ interface MenuProps {
 }
 
 const Menu = (props: MenuProps) => {
-  const { items } = props;
+  const { items = [] } = props;
   return (
     <menu data-testid="Menu">
       {items.map((item: MenuItemProps) => {
