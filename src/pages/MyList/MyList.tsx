@@ -2,69 +2,49 @@ import React, { useState } from 'react';
 import SelectList from '../../components/SelectList';
 import { useNotificationContext } from '../../context/NotificationContext';
 import { useAuthContext } from '../../context/AuthContext';
-import { ResponseProps, ItemsResponseProps } from '../../util/fetchData';
+import { ResponseProps, ItemsResponseProps, fetchData } from '../../util/fetchData';
 import { getStatusChoicesForMyList } from '../../util/status';
 import './MyList.css';
-
-const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
-  const newValue = updateEvent.target.value;
-  console.log('This is the updated list: ', itemid, newValue);
-  const { addMessage } = useNotificationContext();
-  const cmd = 'myListUpdateStatus';
-
-  if (newValue === '-1') {
-    // do nothing. was set to 'no change'
-  } else {
-    fetch(`https://www.visegripped.com/family/api.php?cmd=${cmd}&status=${newValue}&itemid=${itemid}`)
-      .then((response) => {
-        return response.json();
-      })
-      .then((response: ResponseProps) => {
-        if (response.type !== 'success') {
-          addMessage({
-            report: response.statusText,
-            type: 'error',
-          });
-          throw new Error(response.statusText);
-        }
-        addMessage({
-          report: 'Successfully updated list.',
-          type: 'info',
-        });
-      })
-      .catch((response) => {
-        addMessage({
-          report: `Request to execute ${cmd} failed.`,
-          type: 'error',
-        });
-        throw new Error(response.statusText);
-      });
-  }
-};
 
 const MyList = () => {
   const [myListOfItems, updateMyListOfItems] = useState([]);
   // Take a look at toggleDarkMode.tsx Has a useThemeContext
   const { addMessage } = useNotificationContext();
   const { tokenId } = useAuthContext();
+  const updateItem = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: number) => {
+    console.log('BEGIN updateItem');
+    const newValue = Number(updateEvent.target.value);
+    console.log('This is the updated list: ', itemid, newValue);
+    const cmd = 'myListUpdateRemove';
+    if (newValue === 1 || newValue === 0) {
+      fetchData(cmd, tokenId, {
+        remove: newValue,
+        itemid,
+      })
+        .then(() => {
+          addMessage({
+            report: 'Item has been updated',
+            type: 'success',
+          });
+          fetchAndUpdateList();
+        })
+        .catch((error) => {
+          addMessage({
+            report: `Request to execute ${cmd} failed. \n${error}`,
+            type: 'error',
+          });
+          throw new Error();
+        });
+    }
+  };
 
-  React.useEffect(() => {
+  const fetchAndUpdateList = () => {
     const cmd = 'myListGet';
     const formData = new FormData();
     formData.append('tokenId', tokenId);
     formData.append('cmd', cmd);
-
-    fetch(`https://www.visegripped.com/family/api.php`, {
-      body: formData,
-      method: 'post',
-    })
-      .then((response) => {
-        return response.json();
-      })
+    fetchData(cmd, tokenId)
       .then((response: ResponseProps) => {
-        if (response.type !== 'success') {
-          throw new Error(response.msg); // this throw will trigger the catch.
-        }
         updateMyListOfItems(response.items);
       })
       .catch((error) => {
@@ -74,6 +54,10 @@ const MyList = () => {
         });
         throw new Error();
       });
+  };
+
+  React.useEffect(() => {
+    fetchAndUpdateList();
   }, []);
 
   return (
@@ -104,7 +88,7 @@ const MyList = () => {
                 <td className="list--body_status">
                   <SelectList
                     options={getStatusChoicesForMyList(remove)}
-                    onChange={updateList}
+                    onChange={updateItem}
                     selected={remove}
                     uuid={itemid}
                   />

@@ -87,3 +87,7 @@ TODO:
   justify-content: right;
   padding: .5vh 2vw;
 }
+
+h1 {
+  margin-bottom: 16px;
+}

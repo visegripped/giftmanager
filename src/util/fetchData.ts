@@ -24,7 +24,7 @@ export interface ItemsResponseProps {
   status: number;
 }
 
-export const fetchData = (cmd: string, token: string, queryParams: { [key: string]: string | Blob } = {}) => {
+export const fetchData = (cmd: string, token: string, queryParams: { [key: string]: number | string | Blob } = {}) => {
   if (!cmd || !token) {
     Promise.resolve({
       msg: `Token [${token}] and/or cmd [${cmd}] were left blank in fetchData.  Both are required.`,
@@ -35,9 +35,8 @@ export const fetchData = (cmd: string, token: string, queryParams: { [key: strin
   formData.append('tokenId', token);
   formData.append('cmd', cmd);
   Object.keys(queryParams).forEach((propId) => {
-    formData.append(propId, queryParams[propId]);
+    formData.append(propId, queryParams[propId].toString());
   });
-
   return fetch(`https://www.visegripped.com/family/api.php`, {
     body: formData,
     method: 'post',
