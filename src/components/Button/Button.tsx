@@ -8,16 +8,32 @@ export interface ButtonProps {
   priority?: 'primary' | 'secondary';
   onClick(clickEvent: object, props: object): void;
   id?: string;
+  type?: 'submit' | 'reset' | 'button';
 }
 
 const Button = (props: ButtonProps) => {
-  const { children, id, disabled, priority = 'primary', onClick = () => null, theme = 'standard' } = props;
+  const {
+    children,
+    id,
+    disabled,
+    priority = 'primary',
+    onClick = () => null,
+    theme = 'standard',
+    type = 'button',
+  } = props;
   const buttonClickHandler = (clickEvent: React.MouseEvent<HTMLButtonElement>) => {
     onClick(clickEvent, props);
   };
   const className = `button ${priority} button--${theme}`;
   return (
-    <button id={id} className={className} disabled={disabled} data-testid="Button" onClick={buttonClickHandler}>
+    <button
+      type={type}
+      id={id}
+      className={className}
+      disabled={disabled}
+      data-testid="Button"
+      onClick={buttonClickHandler}
+    >
       {children}
     </button>
   );
