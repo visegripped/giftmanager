@@ -15,7 +15,7 @@ export default {
 const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />;
 
 const getButtonsByPriority = (priority: ButtonProps['priority']) => {
-  const themes: ButtonProps['theme'][] = ['standard', 'info', 'warn', 'error'];
+  const themes: ButtonProps['theme'][] = ['standard', 'info', 'warn', 'error', 'success'];
   return (
     <>
       {themes.map((theme: ButtonProps['theme']) => {

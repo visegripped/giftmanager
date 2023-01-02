@@ -1,6 +1,6 @@
 .formLineItem {
   display: flex;
-  gap: 8px 32px;
+  padding-bottom: 8px;
 }
 
 /* mobile only */
@@ -13,7 +13,22 @@
 @media screen and (min-width: 768px) {
   .formLineItem {
     flex-wrap: nowrap;
-    justify-content: center;
+    justify-content: left;
     align-items: flex-start;
+    gap: 8px 32px;
   }
+
+  .formLineItem-span {
+    display: inline-block;
+    width: 33%;
+    text-align: right;
+   }
+
+   .formLineItem > input,
+   .formLineItem > textarea  {
+    display: inline-block;
+    width: 66%;
+   }
 }
+
+

@@ -1,11 +1,11 @@
 :root {
-  --buttonBorderColor: var(--standardStateColor);
-  --buttonBgColor: var(--standardStateColor);
+  --buttonBorderColor: var(--successStateColor);
+  --buttonBgColor: var(--successStateColor);
   --buttonFontColor: #fff;
 }
 
 .secondary {
-  --buttonFontColor: var(--standardStateColor);
+  --buttonFontColor: var(--successStateColor);
 }
 
 .secondary.button--error {
@@ -19,6 +19,9 @@
 }
 .secondary.button--success {
   --buttonFontColor: var(--successStateColor);
+}
+.secondary.button--standard {
+  --buttonFontColor: var(--standardStateColor);
 }
 
 .button--error {
@@ -39,6 +42,11 @@
 .button--success {
   --buttonBorderColor: var(--successStateColor);
   --buttonBgColor: var(--successStateColor);
+}
+
+.button--standard {
+  --buttonBorderColor: var(--standardStateColor);
+  --buttonBgColor: var(--standardStateColor);
 }
 
 .button {

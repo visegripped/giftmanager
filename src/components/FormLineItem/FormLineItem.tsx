@@ -8,11 +8,11 @@ interface FormLineItemProps {
 }
 
 const FormLineItem = (props: FormLineItemProps) => {
-  const { label, cssClasses, children } = props;
+  const { label, cssClasses = '', children } = props;
   const className = `formLineItem ${cssClasses}`;
   return (
     <label className={className} data-testid="FormLineItem">
-      <span>{label}</span>
+      <span className="formLineItem-span">{label}</span>
       {children}
     </label>
   );
