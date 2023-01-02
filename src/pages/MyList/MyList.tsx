@@ -4,8 +4,8 @@ import { useNotificationContext } from '../../context/NotificationContext';
 import { useAuthContext } from '../../context/AuthContext';
 import { ResponseProps, ItemsResponseProps, fetchData } from '../../util/fetchData';
 import { getStatusChoicesForMyList } from '../../util/status';
-import './MyList.css';
 import AddItemForm from '../../components/AddItemForm';
+import './MyList.css';
 
 const MyList = () => {
   const [myListOfItems, updateMyListOfItems] = useState([]);
