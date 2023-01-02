@@ -15,7 +15,7 @@ const Template: ComponentStory<typeof AddItemForm> = (args) => <AddItemForm {...
 export const BasicUsage = Template.bind({});
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 BasicUsage.args = {
-  onSubmit: (event: object) => {
+  onSubmit: () => {
     console.log(' Form submitted ');
   },
 };

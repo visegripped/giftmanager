@@ -30,7 +30,7 @@ TODO:
   --warnStateColor: var(--orangeDark);
   --infoStateColor: var(--greyDark);
   --successStateColor: var(--greenDark);
-  --standardStateColor: var(--greenDark);
+  --standardStateColor: var(--blueDark);
 
   --panelBorderColor: var(--greyLight);
   --borderColor: rgb(42, 42, 42);

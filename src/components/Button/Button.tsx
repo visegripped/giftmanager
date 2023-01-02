@@ -18,7 +18,7 @@ const Button = (props: ButtonProps) => {
     disabled,
     priority = 'primary',
     onClick = () => null,
-    theme = 'standard',
+    theme = 'success',
     type = 'button',
   } = props;
   const buttonClickHandler = (clickEvent: React.MouseEvent<HTMLButtonElement>) => {
