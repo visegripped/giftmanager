@@ -5,24 +5,54 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useParams } from 'react-router-dom';
 import { ResponseProps, ItemsResponseProps, fetchData } from '../../util/fetchData';
 import { getStatusChoicesForTheirList, getPrettyStatus } from '../../util/status';
-
-const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
-  const newValue = updateEvent.target.value;
-  console.log('This is the updated list (This update does nothing yet): ', itemid, newValue);
-};
+import AddItemForm from '../../components/AddItemForm';
+import '../MyList/MyList.css';
 
 const TheirList = () => {
-  const { userId } = useParams() || '';
+  const { recipient } = useParams() || '';
   const [myListOfItems, updateMyListOfItems] = useState([]);
   // Take a look at toggleDarkMode.tsx Has a useThemeContext
   const { addMessage } = useNotificationContext();
   const { tokenId } = useAuthContext();
-  React.useEffect(() => {
-    if (userId) {
-      updateMyListOfItems([]); // blank the list out to indicate something is happening.
-      const cmd = 'theirListGet';
+
+  const handleChangingItemStatus = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
+    const status = updateEvent.target.value;
+    const cmd = 'theirListItemUpdate';
+    if (recipient) {
       fetchData(cmd, tokenId, {
-        theirUserId: userId.toString(),
+        status,
+        recipient,
+        itemid,
+      })
+        .then(() => {
+          addMessage({
+            report: `Item on ${recipient}'s list has been updated.`,
+            type: 'success',
+          });
+          fetchAndUpdateList();
+        })
+        .catch((error) => {
+          addMessage({
+            report: `Request to execute ${cmd} failed. \n${error}`,
+            type: 'error',
+          });
+          throw new Error();
+        });
+    } else {
+      addMessage({
+        report: 'No intended recipient has been set. Please select one',
+        type: 'error',
+      });
+    }
+
+    // TODO -> this needs to update the list. :)
+  };
+
+  const fetchAndUpdateList = () => {
+    const cmd = 'theirListGet';
+    if (recipient) {
+      fetchData(cmd, tokenId, {
+        theirUserId: recipient.toString(),
       })
         .then((response: ResponseProps) => {
           if (!response.items.length) {
@@ -42,50 +72,106 @@ const TheirList = () => {
           throw new error();
         });
     }
-  }, [userId]);
+  };
+
+  const handleAddingItemToList = (
+    submitEvent: React.SyntheticEvent,
+    formFields: { [key: string]: string | number | Blob },
+  ) => {
+    if (recipient) {
+      // back end handles setting remove and status.
+      const cmd = 'theirListItemAdd';
+      const amendedFormFields = { ...formFields, recipient };
+
+      fetchData(cmd, tokenId, amendedFormFields)
+        .then(() => {
+          addMessage({
+            report: `Item has been added to ${recipient}'s list`,
+            type: 'success',
+          });
+          fetchAndUpdateList();
+        })
+        .catch((error) => {
+          addMessage({
+            report: `Request to execute ${cmd} failed. \n${error}`,
+            type: 'error',
+          });
+          throw new Error();
+        });
+    } else {
+      addMessage({
+        report: 'No intended recipient has been set. Please select one',
+        type: 'error',
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    if (recipient) {
+      updateMyListOfItems([]); // blank the list out to indicate something is happening.
+      fetchAndUpdateList();
+    } else {
+      addMessage({
+        report: 'Please select a user',
+        type: 'warn',
+      });
+    }
+  }, [recipient]);
 
   return (
-    <section className="list--container">
-      <h1>Here you edit {userId}'s list.</h1>
-      <table className="list--table">
-        <thead>
-          <tr className="list--header">
-            <td>Item name</td>
-            <td className="list--head_status">Status</td>
-          </tr>
-        </thead>
-        <tbody className="list--body">
-          {myListOfItems.map((item: ItemsResponseProps) => {
-            const { item_name, itemid, item_desc, item_link, remove, buy_userid, status } = item;
-            const optionChoices = getStatusChoicesForTheirList(userId, item);
+    <>
+      <section className="list--container">
+        <h1>Edit {recipient}'s list.</h1>
+        <table className="list--table">
+          <thead>
+            <tr className="list--header">
+              <td>Item name</td>
+              <td className="list--head_status">Status</td>
+            </tr>
+          </thead>
+          <tbody className="list--body">
+            {myListOfItems.map((item: ItemsResponseProps) => {
+              const { item_name, itemid, item_desc, item_link, remove, buy_userid, status } = item;
+              const optionChoices = getStatusChoicesForTheirList(recipient, item);
 
-            return (
-              <tr key={`${itemid}_${item_name}`}>
-                <td>
-                  {item_link ? (
-                    <a href="${item_link}" target="_blank">
-                      {item_name}
-                    </a>
-                  ) : (
-                    item_name
-                  )}
-                  <div className="list--item_desc">{item_desc}</div>
-                </td>
-                <td className="list--body_status">
-                  {optionChoices.length ? (
-                    <SelectList options={optionChoices} onChange={updateList} selected={remove} uuid={itemid} />
-                  ) : (
-                    <div>
-                      {getPrettyStatus(status)} by {buy_userid}
-                    </div>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </section>
+              return (
+                <tr key={`${itemid}_${item_name}`}>
+                  <td>
+                    {item_link ? (
+                      <a href="${item_link}" target="_blank">
+                        {item_name}
+                      </a>
+                    ) : (
+                      item_name
+                    )}
+                    <div className="list--item_desc">{item_desc}</div>
+                  </td>
+                  <td className="list--body_status">
+                    {optionChoices.length ? (
+                      <SelectList
+                        options={optionChoices}
+                        onChange={handleChangingItemStatus}
+                        selected={remove}
+                        uuid={itemid}
+                      />
+                    ) : (
+                      <div>
+                        {getPrettyStatus(status)} by {buy_userid}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
+      <br />
+      <section className="list--container">
+        <h1>Add to your list:</h1>
+        <AddItemForm onSubmit={handleAddingItemToList} />
+      </section>
+    </>
   );
 };
 
