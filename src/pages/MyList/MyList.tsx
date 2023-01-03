@@ -56,7 +56,7 @@ const MyList = () => {
     }
   };
 
-  const handleFormSubmit = (
+  const handleAddingItemToList = (
     submitEvent: React.SyntheticEvent,
     formFields: { [key: string]: string | number | Blob },
   ) => {
@@ -125,7 +125,7 @@ const MyList = () => {
       <br />
       <section className="list--container">
         <h1>Add to your list:</h1>
-        <AddItemForm onSubmit={handleFormSubmit} />
+        <AddItemForm onSubmit={handleAddingItemToList} />
       </section>
     </>
   );

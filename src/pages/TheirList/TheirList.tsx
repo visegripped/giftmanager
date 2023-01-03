@@ -15,9 +15,35 @@ const TheirList = () => {
   const { addMessage } = useNotificationContext();
   const { tokenId } = useAuthContext();
 
-  const updateList = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
-    const newValue = updateEvent.target.value;
-    console.log('This is the updated list (This update does nothing yet): ', itemid, newValue);
+  const handleChangingItemStatus = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
+    const status = updateEvent.target.value;
+    const cmd = 'theirListItemUpdate';
+    if (recipient) {
+      fetchData(cmd, tokenId, {
+        status,
+        recipient,
+        itemid,
+      })
+        .then(() => {
+          addMessage({
+            report: `Item on ${recipient}'s list has been updated.`,
+            type: 'success',
+          });
+          fetchAndUpdateList();
+        })
+        .catch((error) => {
+          addMessage({
+            report: `Request to execute ${cmd} failed. \n${error}`,
+            type: 'error',
+          });
+          throw new Error();
+        });
+    } else {
+      addMessage({
+        report: 'No intended recipient has been set. Please select one',
+        type: 'error',
+      });
+    }
 
     // TODO -> this needs to update the list. :)
   };
@@ -48,11 +74,12 @@ const TheirList = () => {
     }
   };
 
-  const handleFormSubmit = (
+  const handleAddingItemToList = (
     submitEvent: React.SyntheticEvent,
     formFields: { [key: string]: string | number | Blob },
   ) => {
     if (recipient) {
+      // back end handles setting remove and status.
       const cmd = 'theirListItemAdd';
       const amendedFormFields = { ...formFields, recipient };
 
@@ -121,7 +148,12 @@ const TheirList = () => {
                   </td>
                   <td className="list--body_status">
                     {optionChoices.length ? (
-                      <SelectList options={optionChoices} onChange={updateList} selected={remove} uuid={itemid} />
+                      <SelectList
+                        options={optionChoices}
+                        onChange={handleChangingItemStatus}
+                        selected={remove}
+                        uuid={itemid}
+                      />
                     ) : (
                       <div>
                         {getPrettyStatus(status)} by {buy_userid}
@@ -137,7 +169,7 @@ const TheirList = () => {
       <br />
       <section className="list--container">
         <h1>Add to your list:</h1>
-        <AddItemForm onSubmit={handleFormSubmit} />
+        <AddItemForm onSubmit={handleAddingItemToList} />
       </section>
     </>
   );
