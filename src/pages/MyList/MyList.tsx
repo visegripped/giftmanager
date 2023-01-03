@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SelectList from '../../components/SelectList';
 import { useNotificationContext } from '../../context/NotificationContext';
-import { useAuthContext } from '../../context/AuthContext';
+import { useAppContext } from '../../context/AppContext';
 import { ResponseProps, ItemsResponseProps, fetchData } from '../../util/fetchData';
 import { getStatusChoicesForMyList } from '../../util/status';
 import AddItemForm from '../../components/AddItemForm';
@@ -11,7 +11,7 @@ const MyList = () => {
   const [myListOfItems, updateMyListOfItems] = useState([]);
   // Take a look at toggleDarkMode.tsx Has a useThemeContext
   const { addMessage } = useNotificationContext();
-  const { tokenId } = useAuthContext();
+  const { tokenId } = useAppContext();
 
   const fetchAndUpdateList = () => {
     const cmd = 'myListGet';

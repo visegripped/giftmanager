@@ -4,6 +4,7 @@ export interface ResponseProps {
   type: string;
   msg: string;
   statusText: string;
+  userid: number;
 }
 
 export interface UserResponseProps {

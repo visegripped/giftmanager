@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SelectList from '../../components/SelectList';
 import { useNotificationContext } from '../../context/NotificationContext';
-import { useAuthContext } from '../../context/AuthContext';
+import { useAppContext } from '../../context/AppContext';
 import { useParams } from 'react-router-dom';
 import { ResponseProps, ItemsResponseProps, fetchData } from '../../util/fetchData';
 import { getStatusChoicesForTheirList, getPrettyStatus } from '../../util/status';
@@ -13,7 +13,7 @@ const TheirList = () => {
   const [myListOfItems, updateMyListOfItems] = useState([]);
   // Take a look at toggleDarkMode.tsx Has a useThemeContext
   const { addMessage } = useNotificationContext();
-  const { tokenId } = useAuthContext();
+  const { tokenId, userId } = useAppContext();
 
   const handleChangingItemStatus = (updateEvent: React.ChangeEvent<HTMLSelectElement>, itemid: string | number) => {
     const status = updateEvent.target.value;
@@ -131,11 +131,11 @@ const TheirList = () => {
           </thead>
           <tbody className="list--body">
             {myListOfItems.map((item: ItemsResponseProps) => {
-              const { item_name, itemid, item_desc, item_link, remove, buy_userid, status } = item;
-              const optionChoices = getStatusChoicesForTheirList(recipient, item);
+              const { item_name, itemid, item_desc, item_link, buy_userid, status } = item;
+              const optionChoices = getStatusChoicesForTheirList(userId, item);
 
               return (
-                <tr key={`${itemid}_${item_name}`}>
+                <tr key={`${itemid}_${item_name}`} className="list--row">
                   <td>
                     {item_link ? (
                       <a href="${item_link}" target="_blank">
@@ -151,7 +151,9 @@ const TheirList = () => {
                       <SelectList
                         options={optionChoices}
                         onChange={handleChangingItemStatus}
-                        selected={remove}
+                        // the 'or blank' here will set zero to blank, which sets the 'selected' to the blank choice, which is desired.
+                        // otherwise, the value of zero will set the 'unpurchase/unreserve' value as selected.
+                        selected={status || ''}
                         uuid={itemid}
                       />
                     ) : (

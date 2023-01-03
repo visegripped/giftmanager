@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Nav from './components/Nav/';
 import { NotificationContext, IMessage } from './context/NotificationContext';
 import ThemeContext from './context/ThemeContext';
-import AuthContext, { IAuthUpdate } from './context/AuthContext';
+import AuthContext, { IAuthUpdate } from './context/AppContext';
 import Notifications from './components/Notifications';
 import './App.css';
 import ToggleDarkMode from './components/ToggleDarkMode';
@@ -14,15 +14,16 @@ import { MenuItemProps } from './components/Menu/Menu';
 
 function App() {
   const [dark, setDark] = useState(false);
+  const [userId, setUserId] = useState(0);
   const [users, setUsers] = useState<MenuItemProps[]>([]);
   const [messages, setMessages] = useState<IMessage[]>([]);
   // Need to upgrade the API for session storage to support TTL.
   // ex: https://www.sohamkamani.com/javascript/localstorage-with-ttl-expiry/
   const tokenId = sessionStorage.getItem('tokenId') || '';
-  const userId = sessionStorage.getItem('userId') || '';
+  const email = sessionStorage.getItem('email') || '';
   const [Auth, setAuth] = useState({
     tokenId,
-    userId,
+    email,
   });
 
   const toggleDark = () => {
@@ -63,6 +64,7 @@ function App() {
             })
             .sort((a, b) => a.value.localeCompare(b.value));
           setUsers(userList);
+          setUserId(response.userid);
         })
         .catch((error) => {
           addMessage({
@@ -84,7 +86,9 @@ function App() {
         <AuthContext.Provider
           value={{
             tokenId,
+            email,
             userId,
+            setUserId,
             setAuth: updateAuth,
           }}
         >
@@ -96,7 +100,6 @@ function App() {
             </div>{' '}
             {/* link this to their view */}
           </header>
-
           <main className="App-main">
             <Notifications />
             {tokenId ? (

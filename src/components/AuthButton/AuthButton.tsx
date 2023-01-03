@@ -1,6 +1,6 @@
 import React from 'react';
 import { GoogleLogin, GoogleLogout, GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
-import { useAuthContext } from '../../context/AuthContext';
+import { useAppContext } from '../../context/AppContext';
 import { useNotificationContext } from '../../context/NotificationContext';
 import './AuthButton.css';
 
@@ -22,13 +22,13 @@ interface ResponseProps {
 const clientId = '451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleusercontent.com';
 
 export const AuthButton = () => {
-  const { tokenId, setAuth } = useAuthContext();
+  const { tokenId, setAuth } = useAppContext();
   const { addMessage } = useNotificationContext();
 
   const setToken = (tokenId = '', email = '') => {
     sessionStorage.setItem('tokenId', tokenId);
-    sessionStorage.setItem('userId', email);
-    setAuth({ tokenId: tokenId, userId: email });
+    sessionStorage.setItem('email', email);
+    setAuth({ tokenId: tokenId, email: email });
   };
 
   const parseSuccessResponse = (authResponse: GoogleLoginResponseOffline | GoogleLoginResponse) => {
@@ -62,8 +62,8 @@ export const AuthButton = () => {
 
   const onLogoutSuccess = () => {
     sessionStorage.setItem('tokenId', '');
-    sessionStorage.setItem('userId', '');
-    setAuth({ tokenId: '', userId: '' });
+    sessionStorage.setItem('email', '');
+    setAuth({ tokenId: '', email: '' });
     addMessage({
       report: 'You have been logged out',
       type: 'info',
