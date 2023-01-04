@@ -8,7 +8,6 @@ export interface ResponseProps {
 }
 
 export interface UserResponseProps {
-  email: string;
   userid: number;
   firstName: string;
   lastName: string;

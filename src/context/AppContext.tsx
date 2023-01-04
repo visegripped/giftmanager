@@ -1,4 +1,5 @@
 import React, { createContext, useContext } from 'react';
+import { UserResponseProps } from '../util/fetchData';
 
 export interface IAuthUpdate {
   tokenId: string;
@@ -10,11 +11,13 @@ interface IAppContext extends IAuthUpdate {
   children?: React.ReactNode;
   userId: number;
   setUserId: (id: number) => void;
+  users: UserResponseProps[];
 }
 
 const defaultState = {
   tokenId: '',
   email: '',
+  users: [],
   userId: 0,
   setUserId: () => {
     console.log('default context updateAuth executed');

@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Nav.css';
 import Menu from '../Menu';
-import { MenuItemProps } from '../Menu/Menu';
+import { useAppContext } from '../../context/AppContext';
+import { userListToMenuFormat } from '../../util/user';
 
 interface NavProps {
-  users: MenuItemProps[];
   cssClasses?: string;
 }
 
 const Nav = (props: NavProps) => {
-  const { cssClasses, users } = props;
+  const { cssClasses } = props;
   const [userMenuIsVisible, setUserMenuIsVisible] = useState(false);
+  const { users } = useAppContext();
   const className = `${cssClasses}`;
   const toggleMenuVisibility = () => {
     setUserMenuIsVisible(false);
@@ -42,7 +43,7 @@ const Nav = (props: NavProps) => {
             Their list
           </Link>
           <div className={`nav-menu-container nav-menu-container--${userMenuIsVisible ? 'visible' : 'hidden'}`}>
-            <Menu items={users} />
+            <Menu items={userListToMenuFormat(users)} />
           </div>
         </li>
       </ul>
