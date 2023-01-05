@@ -51,7 +51,7 @@ describe('getStatusChoicesForTheirList', () => {
   };
   const release = {
     label: 'Unpurchase/unreserve',
-    value: 'XX',
+    value: 0,
   };
   const fullList = [blank, reserved, purchased, release];
 
@@ -75,6 +75,16 @@ describe('getStatusChoicesForTheirList', () => {
       remove: 0,
     });
     expect(value).toEqual(fullList);
+  });
+
+  test('returns only a choice of purchased when remove is 2 and userid matches buyuserid', () => {
+    const value = getStatusChoicesForTheirList(1234, {
+      status: 10,
+      remove: 2,
+      buy_userid: 1234,
+    });
+    const expectation = [purchased, release];
+    expect(value).toEqual(expectation);
   });
 
   test('returns the full list of choices if status is > 0 and the authenticated user is also the buyer.', () => {

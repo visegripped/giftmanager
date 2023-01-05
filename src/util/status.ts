@@ -36,17 +36,20 @@ export const getStatusChoicesForTheirList = (myUserId: number | string | undefin
   };
   const release = {
     label: 'Unpurchase/unreserve',
-    value: 'XX',
+    value: 0,
   };
   const fullList = [blank, reserved, purchased, release];
   // cases where remove > 1 and status = 0 are handled on the request.
   if (status === 0 && remove > 0) {
     return [];
   }
+  if (remove === 2 && buy_userid == myUserId) {
+    return [purchased, release];
+  }
   if (status === 0 && remove === 0) {
     return fullList;
   }
-  if (status >= 1 && myUserId === buy_userid) {
+  if (status >= 1 && myUserId == buy_userid) {
     return fullList;
   }
 

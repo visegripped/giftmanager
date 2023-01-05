@@ -16,7 +16,7 @@ interface SelectListProps {
 }
 
 const SelectList = (props: SelectListProps) => {
-  const { options = [], cssClasses, disabled, uuid, onChange, selected } = props;
+  const { options = [], cssClasses, disabled, uuid, onChange, selected = '' } = props;
   const selectChangeHandler = (changeEvent: React.ChangeEvent<HTMLSelectElement>) => {
     onChange(changeEvent, uuid);
   };

@@ -4,10 +4,10 @@ export interface ResponseProps {
   type: string;
   msg: string;
   statusText: string;
+  userid: number;
 }
 
 export interface UserResponseProps {
-  email: string;
   userid: number;
   firstName: string;
   lastName: string;
