@@ -140,7 +140,7 @@ const TheirList = () => {
                 <tr key={`${itemid}_${item_name}`} className="list--row">
                   <td>
                     {item_link ? (
-                      <a href="${item_link}" target="_blank">
+                      <a href={item_link} target="_blank">
                         {item_name}
                       </a>
                     ) : (
