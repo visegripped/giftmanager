@@ -1,8 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Button snapshot matches 1`] = `
-<button
-  class="button secondary button--standard"
-  data-testid="Button"
-/>
-`;
