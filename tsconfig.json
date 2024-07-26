@@ -1,7 +1,14 @@
 {
   "files": [],
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["./src/components/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@utilities/*": ["./src/utilities/*"],
+      "@context/*": ["./src/context/*"],
+      "@routes/*": ["./src/routes"]
+    }
   },
   "references": [
     {
