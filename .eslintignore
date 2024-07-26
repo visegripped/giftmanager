@@ -1,7 +1,0 @@
-test / fixtures ** /app/bcilpu;
-node_modules;
-logs;
-run;
-coverage;
-package.json;
-yarn.lock;

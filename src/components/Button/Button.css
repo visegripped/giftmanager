@@ -1,77 +1,22 @@
-:root {
-  --buttonBorderColor: var(--successStateColor);
-  --buttonBgColor: var(--successStateColor);
-  --buttonFontColor: #fff;
-}
-
-.secondary {
-  --buttonFontColor: var(--successStateColor);
-}
-
-.secondary.button--error {
-  --buttonFontColor: var(--errorStateColor);
-}
-.secondary.button--warn {
-  --buttonFontColor: var(--warnStateColor);
-}
-.secondary.button--info {
-  --buttonFontColor: var(--infoStateColor);
-}
-.secondary.button--success {
-  --buttonFontColor: var(--successStateColor);
-}
-.secondary.button--standard {
-  --buttonFontColor: var(--standardStateColor);
-}
-
-.button--error {
-  --buttonBorderColor: var(--errorStateColor);
-  --buttonBgColor: var(--errorStateColor);
-}
-
-.button--warn {
-  --buttonBorderColor: var(--warnStateColor);
-  --buttonBgColor: var(--warnStateColor);
-}
-
-.button--info {
-  --buttonBorderColor: var(--infoStateColor);
-  --buttonBgColor: var(--infoStateColor);
-}
-
-.button--success {
-  --buttonBorderColor: var(--successStateColor);
-  --buttonBgColor: var(--successStateColor);
-}
-
-.button--standard {
-  --buttonBorderColor: var(--standardStateColor);
-  --buttonBgColor: var(--standardStateColor);
-}
-
 .button {
-  border-radius: var(--borderRadius);
-  padding: 4px 12px;
-  font-size: 1rem;
+  font-family: 'Avenir', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  border: 0;
+  border-radius: 3em;
   cursor: pointer;
-  border-width: 2px;
-  border-style: solid;
-  color: var(--buttonFontColor);
-  border-color: var(--buttonBorderColor);
-  background-color: var(--buttonBgColor);
+  display: inline-block;
+  line-height: 1;
 }
 
-.button:hover {
-  opacity: .9;
+.button--small {
+  font-size: 12px;
+  padding: 10px 16px;
 }
-
-.button:disabled {
-  opacity: .3;
-  cursor: auto;
+.button--medium {
+  font-size: 14px;
+  padding: 11px 20px;
 }
-
-
-
-.secondary {
-  background: #fff;
+.button--large {
+  font-size: 16px;
+  padding: 12px 24px;
 }

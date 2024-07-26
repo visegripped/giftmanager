@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Menu snapshot matches 1`] = `
-<menu
-  data-testid="Menu"
-/>
-`;

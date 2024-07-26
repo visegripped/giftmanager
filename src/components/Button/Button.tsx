@@ -1,40 +1,28 @@
-import React from 'react';
+// import React from 'react';
 import './Button.css';
 
 export interface ButtonProps {
-  children: React.ReactNode;
-  disabled?: boolean;
-  theme?: 'standard' | 'error' | 'warn' | 'info' | 'success';
-  priority?: 'primary' | 'secondary';
-  onClick(clickEvent: object, props: object): void;
-  id?: string;
-  type?: 'submit' | 'reset' | 'button';
+  size?: 'small' | 'medium' | 'large';
+  label: string;
+  onClick?: () => void;
 }
 
-const Button = (props: ButtonProps) => {
-  const {
-    children,
-    id,
-    disabled,
-    priority = 'primary',
-    onClick = () => null,
-    theme = 'success',
-    type = 'button',
-  } = props;
-  const buttonClickHandler = (clickEvent: React.MouseEvent<HTMLButtonElement>) => {
-    onClick(clickEvent, props);
-  };
-  const className = `button ${priority} button--${theme}`;
+/**
+ * Primary UI component for user interaction
+ */
+export const Button = ({
+  size = 'medium',
+  label,
+  ...props
+}: ButtonProps) => {
+
   return (
     <button
-      type={type}
-      id={id}
-      className={className}
-      disabled={disabled}
-      data-testid="Button"
-      onClick={buttonClickHandler}
+      type="button"
+      className={`button button--${size}`}
+      {...props}
     >
-      {children}
+      {label}
     </button>
   );
 };
