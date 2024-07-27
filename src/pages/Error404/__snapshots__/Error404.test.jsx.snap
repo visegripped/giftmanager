@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`The Error404 page > when no user context is provided > should match snapshot 1`] = `
+<div>
+  <section>
+    <h2>
+      404 - this page can not be found.
+    </h2>
+  </section>
+</div>
+`;

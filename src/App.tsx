@@ -1,36 +1,47 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+// import { useState, useEffect } from 'react';
+import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
-import Button from '@components/Button';
+// import Button from '@components/Button';
+import routeConstants from '@routes/routeContstants';
+import { Me, User, Error404 } from '@pages/';
+import present from './assets/present-optimized.svg';
 
 function App() {
-  const [count, setCount] = useState(0);
+  let currentDate = new Date();
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <Button
-          onClick={() => setCount((count) => count + 1)}
-          label={`count is ${count}`}
-        />
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Router>
+      <header>
+        <h1 className="logo">
+          <img src={present} className="logo" alt="Vite logo" />{' '}
+          <Link to={routeConstants.ME}>GiftManager</Link>
+        </h1>
+
+        <nav className="navbar">
+          <Link to={routeConstants.USER}>user</Link> chooser
+        </nav>
+
+        <div className="auth">login to go here</div>
+      </header>
+
+      <main>
+        <Routes>
+          <Route path={routeConstants.HOME} Component={Me} />
+          <Route path={routeConstants.ME} Component={Me} />
+          <Route path={routeConstants.USER} Component={User} />
+          <Route path={`${routeConstants.User}/:userId`} Component={User} />
+          <Route Component={Error404} />
+        </Routes>
+      </main>
+
+      <footer>
+        <div>
+          &copy; Copyright 2018 - {currentDate.getFullYear()}. All rights
+          reserved.
+        </div>
+        <div>theme. This will need a chooser.</div>
+      </footer>
+    </Router>
   );
 }
 
