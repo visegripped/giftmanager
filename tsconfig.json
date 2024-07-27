@@ -1,6 +1,7 @@
 {
   "files": [],
   "compilerOptions": {
+    "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
       "@components/*": ["./src/components/*"],
