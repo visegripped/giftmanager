@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
-import "./Me.css";
+import { useState, useEffect } from 'react';
+import './Me.css';
 
 type propsInterface = {
   myId: string | undefined;
-}
+};
 
 const Me = (props: propsInterface) => {
-
   const { myId } = props;
 
   const [userProfile] = useState({}); //, setUserProfile
@@ -15,7 +14,7 @@ const Me = (props: propsInterface) => {
     if (myId) {
       // go fetch the users list.
       console.log(` -> Go fetch the list for ${myId}`, userProfile);
-    };
+    }
   }, [myId]);
 
   return (
