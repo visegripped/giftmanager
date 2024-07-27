@@ -10,18 +10,9 @@ export interface ButtonProps {
 /**
  * Primary UI component for user interaction
  */
-export const Button = ({
-  size = 'medium',
-  label,
-  ...props
-}: ButtonProps) => {
-
+export const Button = ({ size = 'medium', label, ...props }: ButtonProps) => {
   return (
-    <button
-      type="button"
-      className={`button button--${size}`}
-      {...props}
-    >
+    <button type="button" className={`button button--${size}`} {...props}>
       {label}
     </button>
   );
