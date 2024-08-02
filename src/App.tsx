@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { ErrorBoundary, useErrorBoundary } from "react-error-boundary";
+import { ErrorBoundary, useErrorBoundary } from 'react-error-boundary';
 import './App.css';
 // import Button from '@components/Button';
 import routeConstants from '@routes/routeContstants';
@@ -11,12 +11,12 @@ import { setThemeOnBody } from '@utilities/setThemeOnBody';
 
 type fallbackRenderPropsInterface = {
   error: Error;
-}
+};
 
 function App() {
   let currentDate = new Date();
 
-  const selectedThemeAtLoad = localStorage.getItem("theme") || "theme__default";
+  const selectedThemeAtLoad = localStorage.getItem('theme') || 'theme__default';
   const [theme, setTheme] = useState(selectedThemeAtLoad);
 
   useEffect(() => {
@@ -25,14 +25,12 @@ function App() {
     }
   }, [theme]);
 
-
   const updateTheme = () => {
-    const newTheme = "theme__default";
+    const newTheme = 'theme__default';
     localStorage.setItem('theme', newTheme);
     setTheme(newTheme);
     setThemeOnBody(newTheme);
   };
-
 
   const logError = (error: Error, info: { componentStack: string }) => {
     postReport({
@@ -41,7 +39,7 @@ function App() {
       body: {
         stackTrace: info,
         origin: 'errorBoundary',
-      }
+      },
     });
   };
 
@@ -51,21 +49,21 @@ function App() {
     return (
       <div role="alert">
         <p>Something went wrong:</p>
-        <pre style={{ color: "red" }}>{error.message}</pre>
+        <pre style={{ color: 'red' }}>{error.message}</pre>
         <button onClick={resetBoundary}>Try again</button>
       </div>
     );
-  }
+  };
 
   return (
     <Router>
-
       <header>
-        <Link to={routeConstants.ME} className='logo'>
-          <div className="logo__mark-container"><img src={present} className="logo__mark" alt="GiftManager Logo" /></div>
-          <h1 className='logo__word'>GiftManager</h1>
+        <Link to={routeConstants.ME} className="logo">
+          <div className="logo__mark-container">
+            <img src={present} className="logo__mark" alt="GiftManager Logo" />
+          </div>
+          <h1 className="logo__word">GiftManager</h1>
         </Link>
-
 
         <nav className="navbar">
           <Link to={routeConstants.USER}>user</Link> chooser
@@ -78,9 +76,9 @@ function App() {
         <ErrorBoundary
           fallbackRender={fallbackRender}
           onError={logError}
-        // onReset={(details) => {
-        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-        // }}
+          // onReset={(details) => {
+          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+          // }}
         >
           <Routes>
             <Route path={routeConstants.HOME} Component={Me} />
@@ -111,7 +109,7 @@ function App() {
         </div>
       </footer>
       <div className="half-circle"></div>
-    </Router >
+    </Router>
   );
 }
 
