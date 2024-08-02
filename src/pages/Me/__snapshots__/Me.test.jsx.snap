@@ -6,6 +6,53 @@ exports[`The Me page > when no user context is provided > should match snapshot 
     <h2>
       This is the Me page - view other peoples lists.
     </h2>
+    Some stuff to test the palette with:
+    <br />
+    <br />
+    <button
+      class="button button--medium"
+      type="button"
+    >
+      click me
+    </button>
+    <br />
+    <br />
+    <input
+      type="text"
+      value="this field has a value"
+    />
+    <br />
+    <br />
+    <textarea />
+    <br />
+    <br />
+    <a
+      href="#"
+    >
+      This is just  a link
+    </a>
+    <br />
+    <br />
+    <p>
+      Paragraph tag
+    </p>
+    <br />
+    <br />
+    <div>
+      Text not in a paragraph
+    </div>
+    <select>
+      <option>
+        Choose me
+      </option>
+      <option>
+        No, choose me
+      </option>
+      <option>
+        This is the one
+      </option>
+    </select>
+    <br />
   </section>
 </div>
 `;

@@ -1,33 +1,204 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  display: flex;
+  flex-flow: column;
+  height: 100vh;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+:root {
+  --font-size: 16px;
+  --spacing: 20px;
+  --border-radius: 6px;
+}
+
+.theme__default {
+  /* these will eventually be in .default {} */
+  --primary-text-color: #171b18;
+  --secondary-text-color: #665048;
+  --primary-link-color: #3e5b24;
+  --primary-link-color-hover: #665048;
+  --primary-border-color: #96b23c;
+  --secondary-border-color: #96b23c;
+  --button-bg-color: #96b23c;
+  --button-bg-color-hover: #f2cedd;
+  --button-text-color: #fff;
+  --button-text-color-hover: #665048;
+  --primary-bg-color: #fff;
+  --secondary-bg-color: #dfeaa6;
+  --body-bg-color: #fff;
+  --input-bg-color: #fff;
+  --input-text-color: #333;
+}
+
+/* CSS resets */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+  margin: 0;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* /resets */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-size: var(--font-size);
+  font-family: Tahoma, Helvetica, Arial, sans-serif; /* Candara. Monaco. papyrus */
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light;
+  color: var(--primary-text-color);
+  background-color: var(--body-bg-color);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden; /* this is for the half circle */
+}
+
+a {
+  color: var(--primary-link-color);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--primary-link-color-hover);
+}
+
+/* header, footer and main need a z-index for half circle */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--primary-border-color);
+  margin: 0;
+  padding: var(--spacing) var(--spacing) 8px;
+  position: relative;
+  z-index: 1;
+  container-type: inline-size;
+}
+
+main {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spacing);
+  position: relative;
+  z-index: 1;
+  container-type: inline-size;
+}
+
+footer {
+  padding: var(--spacing);
+  border-top: 1px solid var(--primary-border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+button {
+  background: var(--button-bg-color);
+  border: 0;
+  font-size: var(--font-size);
+  padding: 6px 12px;
+  border-radius: var(--border-radius);
+  color: var(--button-text-color);
+  font-weight: normal;
+  white-space: normal;
+  padding: 0.3em 1.5em;
+  cursor: pointer;
+  display: inline-block;
+}
+
+button:hover {
+  background: var(--button-bg-color-hover);
+  color: var(--button-text-color-hover);
+}
+
+input,
+textarea,
+select {
+  padding: 8px;
+  border: 1px solid var(--primary-border-color);
+  background: var(--primary-bg-color);
+  border-radius: var(--border-radius);
+}
+
+/* the extension beyond the body allows for a more graceful curve */
+.half-circle {
+  background-color: var(--secondary-bg-color);
+  height: 50%;
+  width: 140%;
+  border-bottom-left-radius: 50% 30%;
+  border-bottom-right-radius: 50% 30%;
+  position: absolute;
+  top: 0;
+  left: -20%;
+  z-index: 0;
 }
 
 .logo {
-  height: 1.3em;
   will-change: filter;
   transition: filter 300ms;
+  display: flex;
+  align-items: center;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em var(--primary-link-color));
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* there is a bunch of whitespace above/below the SVG.  This crops it. */
+.logo__mark-container {
+  width: 50px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  margin-top: -8px; /* visually centering against words */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+.logo__mark {
+  width: 50px;
+}
+
+.logo__word {
+  font-size: 2em;
+  display: none;
+  line-height: 1.1;
+  margin-left: 8px;
+}
+
+.text-secondary {
+  color: var(--secondary-text-color);
+}
+
+/* tablet+ BP - using container queries to learn how. */
+@container (min-width: 768px) {
+  .logo__word {
+    display: block;
   }
 }

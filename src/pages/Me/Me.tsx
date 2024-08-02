@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Button from '@components/Button';
 import './Me.css';
 
 type propsInterface = {
