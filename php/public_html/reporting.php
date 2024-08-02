@@ -1,6 +1,14 @@
 <?
 include "../includes/report-credentials.php";
 
+// https://www.siteground.com/tutorials/php-mysql/connect-database/
+
+
+// Something is wrong w/ this script.  I've duplicated what works from test.php in report.php
+// Need to come back to this but I'm over it for now.
+
+
+
 $task = $_POST['task'] ?? "";
 
 // Assuming $mysqli is your mysqli connection object
@@ -12,40 +20,42 @@ if ($mysqli->connect_errno) {
     exit();
 }
 
-function addReport($db) {
+function addReport($mysqli) {
+  print("\Start addReport");
   $stmt->bind_param("sss", $report, $type, $body);
+  print("/nGot past stmt");
+
   $query = "INSERT INTO reports (report, type, body) VALUES (?, ?, ?)";
-  
+    
   $stmt = $mysqli->prepare($query);
   
   $report = $_POST['report'] ?? "";
   $type = $_POST['type'] ?? "";
   $body = $_POST['body'] ?? "";
 
-  $executed = $stmt->execute();
+  print("/nGot past vars");
 
-  if ($executed) {
-//    echo "Data successfully inserted.";
-    $response = '{"success":"Succesfully submited report."}';
-    } else {
-//    echo "Failed to insert data: (" . $stmt->errno . ") " . $stmt->error;   
+  if($stmt) {
+    print("Start stmt");
+    $executed = $stmt->execute();
+    if ($executed) {
+      print("Start executed");
+      $response = "success";
+    }
+    else {
+      print("\Failed execution");
+      $response =  '{"Error":"Failed to prepare the statement: (' . $mysqli->errno . ') ' . $mysqli->error .'."}';
+    }
+  }
+  else {
+    print("\SFailed stmt");
     $response = '{"error": "Failed to insert data: (' . $stmt->errno . ') ' . $stmt->error . '."}';
   }
   $stmt->close();
   return $response;
 }
 
-
-
-
-if ($stmt) {
-  if($task === 'addReport') {
-    $apiResponse = addReport($stmt);
-  }
-} else {
-  $apiResponse =  '{"Error":"Failed to prepare the statement: (' . $mysqli->errno . ') ' . $mysqli->error .'."}';
-  exit();
-}
+$apiResponse = addReport($mysqli);
 
 // Close the connection
 $mysqli->close();
@@ -60,5 +70,5 @@ header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-
+return print("success?");
 ?>
