@@ -1,0 +1,37 @@
+.notification {
+  padding: var(--spacing);
+  background: var(--primary-bg-color);
+  opacity: 80%;
+  text-align: left;
+  border: 1px solid var(--secondary-border-color);
+  border-radius: var(--border-radius);
+  margin-top: var(--spacing);
+  min-width: 15vw;
+  max-width: 35vw;
+  display: flex;
+  gap: var(--spacing);
+  flex-flow: space-between;
+  align-items: flex-start;
+  align-content: flex-start;
+  position: relative;
+  color: var(--secondary-text-color);
+}
+
+.notification:hover {
+  opacity: 100%;
+}
+
+.notification--pre {
+  font-size: 14px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.notification button {
+  font-weight: bold;
+  padding: 0.3em 0.8em;
+}

@@ -23,12 +23,12 @@ if ($mysqli->connect_errno) {
 function addReport($mysqli) {
   print("\Start addReport");
   $stmt->bind_param("sss", $report, $type, $body);
-  print("/nGot past stmt");
+ 
 
   $query = "INSERT INTO reports (report, type, body) VALUES (?, ?, ?)";
     
   $stmt = $mysqli->prepare($query);
-  
+   print("/nGot past stmt");
   $report = $_POST['report'] ?? "";
   $type = $_POST['type'] ?? "";
   $body = $_POST['body'] ?? "";

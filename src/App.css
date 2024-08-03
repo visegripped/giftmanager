@@ -11,6 +11,10 @@
   --spacing: 20px;
   --border-radius: 6px;
 }
+/* this is in safari's user agent style sheet. setting it back to default h1 size */
+:is(article, aside, nav, section) h1 {
+  font-size: 2em;
+}
 
 .theme__default {
   /* these will eventually be in .default {} */
@@ -86,6 +90,7 @@ a {
 }
 a:hover {
   color: var(--primary-link-color-hover);
+  text-decoration: underline;
 }
 
 /* header, footer and main need a z-index for half circle */
@@ -194,6 +199,44 @@ select {
 
 .text-secondary {
   color: var(--secondary-text-color);
+}
+
+.notifications {
+  background: green;
+  height: 2px; /* TODO: remove this. here for testing */
+  width: 300px;
+  position: absolute;
+  right: var(--spacing);
+}
+
+.notifications .notification {
+  animation: slide-down 0.7s ease-out;
+}
+
+.notifications .notification.close {
+  animation: slide-up 0.7s ease-out;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translate(0%, 100%);
+    display: none;
+  }
+
+  to {
+    display: block;
+  }
+}
+
+@keyframes slide-out {
+  from {
+    display: block;
+  }
+
+  to {
+    transform: translate(0%, 100%);
+    display: none;
+  }
 }
 
 /* tablet+ BP - using container queries to learn how. */

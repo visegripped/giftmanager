@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { ErrorBoundary, useErrorBoundary } from 'react-error-boundary';
 import './App.css';
-// import Button from '@components/Button';
 import routeConstants from '@routes/routeContstants';
 import { Me, User, Error404, Theme } from '@pages/';
 import present from './assets/present-optimized.svg';
 import postReport from '@utilities/postReport';
 import { setThemeOnBody } from '@utilities/setThemeOnBody';
+import { NotificationsProvider } from "@context/NotificationsContext";
+// import Button from '@components/Button';
+import NotificationList from '@components/NotificationList';
 
 type fallbackRenderPropsInterface = {
   error: Error;
@@ -76,18 +78,23 @@ function App() {
         <ErrorBoundary
           fallbackRender={fallbackRender}
           onError={logError}
-          // onReset={(details) => {
-          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-          // }}
+        // onReset={(details) => {
+        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+        // }}
         >
-          <Routes>
-            <Route path={routeConstants.HOME} Component={Me} />
-            <Route path={routeConstants.ME} Component={Me} />
-            <Route path={routeConstants.THEME} Component={Theme} />
-            <Route path={routeConstants.USER} Component={User} />
-            <Route path={`${routeConstants.User}/:userId`} Component={User} />
-            <Route Component={Error404} />
-          </Routes>
+          <NotificationsProvider >
+            <div className='notifications'>
+              <NotificationList />
+            </div>
+            <Routes>
+              <Route path={routeConstants.HOME} Component={Me} />
+              <Route path={routeConstants.ME} Component={Me} />
+              <Route path={routeConstants.THEME} Component={Theme} />
+              <Route path={routeConstants.USER} Component={User} />
+              <Route path={`${routeConstants.User}/:userId`} Component={User} />
+              <Route Component={Error404} />
+            </Routes>
+          </NotificationsProvider>
         </ErrorBoundary>
       </main>
 
@@ -101,7 +108,7 @@ function App() {
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              updateTheTheme();
+              updateTheme();
             }}
           >
             Use default theme
