@@ -7,7 +7,7 @@ import { Me, User, Error404, Theme } from '@pages/';
 import present from './assets/present-optimized.svg';
 import postReport from '@utilities/postReport';
 import { setThemeOnBody } from '@utilities/setThemeOnBody';
-import { NotificationsProvider } from "@context/NotificationsContext";
+import { NotificationsProvider } from '@context/NotificationsContext';
 // import Button from '@components/Button';
 import NotificationList from '@components/NotificationList';
 
@@ -78,12 +78,12 @@ function App() {
         <ErrorBoundary
           fallbackRender={fallbackRender}
           onError={logError}
-        // onReset={(details) => {
-        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-        // }}
+          // onReset={(details) => {
+          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+          // }}
         >
-          <NotificationsProvider >
-            <div className='notifications'>
+          <NotificationsProvider>
+            <div className="notifications">
               <NotificationList />
             </div>
             <Routes>

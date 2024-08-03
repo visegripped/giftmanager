@@ -1,7 +1,6 @@
 import { useState, createContext, PropsWithChildren } from 'react';
 import { UUID } from 'uuidjs';
 
-
 export interface AddNotificationProps {
   type: 'error' | 'success' | 'info' | 'warn';
   message: string;
@@ -16,7 +15,7 @@ export interface NotificationProps extends AddNotificationProps {
 export interface NotificationContextProps {
   notifications: { [k: number]: NotificationProps };
   setNotifications: () => {};
-  addNotifications: ({ }: AddNotificationProps) => {};
+  addNotifications: ({}: AddNotificationProps) => {};
   removeNotification: (number: NotificationProps) => {};
 }
 
@@ -39,7 +38,7 @@ const NotificationsProvider = (props: PropsWithChildren) => {
     updatedNotifications[uuid] = notificationObj;
     setNotifications(updatedNotifications);
   };
-  console.log(' -> notificationProvider re-render?')
+  console.log(' -> notificationProvider re-render?');
   return (
     <NotificationsContext.Provider
       value={{
