@@ -15,7 +15,7 @@ export interface NotificationProps extends AddNotificationProps {
 export interface NotificationContextProps {
   notifications: { [k: number]: NotificationProps };
   setNotifications: () => {};
-  addNotifications: ({ }: AddNotificationProps) => {};
+  addNotifications: ({}: AddNotificationProps) => {};
   removeNotification: (number: NotificationProps) => {};
 }
 

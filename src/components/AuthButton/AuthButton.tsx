@@ -1,10 +1,18 @@
-import { useContext, useEffect } from "react";
-import { AuthContext, AuthContextInterface } from "@context/AuthContext";
-import { ProfileContext, ProfileContextInterface } from "@context/ProfileContext";
+import { useContext, useEffect } from 'react';
+import { AuthContext, AuthContextInterface } from '@context/AuthContext';
+import {
+  ProfileContext,
+  ProfileContextInterface,
+} from '@context/ProfileContext';
 
 export const AuthButton = () => {
-  const { logout, login, accessToken = '' } = useContext<AuthContextInterface>(AuthContext);
-  const { setProfile, fetchProfile, profile } = useContext<ProfileContextInterface>(ProfileContext);
+  const {
+    logout,
+    login,
+    accessToken = '',
+  } = useContext<AuthContextInterface>(AuthContext);
+  const { setProfile, fetchProfile, profile } =
+    useContext<ProfileContextInterface>(ProfileContext);
 
   useEffect(() => {
     // only need to get the profile once.
@@ -16,7 +24,7 @@ export const AuthButton = () => {
   const authButtonLogout = () => {
     logout();
     setProfile({});
-  }
+  };
 
   return (
     <>

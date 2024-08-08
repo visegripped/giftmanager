@@ -4,7 +4,7 @@ import { ErrorBoundary, useErrorBoundary } from 'react-error-boundary';
 import './App.css';
 import routeConstants from '@routes/routeContstants';
 import { Me, User, Error404, Theme } from '@pages/';
-import { AuthContext } from "@context/AuthContext";
+import { AuthContext } from '@context/AuthContext';
 import { NotificationsProvider } from '@context/NotificationsContext';
 import present from './assets/present-optimized.svg';
 import postReport from '@utilities/postReport';
@@ -73,16 +73,18 @@ function App() {
           <Link to={routeConstants.USER}>user</Link> chooser
         </nav>
 
-        <div className="auth"><AuthButton /></div>
+        <div className="auth">
+          <AuthButton />
+        </div>
       </header>
 
       <main>
         <ErrorBoundary
           fallbackRender={fallbackRender}
           onError={logError}
-        // onReset={(details) => {
-        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-        // }}
+          // onReset={(details) => {
+          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+          // }}
         >
           <NotificationsProvider>
             <div className="notifications">
@@ -94,16 +96,20 @@ function App() {
                 <Route path={routeConstants.ME} Component={Me} />
                 <Route path={routeConstants.THEME} Component={Theme} />
                 <Route path={routeConstants.USER} Component={User} />
-                <Route path={`${routeConstants.User}/:userId`} Component={User} />
+                <Route
+                  path={`${routeConstants.User}/:userId`}
+                  Component={User}
+                />
                 <Route Component={Error404} />
               </Routes>
             ) : (
               <div className="unauthenticated">
                 <h2>You are not logged in.</h2>
-                <h3>Please use the sign in button in the upper right corner.</h3>
+                <h3>
+                  Please use the sign in button in the upper right corner.
+                </h3>
               </div>
             )}
-
           </NotificationsProvider>
         </ErrorBoundary>
       </main>

@@ -1,20 +1,19 @@
-import { useState, createContext, useContext } from "react";
-import { AuthContext } from "./AuthContext";
+import { useState, createContext, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 
 const ProfileContext = createContext(null);
 
 export interface GoogleProfileInterface {
   resourceName: string;
-  emailAdresses: []
+  emailAdresses: [];
   emailData: {
     metaData: {};
   };
   names: string;
   namesData: {
     metaData: {};
-  }
+  };
 }
-
 
 export interface userProfileInterface {
   emailAddress: string;
@@ -29,12 +28,11 @@ export interface ProfileContextInterface {
   fetchProfile: () => {};
 }
 
-
-
 const convertGoogleProfile2Custom = (googleProfile: GoogleProfileInterface) => {
   // need the following from the profile: email. avatar? name.
   let userProfile = { google: googleProfile };
-  const { resourceName, emailAddresses, names } = googleProfile<GoogleProfileInterface>;
+  const { resourceName, emailAddresses, names } =
+    googleProfile<GoogleProfileInterface>;
 
   userProfile.google.resourceName = resourceName;
   emailAddresses.forEach((emailData = {}) => {
@@ -59,14 +57,14 @@ const ProfileProvider = (props) => {
     // Fetch user profile information
     if (!access_token) {
       console.error(
-        "Access token was not passed to getProfile.  No request attempt has been made to retrieve the user profile"
+        'Access token was not passed to getProfile.  No request attempt has been made to retrieve the user profile'
       );
       return;
     }
     try {
       //https://developers.google.com/people/api/rest/v1/people/get
       const response = await fetch(
-        "https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses",
+        'https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses',
         {
           headers: {
             Authorization: `Bearer ${access_token}`, // this is the access_token.
@@ -81,7 +79,7 @@ const ProfileProvider = (props) => {
       // const emailAddress = userProfile?.emailAddresses[0]?.value;
       setProfile(convertGoogleProfile2Custom(userProfile));
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error('Error fetching profile:', error);
     }
   };
 
