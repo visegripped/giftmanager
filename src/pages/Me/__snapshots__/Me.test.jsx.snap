@@ -4,7 +4,7 @@ exports[`The Me page > when no user context is provided > should match snapshot 
 <div>
   <section>
     <h2>
-      This is the Me page - view other peoples lists.
+      This is the Me page - view my list.
     </h2>
   </section>
 </div>
