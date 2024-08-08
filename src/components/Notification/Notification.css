@@ -1,7 +1,7 @@
 .notification {
   padding: var(--spacing);
   background: var(--primary-bg-color);
-  opacity: 80%;
+  opacity: 90%;
   text-align: left;
   border: 1px solid var(--secondary-border-color);
   border-radius: var(--border-radius);
@@ -34,4 +34,16 @@
 .notification button {
   font-weight: bold;
   padding: 0.3em 0.8em;
+}
+
+.notification.info {
+  border-color: #665048;
+}
+
+.notification.warn {
+  border-color: ##3e5b24;
+}
+
+.notification.error {
+  background-color: #f2cedd;
 }

@@ -20,7 +20,7 @@ export const Notification = (props: NotificationProps) => {
   };
 
   if (persist) {
-    console.log(' -> persist actually hit!');
+
   } else {
     setTimeout(() => {
       if (!wasManuallyCleared) {

@@ -202,9 +202,8 @@ select {
 }
 
 .notifications {
-  background: green;
-  height: 2px; /* TODO: remove this. here for testing */
-  width: 300px;
+  height: 2px; /* keep short and let overflow handle it.  Otherwise items behind won't be clickable. */
+  width: 400px;
   position: absolute;
   right: var(--spacing);
 }

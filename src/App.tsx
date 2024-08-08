@@ -10,6 +10,7 @@ import { setThemeOnBody } from '@utilities/setThemeOnBody';
 import { NotificationsProvider } from '@context/NotificationsContext';
 // import Button from '@components/Button';
 import NotificationList from '@components/NotificationList';
+import Header from '@components/Header';
 
 type fallbackRenderPropsInterface = {
   error: Error;
@@ -78,9 +79,9 @@ function App() {
         <ErrorBoundary
           fallbackRender={fallbackRender}
           onError={logError}
-          // onReset={(details) => {
-          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-          // }}
+        // onReset={(details) => {
+        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+        // }}
         >
           <NotificationsProvider>
             <div className="notifications">
