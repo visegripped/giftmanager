@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import './NotificationList.css';
 import {
   NotificationsContext,
@@ -11,12 +11,6 @@ export const NotificationList = () => {
     useContext(NotificationsContext);
   const notificationList: [] = [];
   const keys = Object.keys(notifications);
-
-  useEffect(() => {
-    console.log(
-      ' -> notifications state change occurred and triggere useEffect'
-    );
-  }, [notifications]);
 
   if (keys.length) {
     keys.forEach((uuid) => {

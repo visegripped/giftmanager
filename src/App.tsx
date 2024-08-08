@@ -1,22 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { ErrorBoundary, useErrorBoundary } from 'react-error-boundary';
 import './App.css';
 import routeConstants from '@routes/routeContstants';
 import { Me, User, Error404, Theme } from '@pages/';
+import { AuthContext } from '@context/AuthContext';
+import { NotificationsProvider } from '@context/NotificationsContext';
 import present from './assets/present-optimized.svg';
 import postReport from '@utilities/postReport';
 import { setThemeOnBody } from '@utilities/setThemeOnBody';
-import { NotificationsProvider } from '@context/NotificationsContext';
-// import Button from '@components/Button';
 import NotificationList from '@components/NotificationList';
-import Header from '@components/Header';
+import AuthButton from '@components/AuthButton';
 
 type fallbackRenderPropsInterface = {
   error: Error;
 };
 
 function App() {
+  const { accessToken } = useContext(AuthContext);
   let currentDate = new Date();
 
   const selectedThemeAtLoad = localStorage.getItem('theme') || 'theme__default';
@@ -72,7 +73,9 @@ function App() {
           <Link to={routeConstants.USER}>user</Link> chooser
         </nav>
 
-        <div className="auth">login to go here</div>
+        <div className="auth">
+          <AuthButton />
+        </div>
       </header>
 
       <main>
@@ -87,14 +90,26 @@ function App() {
             <div className="notifications">
               <NotificationList />
             </div>
-            <Routes>
-              <Route path={routeConstants.HOME} Component={Me} />
-              <Route path={routeConstants.ME} Component={Me} />
-              <Route path={routeConstants.THEME} Component={Theme} />
-              <Route path={routeConstants.USER} Component={User} />
-              <Route path={`${routeConstants.User}/:userId`} Component={User} />
-              <Route Component={Error404} />
-            </Routes>
+            {accessToken ? (
+              <Routes>
+                <Route path={routeConstants.HOME} Component={Me} />
+                <Route path={routeConstants.ME} Component={Me} />
+                <Route path={routeConstants.THEME} Component={Theme} />
+                <Route path={routeConstants.USER} Component={User} />
+                <Route
+                  path={`${routeConstants.User}/:userId`}
+                  Component={User}
+                />
+                <Route Component={Error404} />
+              </Routes>
+            ) : (
+              <div className="unauthenticated">
+                <h2>You are not logged in.</h2>
+                <h3>
+                  Please use the sign in button in the upper right corner.
+                </h3>
+              </div>
+            )}
           </NotificationsProvider>
         </ErrorBoundary>
       </main>
