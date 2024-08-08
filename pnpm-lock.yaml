@@ -20,6 +20,9 @@ importers:
       react-router-dom:
         specifier: ^6.25.1
         version: 6.25.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      uuidjs:
+        specifier: ^5.1.0
+        version: 5.1.0
     devDependencies:
       '@chromatic-com/storybook':
         specifier: ^1.6.1
@@ -3689,6 +3692,10 @@ packages:
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    hasBin: true
+
+  uuidjs@5.1.0:
+    resolution: {integrity: sha512-HAQPtUkr7t5Ud3uCwRcqtBRNagu/2aerrrBQE6PzgSluGijvFF75UaOq22Xw545GGviRjSLhc4c8CaSMI5h4Ng==}
     hasBin: true
 
   vary@1.1.2:
@@ -8010,6 +8017,8 @@ snapshots:
   utils-merge@1.0.1: {}
 
   uuid@9.0.1: {}
+
+  uuidjs@5.1.0: {}
 
   vary@1.1.2: {}
 
