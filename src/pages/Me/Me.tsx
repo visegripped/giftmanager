@@ -21,7 +21,7 @@ const Me = (props: propsInterface) => {
   return (
     <>
       <section>
-        <h2>This is the Me page - view other peoples lists.</h2>
+        <h2>This is the Me page - view my list.</h2>
       </section>
     </>
   );

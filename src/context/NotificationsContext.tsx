@@ -15,7 +15,7 @@ export interface NotificationProps extends AddNotificationProps {
 export interface NotificationContextProps {
   notifications: { [k: number]: NotificationProps };
   setNotifications: () => {};
-  addNotifications: ({}: AddNotificationProps) => {};
+  addNotifications: ({ }: AddNotificationProps) => {};
   removeNotification: (number: NotificationProps) => {};
 }
 
@@ -31,14 +31,12 @@ const NotificationsProvider = (props: PropsWithChildren) => {
   };
 
   const addNotification = (notificationObj: NotificationProps) => {
-    console.log(` -> addNotification: `, notificationObj);
     let updatedNotifications = { ...notifications };
     const uuid = UUID.generate();
     notificationObj.uuid = uuid; // add to the individual notification for easy lookup later.
     updatedNotifications[uuid] = notificationObj;
     setNotifications(updatedNotifications);
   };
-  console.log(' -> notificationProvider re-render?');
   return (
     <NotificationsContext.Provider
       value={{
