@@ -1,7 +1,10 @@
 import { useContext } from 'react';
 import Button from '@components/Button';
 import Notification from '@components/Notification';
-import { NotificationsContext, AddNotificationProps } from '@context/NotificationsContext';
+import {
+  NotificationsContext,
+  AddNotificationProps,
+} from '@context/NotificationsContext';
 import './Theme.css';
 
 /*
@@ -17,7 +20,12 @@ const Theme = () => {
   const { addNotification } = useContext(NotificationsContext);
 
   const notify = (report: AddNotificationProps) => {
-    const { type = '', message = '', persist = false, clearDuration = 10000 } = report;
+    const {
+      type = '',
+      message = '',
+      persist = false,
+      clearDuration = 10000,
+    } = report;
     addNotification({
       type,
       message,
@@ -172,16 +180,52 @@ const Theme = () => {
             <Button label="Click me" />
           </div>
           <div className="element">
-            <Button label="Throw message - error" onClick={() => { notify({ persist: true, type: 'error', message: 'Oh no.  An error occured. What shall we do now?' }) }} />
+            <Button
+              label="Throw message - error"
+              onClick={() => {
+                notify({
+                  persist: true,
+                  type: 'error',
+                  message: 'Oh no.  An error occured. What shall we do now?',
+                });
+              }}
+            />
           </div>
           <div className="element">
-            <Button label="Throw message - info" onClick={() => { notify({ persist: true, type: 'info', message: 'This is to let you know we have no info.' }) }} />
+            <Button
+              label="Throw message - info"
+              onClick={() => {
+                notify({
+                  persist: true,
+                  type: 'info',
+                  message: 'This is to let you know we have no info.',
+                });
+              }}
+            />
           </div>
           <div className="element">
-            <Button label="Throw message - success" onClick={() => { notify({ persist: true, type: 'success', message: 'success is in the eye of the beer holder.' }) }} />
+            <Button
+              label="Throw message - success"
+              onClick={() => {
+                notify({
+                  persist: true,
+                  type: 'success',
+                  message: 'success is in the eye of the beer holder.',
+                });
+              }}
+            />
           </div>
           <div className="element">
-            <Button label="Throw message - warn" onClick={() => { notify({ persist: true, type: 'warn', message: 'This is just a warning... but PANIC!' }) }} />
+            <Button
+              label="Throw message - warn"
+              onClick={() => {
+                notify({
+                  persist: true,
+                  type: 'warn',
+                  message: 'This is just a warning... but PANIC!',
+                });
+              }}
+            />
           </div>
           <div className="element"></div>
         </section>
@@ -193,17 +237,37 @@ const Theme = () => {
             messaging.
           </p>
 
-          <div className='element'>
-            <Notification type='success' message='This is the message for the success type.' persist={true} uuid='1546565465654645' />
+          <div className="element">
+            <Notification
+              type="success"
+              message="This is the message for the success type."
+              persist={true}
+              uuid="1546565465654645"
+            />
           </div>
-          <div className='element'>
-            <Notification type='info' message='This is the message for the info type.' persist={true} uuid='2546565465654645' />
+          <div className="element">
+            <Notification
+              type="info"
+              message="This is the message for the info type."
+              persist={true}
+              uuid="2546565465654645"
+            />
           </div>
-          <div className='element'>
-            <Notification type='warn' message='This is the message for the warn type.' persist={true} uuid='3546565465654645' />
+          <div className="element">
+            <Notification
+              type="warn"
+              message="This is the message for the warn type."
+              persist={true}
+              uuid="3546565465654645"
+            />
           </div>
-          <div className='element'>
-            <Notification type='error' message='This is the message for the error type.' persist={true} uuid='4546565465654645' />
+          <div className="element">
+            <Notification
+              type="error"
+              message="This is the message for the error type."
+              persist={true}
+              uuid="4546565465654645"
+            />
           </div>
         </section>
       </div>
