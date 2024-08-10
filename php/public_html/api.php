@@ -1,10 +1,11 @@
 <?php
 
 include "../includes/api-credentials.php";
+include "../includes/api-functions.php";
 
 // Assuming $mysqli is your mysqli connection object
 $mysqli = new mysqli("localhost", $username, $password, $database);
-$apiResponse = array("warn" => "successful post with no task assignment.");
+$apiResponse = array("warn" => "successful post with no task passed.");
 
 // Check connection
 if ($mysqli->connect_errno) {
@@ -25,27 +26,26 @@ $qty = $_POST['qty'] ?? "1";
 $added_by_userid = $_POST['added_by_userid'] ?? "";
 $groupid = $_POST['groupid'] ?? "1";
 
-if ($task == 'getMyList' && $userid !== "") {
-    $query = "SELECT * FROM `items` WHERE userid = ? AND added_by_userid = ? AND `removed` = 0 ORDER BY date_added ASC";
-    $stmt = $mysqli->prepare($query);
 
-    if ($stmt) {
-        $stmt->bind_param("ss", $userid, $userid);
-        $stmt->execute();
-        
-        $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-            $apiResponse = $result->fetch_all(MYSQLI_ASSOC);
-        } else {
-            $apiResponse = array("error" => "No items found for the specified user.");
-        }
+// valid tasks:
+// getMyList
+// getListByUserId
+// getUserList
+// getUserProfile
+// addItemToListByUserId
+// updateItem
+// deleteItem
 
-        $stmt->close();
-    } else {
-        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
-    }
-} else {
+
+if ($task == 'getMyList' && $userid) {
+    $apiResponse = getMyList($userid, $mysqli);
+} else if ($task == 'getListByUserId' && $userid) {
+    $apiResponse = getListByUserId($userid, $mysqli);
+} else if ($task == 'getUserList') {
+    $apiResponse = getUserList($mysqli);
+}
+else {
     $apiResponse = array("error" => "Invalid task or userid.");
 }
 
