@@ -1,5 +1,8 @@
 <?php
-
+header('Content-type: application/json');
+header('Access-Control-Allow-Methods: POST');
+header("Access-Control-Allow-Headers: X-Requested-With");
+header("Access-Control-Allow-Origin: '*'");
 include "../includes/api-credentials.php";
 include "../includes/api-functions.php";
 
@@ -15,6 +18,7 @@ if ($mysqli->connect_errno) {
 
 // Get POST variables
 $task = $_POST['task'] ?? "";
+$myuserid = $_POST['myuserid'] ?? "";
 $userid = $_POST['userid'] ?? "";
 $name = $_POST['name'] ?? "";
 $note = $_POST['note'] ?? "";
@@ -23,6 +27,7 @@ $date_received = $_POST['date_received'] ?? "";
 $removed = $_POST['removed'] ?? "";
 $status = $_POST['status'] ?? "";
 $qty = $_POST['qty'] ?? "1";
+$archive = $_POST['archive'] ?? "1";
 $added_by_userid = $_POST['added_by_userid'] ?? "";
 $groupid = $_POST['groupid'] ?? "1";
 
@@ -38,12 +43,12 @@ $groupid = $_POST['groupid'] ?? "1";
 // deleteItem
 
 
-if ($task == 'getMyList' && $userid) {
-    $apiResponse = getMyList($userid, $mysqli);
+if ($task == 'getMyList' && $myuserid) {
+    $apiResponse = getMyList($myuserid, $mysqli);
 } else if ($task == 'getListByUserId' && $userid) {
     $apiResponse = getListByUserId($userid, $mysqli);
-} else if ($task == 'getUserList') {
-    $apiResponse = getUserList($mysqli);
+} else if ($task == 'getUsers') {
+    $apiResponse = getUsers($mysqli);
 }
 else {
     $apiResponse = array("error" => "Invalid task or userid.");
@@ -53,9 +58,7 @@ else {
 $mysqli->close();
 
 // Return the response as JSON
-header('Content-type: application/json');
-header('Access-Control-Allow-Methods: POST');
-header("Access-Control-Allow-Headers: X-Requested-With");
+
 
 echo json_encode($apiResponse);
 

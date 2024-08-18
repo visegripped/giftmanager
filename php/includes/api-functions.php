@@ -3,7 +3,7 @@
 
 
 function getMyList($userid, $mysqli) {
-    $query = "SELECT * FROM `items` WHERE userid = ? AND added_by_userid = ? AND `removed` = 0 ORDER BY date_added ASC";
+    $query = "SELECT * FROM `items` WHERE userid = ? AND added_by_userid = ? AND `archive` = 0 ORDER BY date_added ASC";
     $stmt = $mysqli->prepare($query);
 
     if ($stmt) {
@@ -44,7 +44,7 @@ function getListByUserId($userid, $mysqli) {
 }
 
 
-function getUserList($mysqli) {
+function getUsers($mysqli) {
     $query = "SELECT * FROM `users` ORDER BY firstname ASC";
     $stmt = $mysqli->prepare($query);
 
