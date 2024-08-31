@@ -59,8 +59,8 @@ const StatusDD = (props: propsInterface) => {
     <>
       {removed === 1 ? (
         <div>plus</div>
-        // <button className="btn-small"><Icon icon='plus' color='red' size='small' /></button>
       ) : (
+        // <button className="btn-small"><Icon icon='plus' color='red' size='small' /></button>
         <>
           edit and delete
           {/* <button className="btn-small"><Icon icon='edit' color='red' size='medium' title="Edit item" /></button>
@@ -75,7 +75,7 @@ const linkedName = (props: tableDataInterface) => {
   return <Link {...props.data} />;
 };
 
-const adjustedStatus = (props: tableDataInterface) => { };
+const adjustedStatus = (props: tableDataInterface) => {};
 
 // change status title to actions: add a remove button.
 const Table = (props: myItemListInterface) => {
@@ -128,23 +128,28 @@ const Me = () => {
     <>
       <h2 className="page-heading">YOURNAME's List</h2>
       <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
+        <form className="form">
+          <fieldset className="fieldset">
+            <legend className="legend">Add item</legend>
 
-        <form className='form'>
-          <fieldset className='fieldset'>
-            <legend className='legend'>Add item</legend>
-
-            <label className='label' >Name</label>
-            <div className='input-container'><input type="text" name="name" /></div>
-
+            <label className="label">Name</label>
+            <div className="input-container">
+              <input type="text" name="name" />
+            </div>
 
             <label>URL</label>
-            <div className='input-container'><input type="url" name="link" /></div>
-
+            <div className="input-container">
+              <input type="url" name="link" />
+            </div>
 
             <label>Description</label>
-            <div className='input-container'><textarea name="description"></textarea></div>
+            <div className="input-container">
+              <textarea name="description"></textarea>
+            </div>
 
-            <button><img src={iconPlus} alt="" /> Add item</button>
+            <button>
+              <img src={iconPlus} alt="" /> Add item
+            </button>
           </fieldset>
         </form>
 
@@ -155,7 +160,6 @@ const Me = () => {
             <h3>Fetching data...</h3>
           )}
         </>
-
       </section>
     </>
   );

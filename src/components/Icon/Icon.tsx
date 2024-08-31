@@ -20,11 +20,14 @@ export interface IconProps {
  * Primary UI component for user interaction
  * https://blog.logrocket.com/how-to-use-svgs-react/
  */
-export const Icon = ({ size = 'medium', color = '#666', icon, title = '' }: IconProps) => {
+export const Icon = ({
+  size = 'medium',
+  color = '#666',
+  icon,
+  title = '',
+}: IconProps) => {
   console.log('stuff', icon, size, color, title);
-  return (
-    <Delete />
-  );
+  return <Delete />;
 };
 
 export default Icon;
