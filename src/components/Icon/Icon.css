@@ -1,0 +1,10 @@
+.icon {
+  height: 40px;
+}
+.icon--small {
+  height: 20px;
+}
+
+.icon--large {
+  height: 60px;
+}

@@ -1,10 +1,28 @@
 import { useState, useEffect } from 'react';
-// import Button from '@components/Button';
+// import Icon from '@components/Icon';
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
 import './Me.css';
 import fetchData from '@utilities/fetchData';
+// import iconDelete from '@assets/icon-delete.svg';
+// import iconEdit from '@assets/icon-edit.svg';
+import iconPlus from '@assets/icon-plus.svg';
+
+/*
+To do:
+  Status column: 
+      if item is removed, row should turn warning/error color.
+      remove button needs to work
+      edit button should allows changing the link and description, NOT the name.
+  API response should be cleaned up to only return data that doesn't reveal anything.
+  Page needs to be responsive, for smaller browsers, left col should be on top.
+  Need an Add item section
+    includes: name, link, description (rename note)
+    updates DB
+    refetches list.
+    updates table.
+*/
 
 type propsInterface = {
   userid: string | undefined;
@@ -12,59 +30,77 @@ type propsInterface = {
   name: string;
   note: string;
   date_received: number;
-  status: null | 'nochange' | 'uncancel' | 'remove';
+  status: null | 'nochange' | 'uncancel' | 'remove' | 'purchased' | 'reserved';
+  removed: 1 | 0;
   link: string;
   giftid: number;
   groupid: number;
-  qty: number;
 };
 
 type myItemListInterface = {
   myItemList: propsInterface[];
-}
-
-
-type linkedNameInterface = {
-  name: string;
-  link: string;
-};
-type adjustedStatusInterface = {
-  status: string;
-  removed: number;
 };
 
-const linkedName = (props: linkedNameInterface) => {
+type tableDataInterface = {
+  data: propsInterface;
+};
+
+const Link = (props: propsInterface) => {
   const { link, name } = props;
-  return name;
-  if (!link) {
-    return name;
-  }
-  return `<a href='${link}' target='_blank'>${name}</a>`;
+  return (
+    <a href={link} target="_blank">
+      {name}
+    </a>
+  );
+};
+const StatusDD = (props: propsInterface) => {
+  const { removed } = props.data;
+  return (
+    <>
+      {removed === 1 ? (
+        <div>plus</div>
+        // <button className="btn-small"><Icon icon='plus' color='red' size='small' /></button>
+      ) : (
+        <>
+          edit and delete
+          {/* <button className="btn-small"><Icon icon='edit' color='red' size='medium' title="Edit item" /></button>
+            <button className="btn-small"><Icon icon='delete' color='red' size='large' title="Remove item from list" /></button> */}
+        </>
+      )}
+    </>
+  );
 };
 
-const adjustedStatus = (props: adjustedStatusInterface) => {
-  const { status, removed } = props;
-  let newStatus = status;
-  if (removed === 1 && status === 'purchased') {
-    return 'cancelled';
-  }
-  return newStatus;
+const linkedName = (props: tableDataInterface) => {
+  return <Link {...props.data} />;
 };
 
+const adjustedStatus = (props: tableDataInterface) => { };
+
+// change status title to actions: add a remove button.
 const Table = (props: myItemListInterface) => {
   const { myItemList } = props;
   const [colDefs] = useState([
-    { field: 'name', sortable: true, }, // cellRenderer: linkedName
-    { field: 'note', flex: 2 },
-    { field: 'status', cellRenderer: adjustedStatus },
-    { field: 'date', sort: 'asc' },
+    { field: 'name', sortable: true, cellRenderer: linkedName, sort: 'asc' },
+    { field: 'description' },
+    {
+      field: 'removed',
+      cellRenderer: StatusDD,
+      headerName: 'actions',
+      flex: 2,
+    },
   ]);
+
+  const rowClassRules = {
+    'row-removed': 'data.removed >= 1',
+  };
 
   return (
     <>
       <AgGridReact
         rowData={myItemList}
         columnDefs={colDefs}
+        rowClassRules={rowClassRules}
         style={{ width: '100%', height: '100%' }}
       />
     </>
@@ -74,7 +110,7 @@ const Table = (props: myItemListInterface) => {
 const Me = () => {
   const [myItemList, setMyItemList] = useState([]);
 
-  // const [userProfile] = useState({}); //, setUserProfile
+  // const [userProfile] = useState({ }); //, setUserProfile
 
   useEffect(() => {
     const response = fetchData({
@@ -90,8 +126,28 @@ const Me = () => {
 
   return (
     <>
-      <section className="table-container ag-theme-quartz">
-        <h2>This is the Me page - view my list.</h2>
+      <h2 className="page-heading">YOURNAME's List</h2>
+      <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
+
+        <form className='form'>
+          <fieldset className='fieldset'>
+            <legend className='legend'>Add item</legend>
+
+            <label className='label' >Name</label>
+            <div className='input-container'><input type="text" name="name" /></div>
+
+
+            <label>URL</label>
+            <div className='input-container'><input type="url" name="link" /></div>
+
+
+            <label>Description</label>
+            <div className='input-container'><textarea name="description"></textarea></div>
+
+            <button><img src={iconPlus} alt="" /> Add item</button>
+          </fieldset>
+        </form>
+
         <>
           {myItemList.length ? (
             <Table myItemList={myItemList} />
@@ -99,6 +155,7 @@ const Me = () => {
             <h3>Fetching data...</h3>
           )}
         </>
+
       </section>
     </>
   );

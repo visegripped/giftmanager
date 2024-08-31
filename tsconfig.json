@@ -4,6 +4,7 @@
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
+      "@assets/*": ["./src/assets/*"],
       "@components/*": ["./src/components/*"],
       "@pages/*": ["./src/pages/*"],
       "@utilities/*": ["./src/utilities/*"],

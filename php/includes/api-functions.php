@@ -65,4 +65,109 @@ function getUsers($mysqli) {
 }
 
 
+
+
+function updateRemovedStatusForMyItem($userid, $removed, $giftid, $mysqli) {
+    $query = "UPDATE items SET removed = ? WHERE giftid = ? AND userid = ?";
+    $stmt = $mysqli->prepare($query);
+    $stmt->bind_param('sis', $removed, $giftid, $userid);
+    if ($stmt) {
+        $stmt->execute();
+        if ($stmt->affected_rows > 0) {
+            $apiResponse = array("success" => "item $giftid updated");
+        } else {
+            $apiResponse = array("error" => "No items found for the specified user (affected rows: ".$stmt->affected_rows.").");
+        }
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
+
+
+function addItemToMyOwnList($userid, $name, $description, $link, $mysqli) {
+    // Correct SQL query
+    $stmt = $mysqli->prepare("INSERT INTO items (userid, name, description, link) VALUES (?, ?, ?, ?)");
+
+    if ($stmt) {
+        // Bind the parameters correctly
+        $stmt->bind_param('ssss', $userid, $name, $description, $link);
+        
+        // Execute the statement
+        if ($stmt->execute()) {
+            $apiResponse = array("success" => "Item added");
+        } else {
+            $apiResponse = array("error" => "Failed to add item: " . $stmt->error);
+        }
+        
+        // Close the statement
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    
+    return $apiResponse;
+}
+
+function updateItemInMyOwnList($userid, $itemid, $description, $link, $mysqli) {
+    // Start building the SQL query dynamically
+    $query = "UPDATE items SET ";
+    $params = [];
+    $types = '';
+
+    if (!empty($description)) {
+        $query .= "description = ?, ";
+        $params[] = $description;
+        $types .= 's';
+    }
+
+    if (!empty($link)) {
+        $query .= "link = ?, ";
+        $params[] = $link;
+        $types .= 's';
+    }
+
+    // Check if there's anything to update
+    if (empty($params)) {
+        return array("error" => "No fields to update");
+    }
+
+    // Remove the last comma and space
+    $query = rtrim($query, ', ');
+
+    // Add the WHERE clause
+    $query .= " WHERE userid = ? AND itemid = ?";
+    $params[] = $userid;
+    $params[] = $itemid;
+    $types .= 'si';
+
+    // Prepare the statement
+    $stmt = $mysqli->prepare($query);
+
+    if ($stmt) {
+        // Bind the parameters dynamically
+        $stmt->bind_param($types, ...$params);
+        
+        // Execute the statement
+        if ($stmt->execute()) {
+            // Check the number of affected rows
+            if ($stmt->affected_rows > 0) {
+                $apiResponse = array("success" => "Item updated");
+            } else {
+                $apiResponse = array("error" => "No rows updated. Please check the input.");
+            }
+        } else {
+            $apiResponse = array("error" => "Failed to update item: " . $stmt->error);
+        }
+
+        // Close the statement
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    
+    return $apiResponse;
+}
+
 ?>

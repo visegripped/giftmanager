@@ -14,7 +14,7 @@
   align-items: flex-start;
   align-content: flex-start;
   position: relative;
-  color: var(--secondary-text-color);
+  color: var(--text-secondary);
 }
 
 .notification:hover {

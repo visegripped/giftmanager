@@ -20,6 +20,7 @@ if ($mysqli->connect_errno) {
 $task = $_POST['task'] ?? "";
 $myuserid = $_POST['myuserid'] ?? "";
 $userid = $_POST['userid'] ?? "";
+$giftid = $_POST['giftid'] ?? "";
 $name = $_POST['name'] ?? "";
 $note = $_POST['note'] ?? "";
 $link = $_POST['link'] ?? "";
@@ -38,8 +39,10 @@ $groupid = $_POST['groupid'] ?? "1";
 // getListByUserId
 // getUserList
 // getUserProfile
+// addItemToMyOwnList
 // addItemToListByUserId
-// updateItem
+// updateRemovedStatusForMyItem
+// updateMyItem
 // deleteItem
 
 
@@ -49,9 +52,15 @@ if ($task == 'getMyList' && $myuserid) {
     $apiResponse = getListByUserId($userid, $mysqli);
 } else if ($task == 'getUsers') {
     $apiResponse = getUsers($mysqli);
+} else if($task == 'updateRemovedStatusForMyItem' && $userid &&  $removed >= 0 &&  $giftid && ($myuserid == $userid)) {
+    $apiResponse = updateRemovedStatusForMyItem($userid, $removed, $giftid, $mysqli);
+}  else if($task == 'addItemToMyOwnList' && $userid && ($myuserid == $userid) && $name) {
+    $apiResponse = addItemToMyOwnList($userid, $name, $description, $link, $mysqli);
+} else if($task == 'updateItemOnMyOwnList' && $userid && ($myuserid == $userid) && $giftid && ($description || $link)) {
+    $apiResponse = updateItemOnMyOwnList($userid, $itemid, $description, $link, $mysqli);
 }
 else {
-    $apiResponse = array("error" => "Invalid task or userid.");
+    $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed $removed, description: $description, $link");
 }
 
 // Close the connection
