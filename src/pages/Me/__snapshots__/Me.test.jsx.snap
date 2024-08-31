@@ -2,10 +2,71 @@
 
 exports[`The Me page > when no user context is provided > should match snapshot 1`] = `
 <div>
-  <section>
-    <h2>
-      This is the Me page - view my list.
-    </h2>
+  <h2
+    class="page-heading"
+  >
+    YOURNAME's List
+  </h2>
+  <section
+    class="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar"
+  >
+    <form
+      class="form"
+    >
+      <fieldset
+        class="fieldset"
+      >
+        <legend
+          class="legend"
+        >
+          Add item
+        </legend>
+        <label
+          class="label"
+        >
+          Name
+        </label>
+        <div
+          class="input-container"
+        >
+          <input
+            name="name"
+            type="text"
+          />
+        </div>
+        <label>
+          URL
+        </label>
+        <div
+          class="input-container"
+        >
+          <input
+            name="link"
+            type="url"
+          />
+        </div>
+        <label>
+          Description
+        </label>
+        <div
+          class="input-container"
+        >
+          <textarea
+            name="description"
+          />
+        </div>
+        <button>
+          <img
+            alt=""
+            src="/src/assets/icon-plus.svg"
+          />
+           Add item
+        </button>
+      </fieldset>
+    </form>
+    <h3>
+      Fetching data...
+    </h3>
   </section>
 </div>
 `;
