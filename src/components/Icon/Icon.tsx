@@ -17,7 +17,11 @@ export const Icon = (props: IconProps) => {
     plus: <IconPlus />,
     close: <IconClose />,
   };
-  return <span className={`icon`} title={title}>{icons[icon]}</span>;
+  return (
+    <span className={`icon`} title={title}>
+      {icons[icon]}
+    </span>
+  );
 };
 
 export default Icon;

@@ -57,11 +57,10 @@ const Me = () => {
       });
       response &&
         response.then((data) => {
-          fetchItemList()
+          fetchItemList();
         });
-    }
-  }
-
+    };
+  };
 
   const Link = (props: propsInterface) => {
     const { link, name } = props;
@@ -111,8 +110,6 @@ const Me = () => {
       'row-removed': 'data.removed >= 1',
     };
 
-
-
     return (
       <>
         <AgGridReact
@@ -125,8 +122,6 @@ const Me = () => {
     );
   };
 
-
-
   const fetchItemList = () => {
     const response = fetchData({
       task: 'getMyList',
@@ -137,7 +132,7 @@ const Me = () => {
       response.then((data) => {
         setMyItemList(data.success);
       });
-  }
+  };
 
   // const [userProfile] = useState({ }); //, setUserProfile
 
@@ -147,7 +142,6 @@ const Me = () => {
       fetchItemList();
     }
   }, []);
-
 
   return (
     <>
@@ -172,7 +166,7 @@ const Me = () => {
               <textarea name="description"></textarea>
             </div>
 
-            <Button icon='plus' label='Add item' />
+            <Button icon="plus" label="Add item" />
           </fieldset>
         </form>
 
