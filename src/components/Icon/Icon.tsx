@@ -27,7 +27,7 @@ export const Icon = (props: IconProps) => {
     edit: <IconEdit {...props} />,
     plus: <IconPlus {...props} />,
     close: <IconClose {...props} />,
-  }
+  };
   return icons[icon];
 };
 

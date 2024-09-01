@@ -6,7 +6,6 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied
 import './Me.css';
 import fetchData from '@utilities/fetchData';
 
-
 /*
 To do:
   Status column: 
@@ -56,11 +55,11 @@ const StatusDD = (props: propsInterface) => {
   return (
     <>
       {removed === 1 ? (
-        <Icon icon='plus' />
+        <Icon icon="plus" />
       ) : (
         <>
-          <Icon icon='edit' />
-          <Icon icon='delete' />
+          <Icon icon="edit" />
+          <Icon icon="delete" />
         </>
       )}
     </>
@@ -124,21 +123,24 @@ const Me = () => {
     <>
       <h2 className="page-heading">YOURNAME's List</h2>
       <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
+        <form className="form">
+          <fieldset className="fieldset">
+            <legend className="legend">Add item</legend>
 
-        <form className='form'>
-          <fieldset className='fieldset'>
-            <legend className='legend'>Add item</legend>
-
-            <label className='label' >Name</label>
-            <div className='input-container'><input type="text" name="name" /></div>
-
+            <label className="label">Name</label>
+            <div className="input-container">
+              <input type="text" name="name" />
+            </div>
 
             <label>URL</label>
-            <div className='input-container'><input type="url" name="link" /></div>
-
+            <div className="input-container">
+              <input type="url" name="link" />
+            </div>
 
             <label>Description</label>
-            <div className='input-container'><textarea name="description"></textarea></div>
+            <div className="input-container">
+              <textarea name="description"></textarea>
+            </div>
 
             {/* <button><img src={iconPlus} alt="" /> Add item</button> */}
           </fieldset>
@@ -151,7 +153,6 @@ const Me = () => {
             <h3>Fetching data...</h3>
           )}
         </>
-
       </section>
     </>
   );
