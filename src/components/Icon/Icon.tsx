@@ -1,9 +1,9 @@
 // import React, { ReactComponent } from 'react';
 import './Icon.css';
-import Delete from '@assets/icon-delete.svg?react'; //https://aronschueler.de/blog/2024/04/25/fix-no-exported-member-'reactcomponent'-when-importing-svg-in-react-and-vite/
-// import iconEdit from '@assets/icon-edit.svg';
-// import iconPlus from '@assets/icon-plus.svg';
-// import iconClose from '@assets/icon-close.svg';
+import IconDelete from '@assets/icon-delete.svg'; //https://aronschueler.de/blog/2024/04/25/fix-no-exported-member-'reactcomponent'-when-importing-svg-in-react-and-vite/
+import IconEdit from '@assets/icon-edit.svg';
+import IconPlus from '@assets/icon-plus.svg';
+import IconClose from '@assets/icon-close.svg';
 
 export interface IconProps {
   icon: 'delete' | 'edit' | 'plus' | 'close';
@@ -20,14 +20,15 @@ export interface IconProps {
  * Primary UI component for user interaction
  * https://blog.logrocket.com/how-to-use-svgs-react/
  */
-export const Icon = ({
-  size = 'medium',
-  color = '#666',
-  icon,
-  title = '',
-}: IconProps) => {
-  console.log('stuff', icon, size, color, title);
-  return <Delete />;
+export const Icon = (props: IconProps) => {
+  const { icon } = props;
+  const icons = {
+    delete: <IconDelete {...props} />,
+    edit: <IconEdit {...props} />,
+    plus: <IconPlus {...props} />,
+    close: <IconClose {...props} />,
+  }
+  return icons[icon];
 };
 
 export default Icon;

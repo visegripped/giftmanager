@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
-// import Icon from '@components/Icon';
+import Icon from '@components/Icon';
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
 import './Me.css';
 import fetchData from '@utilities/fetchData';
-// import iconDelete from '@assets/icon-delete.svg';
-// import iconEdit from '@assets/icon-edit.svg';
-import iconPlus from '@assets/icon-plus.svg';
+
 
 /*
 To do:
@@ -58,13 +56,11 @@ const StatusDD = (props: propsInterface) => {
   return (
     <>
       {removed === 1 ? (
-        <div>plus</div>
+        <Icon icon='plus' />
       ) : (
-        // <button className="btn-small"><Icon icon='plus' color='red' size='small' /></button>
         <>
-          edit and delete
-          {/* <button className="btn-small"><Icon icon='edit' color='red' size='medium' title="Edit item" /></button>
-            <button className="btn-small"><Icon icon='delete' color='red' size='large' title="Remove item from list" /></button> */}
+          <Icon icon='edit' />
+          <Icon icon='delete' />
         </>
       )}
     </>
@@ -75,7 +71,7 @@ const linkedName = (props: tableDataInterface) => {
   return <Link {...props.data} />;
 };
 
-const adjustedStatus = (props: tableDataInterface) => {};
+// const adjustedStatus = (props: tableDataInterface) => { };
 
 // change status title to actions: add a remove button.
 const Table = (props: myItemListInterface) => {
@@ -128,28 +124,23 @@ const Me = () => {
     <>
       <h2 className="page-heading">YOURNAME's List</h2>
       <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
-        <form className="form">
-          <fieldset className="fieldset">
-            <legend className="legend">Add item</legend>
 
-            <label className="label">Name</label>
-            <div className="input-container">
-              <input type="text" name="name" />
-            </div>
+        <form className='form'>
+          <fieldset className='fieldset'>
+            <legend className='legend'>Add item</legend>
+
+            <label className='label' >Name</label>
+            <div className='input-container'><input type="text" name="name" /></div>
+
 
             <label>URL</label>
-            <div className="input-container">
-              <input type="url" name="link" />
-            </div>
+            <div className='input-container'><input type="url" name="link" /></div>
+
 
             <label>Description</label>
-            <div className="input-container">
-              <textarea name="description"></textarea>
-            </div>
+            <div className='input-container'><textarea name="description"></textarea></div>
 
-            <button>
-              <img src={iconPlus} alt="" /> Add item
-            </button>
+            {/* <button><img src={iconPlus} alt="" /> Add item</button> */}
           </fieldset>
         </form>
 
@@ -160,6 +151,7 @@ const Me = () => {
             <h3>Fetching data...</h3>
           )}
         </>
+
       </section>
     </>
   );
