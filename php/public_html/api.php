@@ -60,7 +60,7 @@ if ($task == 'getMyList' && $myuserid) {
     $apiResponse = updateItemOnMyOwnList($userid, $itemid, $description, $link, $mysqli);
 }
 else {
-    $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed $removed, description: $description, $link");
+    $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed: $removed, description: $description, link: $link");
 }
 
 // Close the connection

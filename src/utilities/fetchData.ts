@@ -16,6 +16,7 @@ type statusInterface = 'cancelled' | 'uncancel' | 'purchased' | 'reserved';
 type fetchInterface = {
   task: tasksInterface;
   myuserid: number;
+  giftid: number;
   userid: number;
   name: string;
   note?: string;
@@ -40,6 +41,7 @@ export const fetchData = (config: fetchInterface) => {
     task,
     myuserid,
     userid,
+    giftid,
     name,
     note,
     link,
@@ -77,6 +79,7 @@ export const fetchData = (config: fetchInterface) => {
   formData.append('task', task);
   if (myuserid) formData.append('myuserid', myuserid);
   if (userid) formData.append('userid', userid);
+  if (giftid) formData.append('giftid', giftid);
   if (name) formData.append('name', name);
   if (note) formData.append('note', note);
   if (link) formData.append('link', link);

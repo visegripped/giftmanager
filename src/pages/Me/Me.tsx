@@ -23,7 +23,7 @@ To do:
 */
 
 type propsInterface = {
-  userid: string | undefined;
+  userid: number;
   date_added: number;
   name: string;
   note: string;
@@ -46,20 +46,24 @@ type tableDataInterface = {
 const Me = () => {
   const [myItemList, setMyItemList] = useState([]);
 
-  const updateRemoveStatus = (removed: number, giftid: number) => {
-    const fetchItemList = () => {
-      const response = fetchData({
-        task: 'updateRemovedStatusForMyItem',
-        giftid,
-        myuserid: 1,
-        userid: 1,
-        removed,
-      });
-      response &&
-        response.then((data) => {
+  const updateRemoveStatus = (removed: number, giftid: number, userid: number) => {
+
+    const response = fetchData({
+      task: 'updateRemovedStatusForMyItem',
+      giftid,
+      myuserid: 1, // TODO -> fix this
+      userid,
+      removed,
+    });
+    response &&
+      response.then((data: { success: string, error: string }) => {
+        if (data.success) {
           fetchItemList();
-        });
-    };
+        } else {
+          //TODO - log this.
+          console.log(data.error);
+        }
+      });
   };
 
   const Link = (props: propsInterface) => {
@@ -71,16 +75,25 @@ const Me = () => {
     );
   };
 
-  const StatusDD = (props: propsInterface) => {
-    const { removed } = props.data;
+  const StatusDD = (props: { data: propsInterface }) => {
+    const { removed, giftid, userid } = props.data;
+    console.log(' -> giftid: ', props.data.giftid);
     return (
       <>
         {removed === 1 ? (
-          <Button icon="plus" />
+          <Button
+            icon="plus"
+            onButtonClick={() => {
+              updateRemoveStatus(0, giftid, userid);
+            }}
+          />
         ) : (
           <>
             {/* <Icon icon="edit" /> */}
-            <Button icon="delete" />
+            <Button icon="delete"
+              onButtonClick={() => {
+                updateRemoveStatus(1, giftid, userid);
+              }} />
           </>
         )}
       </>
@@ -129,11 +142,10 @@ const Me = () => {
       userid: 1,
     });
     response &&
-      response.then((data) => {
+      response.then((data: { success: [] }) => {
         setMyItemList(data.success);
       });
   };
-
   // const [userProfile] = useState({ }); //, setUserProfile
 
   useEffect(() => {
