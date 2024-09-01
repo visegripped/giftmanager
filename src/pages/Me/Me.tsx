@@ -46,8 +46,11 @@ type tableDataInterface = {
 const Me = () => {
   const [myItemList, setMyItemList] = useState([]);
 
-  const updateRemoveStatus = (removed: number, giftid: number, userid: number) => {
-
+  const updateRemoveStatus = (
+    removed: number,
+    giftid: number,
+    userid: number
+  ) => {
     const response = fetchData({
       task: 'updateRemovedStatusForMyItem',
       giftid,
@@ -56,7 +59,7 @@ const Me = () => {
       removed,
     });
     response &&
-      response.then((data: { success: string, error: string }) => {
+      response.then((data: { success: string; error: string }) => {
         if (data.success) {
           fetchItemList();
         } else {
@@ -90,10 +93,12 @@ const Me = () => {
         ) : (
           <>
             {/* <Icon icon="edit" /> */}
-            <Button icon="delete"
+            <Button
+              icon="delete"
               onButtonClick={() => {
                 updateRemoveStatus(1, giftid, userid);
-              }} />
+              }}
+            />
           </>
         )}
       </>
