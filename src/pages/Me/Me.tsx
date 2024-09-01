@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Icon from '@components/Icon';
+import Button from '@components/Button';
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
@@ -42,72 +43,91 @@ type tableDataInterface = {
   data: propsInterface;
 };
 
-const Link = (props: propsInterface) => {
-  const { link, name } = props;
-  return (
-    <a href={link} target="_blank">
-      {name}
-    </a>
-  );
-};
-const StatusDD = (props: propsInterface) => {
-  const { removed } = props.data;
-  return (
-    <>
-      {removed === 1 ? (
-        <Icon icon="plus" />
-      ) : (
-        <>
-          <Icon icon="edit" />
-          <Icon icon="delete" />
-        </>
-      )}
-    </>
-  );
-};
-
-const linkedName = (props: tableDataInterface) => {
-  return <Link {...props.data} />;
-};
-
-// const adjustedStatus = (props: tableDataInterface) => { };
-
-// change status title to actions: add a remove button.
-const Table = (props: myItemListInterface) => {
-  const { myItemList } = props;
-  const [colDefs] = useState([
-    { field: 'name', sortable: true, cellRenderer: linkedName, sort: 'asc' },
-    { field: 'description' },
-    {
-      field: 'removed',
-      cellRenderer: StatusDD,
-      headerName: 'actions',
-      flex: 2,
-    },
-  ]);
-
-  const rowClassRules = {
-    'row-removed': 'data.removed >= 1',
-  };
-
-  return (
-    <>
-      <AgGridReact
-        rowData={myItemList}
-        columnDefs={colDefs}
-        rowClassRules={rowClassRules}
-        style={{ width: '100%', height: '100%' }}
-      />
-    </>
-  );
-};
-
 const Me = () => {
   const [myItemList, setMyItemList] = useState([]);
 
-  // const [userProfile] = useState({ }); //, setUserProfile
+  const updateRemoveStatus = (removed: number, giftid: number) => {
+    const fetchItemList = () => {
+      const response = fetchData({
+        task: 'updateRemovedStatusForMyItem',
+        giftid,
+        myuserid: 1,
+        userid: 1,
+        removed,
+      });
+      response &&
+        response.then((data) => {
+          fetchItemList()
+        });
+    }
+  }
 
-  useEffect(() => {
+
+  const Link = (props: propsInterface) => {
+    const { link, name } = props;
+    return (
+      <a href={link} target="_blank">
+        {name}
+      </a>
+    );
+  };
+
+  const StatusDD = (props: propsInterface) => {
+    const { removed } = props.data;
+    return (
+      <>
+        {removed === 1 ? (
+          <Button icon="plus" />
+        ) : (
+          <>
+            {/* <Icon icon="edit" /> */}
+            <Button icon="delete" />
+          </>
+        )}
+      </>
+    );
+  };
+
+  const linkedName = (props: tableDataInterface) => {
+    return <Link {...props.data} />;
+  };
+
+  // const adjustedStatus = (props: tableDataInterface) => { };
+
+  // change status title to actions: add a remove button.
+  const Table = (props: myItemListInterface) => {
+    const { myItemList } = props;
+    const [colDefs] = useState([
+      { field: 'name', sortable: true, cellRenderer: linkedName, sort: 'asc' },
+      { field: 'description', flex: 2 },
+      {
+        field: 'removed',
+        cellRenderer: StatusDD,
+        headerName: 'actions',
+      },
+    ]);
+
+    const rowClassRules = {
+      'row-removed': 'data.removed >= 1',
+    };
+
+
+
+    return (
+      <>
+        <AgGridReact
+          rowData={myItemList}
+          columnDefs={colDefs}
+          rowClassRules={rowClassRules}
+          style={{ width: '100%', height: '100%' }}
+        />
+      </>
+    );
+  };
+
+
+
+  const fetchItemList = () => {
     const response = fetchData({
       task: 'getMyList',
       myuserid: 1,
@@ -117,7 +137,17 @@ const Me = () => {
       response.then((data) => {
         setMyItemList(data.success);
       });
+  }
+
+  // const [userProfile] = useState({ }); //, setUserProfile
+
+  useEffect(() => {
+    //on load, only fetch the list once.
+    if (!myItemList.length) {
+      fetchItemList();
+    }
   }, []);
+
 
   return (
     <>
@@ -142,7 +172,7 @@ const Me = () => {
               <textarea name="description"></textarea>
             </div>
 
-            {/* <button><img src={iconPlus} alt="" /> Add item</button> */}
+            <Button icon='plus' label='Add item' />
           </fieldset>
         </form>
 
