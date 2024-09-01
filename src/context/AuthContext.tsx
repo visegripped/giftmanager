@@ -107,11 +107,13 @@ function AuthProvider(props: PropsWithChildren) {
       const data = await response.json();
 
       if (data.error_description) {
+        logout();
         return false;
       }
 
       return true;
     } catch (error) {
+      logout();
       return false;
     }
   }, [accessToken, accessTokenExpiration]);
