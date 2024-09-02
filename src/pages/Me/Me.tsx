@@ -169,6 +169,9 @@ const Me = () => {
     response &&
       response.then((data: { success: string; error: string }) => {
         if (data.success) {
+          setAddItemName('');
+          setAddItemDescription('');
+          setAddItemLink('');
           fetchItemList();
         } else {
           //TODO -> log this.
@@ -197,7 +200,7 @@ const Me = () => {
           }}
         >
           <fieldset className="fieldset">
-            <legend className="legend">Add item</legend>
+            <legend className="legend">Add item to my list</legend>
             <label className="label">Name</label>
             <div className="input-container">
               <input
@@ -234,7 +237,7 @@ const Me = () => {
               ></textarea>
             </div>
 
-            <Button icon="plus" label="Add item to my list" type="submit" />
+            <Button icon="plus" label="Add" type="submit" />
           </fieldset>
         </form>
 

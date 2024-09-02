@@ -209,7 +209,7 @@ button {
   font-size: var(--font-size);
   border-radius: var(--border-radius);
   color: var(--button-text-color);
-  font-weight: normal;
+  font-weight: 600;
   white-space: normal;
   padding: 0.3em 1em;
   cursor: pointer;
@@ -241,6 +241,9 @@ fieldset {
 
 legend {
   font-weight: 600;
+  padding: calc(var(--spacing) / 4) var(--spacing);
+  background-color: var(--container-bg-secondary);
+  border-radius: var(--border-radius);
 }
 
 label {
