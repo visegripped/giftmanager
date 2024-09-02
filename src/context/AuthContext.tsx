@@ -54,7 +54,7 @@ function AuthProvider(props: PropsWithChildren) {
     const { access_token, refresh_token } = authResponse;
     setAccessToken(access_token);
     localStorage.setItem('access_token', access_token);
-    localStorage.setItem('refresh_token', refresh_token);
+    localStorage.setItem('refresh_token', refresh_token || '');
     handleGoogleTokenExpiration();
   };
 

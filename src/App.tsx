@@ -116,11 +116,11 @@ function App() {
 
       <footer>
         <div>
-          &copy; Copyright 2010 - {currentDate.getFullYear()}.<br />
-          All rights reserved.
+          &copy; Copyright 2010 - {currentDate.getFullYear()}. All rights
+          reserved.
         </div>
         <div>
-          <a
+          {/* <a
             href="#"
             onClick={(e) => {
               e.preventDefault();
@@ -128,7 +128,7 @@ function App() {
             }}
           >
             Use default theme
-          </a>
+          </a> */}
         </div>
       </footer>
       <div className="half-circle"></div>

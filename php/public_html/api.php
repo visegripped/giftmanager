@@ -17,6 +17,7 @@ if ($mysqli->connect_errno) {
 }
 
 // Get POST variables
+$access_token = $_POST['access_token'] ?? "";
 $task = $_POST['task'] ?? "";
 $myuserid = $_POST['myuserid'] ?? "";
 $userid = $_POST['userid'] ?? "";
@@ -32,6 +33,21 @@ $archive = $_POST['archive'] ?? "1";
 $added_by_userid = $_POST['added_by_userid'] ?? "";
 $groupid = $_POST['groupid'] ?? "1";
 
+function isValidGoogleAccessToken($token) {
+  if (!$token) {
+    return false;
+  }
+
+  $url = "https://oauth2.googleapis.com/tokeninfo?access_token=" . $token;
+
+  $response = file_get_contents($url);
+  $result = json_decode($response, true);
+
+  if (isset($result['aud']) && $result['aud'] === "451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleusercontent.com") {
+    return true;
+  }
+  return false;
+}
 
 
 // valid tasks:
@@ -45,8 +61,11 @@ $groupid = $_POST['groupid'] ?? "1";
 // updateMyItem
 // deleteItem
 
-
-if ($task == 'getMyList' && $myuserid) {
+if(!$access_token) {
+    $apiResponse = array("error" => "Access token not specified on API request.");
+} else if(!isValidGoogleAccessToken($access_token)) {
+    $apiResponse = array("error" => "Invalid/expired token.  Please sign (or re-sign) in.");
+}  else if ($task == 'getMyList' && $myuserid) {
     $apiResponse = getMyList($myuserid, $mysqli);
 } else if ($task == 'getListByUserId' && $userid) {
     $apiResponse = getListByUserId($userid, $mysqli);
