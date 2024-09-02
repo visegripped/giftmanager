@@ -54,13 +54,13 @@ if ($task == 'getMyList' && $myuserid) {
     $apiResponse = getUsers($mysqli);
 } else if($task == 'updateRemovedStatusForMyItem' && $userid &&  $removed >= 0 &&  $giftid && ($myuserid == $userid)) {
     $apiResponse = updateRemovedStatusForMyItem($userid, $removed, $giftid, $mysqli);
-}  else if($task == 'addItemToMyOwnList' && $userid && ($myuserid == $userid) && $name) {
-    $apiResponse = addItemToMyOwnList($userid, $name, $description, $link, $mysqli);
+}  else if($task == 'addItemToMyOwnList' && $userid && ($added_by_userid == $userid) && $name && $groupid) {
+    $apiResponse = addItemToMyOwnList($userid, $name, $description, $link, $groupid, $mysqli);
 } else if($task == 'updateItemOnMyOwnList' && $userid && ($myuserid == $userid) && $giftid && ($description || $link)) {
     $apiResponse = updateItemOnMyOwnList($userid, $itemid, $description, $link, $mysqli);
 }
 else {
-    $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed: $removed, description: $description, link: $link");
+    $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed: $removed, name: $name, description: $description, link: $link, groupid: $groupid");
 }
 
 // Close the connection

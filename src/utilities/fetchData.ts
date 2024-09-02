@@ -19,7 +19,7 @@ type fetchInterface = {
   giftid: number;
   userid: number;
   name: string;
-  note?: string;
+  description?: string;
   link?: string;
   date_received?: string;
   removed?: 1 | 0;
@@ -43,7 +43,7 @@ export const fetchData = (config: fetchInterface) => {
     userid,
     giftid,
     name,
-    note,
+    description,
     link,
     date_received,
     removed,
@@ -81,7 +81,7 @@ export const fetchData = (config: fetchInterface) => {
   if (userid) formData.append('userid', userid);
   if (giftid) formData.append('giftid', giftid);
   if (name) formData.append('name', name);
-  if (note) formData.append('note', note);
+  if (description) formData.append('description', description);
   if (link) formData.append('link', link);
   if (date_received) formData.append('date_received', date_received);
   if (removed) formData.append('removed', removed);

@@ -45,6 +45,9 @@ type tableDataInterface = {
 
 const Me = () => {
   const [myItemList, setMyItemList] = useState([]);
+  const [addItemName, setAddItemName] = useState('');
+  const [addItemDescription, setAddItemDescription] = useState('');
+  const [addItemLink, setAddItemLink] = useState('');
 
   const updateRemoveStatus = (
     removed: number,
@@ -67,6 +70,7 @@ const Me = () => {
           console.log(data.error);
         }
       });
+    return response;
   };
 
   const Link = (props: propsInterface) => {
@@ -80,12 +84,12 @@ const Me = () => {
 
   const StatusDD = (props: { data: propsInterface }) => {
     const { removed, giftid, userid } = props.data;
-    console.log(' -> giftid: ', props.data.giftid);
     return (
       <>
         {removed === 1 ? (
           <Button
             icon="plus"
+            title="Re-add item to my list"
             onButtonClick={() => {
               updateRemoveStatus(0, giftid, userid);
             }}
@@ -95,6 +99,7 @@ const Me = () => {
             {/* <Icon icon="edit" /> */}
             <Button
               icon="delete"
+              title="Remove item from my list"
               onButtonClick={() => {
                 updateRemoveStatus(1, giftid, userid);
               }}
@@ -108,8 +113,6 @@ const Me = () => {
   const linkedName = (props: tableDataInterface) => {
     return <Link {...props.data} />;
   };
-
-  // const adjustedStatus = (props: tableDataInterface) => { };
 
   // change status title to actions: add a remove button.
   const Table = (props: myItemListInterface) => {
@@ -153,6 +156,28 @@ const Me = () => {
   };
   // const [userProfile] = useState({ }); //, setUserProfile
 
+  const addItemToMyList = (name: string, description: string, link: string) => {
+    const response = fetchData({
+      task: 'addItemToMyOwnList',
+      userid: 1, // TODO -> fix this so it is not hard coded
+      added_by_userid: 1,
+      groupid: 1,
+      name,
+      description,
+      link,
+    });
+    response &&
+      response.then((data: { success: string; error: string }) => {
+        if (data.success) {
+          fetchItemList();
+        } else {
+          //TODO -> log this.
+          console.log(data.error);
+        }
+      });
+    return response;
+  };
+
   useEffect(() => {
     //on load, only fetch the list once.
     if (!myItemList.length) {
@@ -164,26 +189,52 @@ const Me = () => {
     <>
       <h2 className="page-heading">YOURNAME's List</h2>
       <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
-        <form className="form">
+        <form
+          className="form"
+          onSubmit={(formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
+            formSubmitEvent.preventDefault();
+            addItemToMyList(addItemName, addItemDescription, addItemLink);
+          }}
+        >
           <fieldset className="fieldset">
             <legend className="legend">Add item</legend>
-
             <label className="label">Name</label>
             <div className="input-container">
-              <input type="text" name="name" />
+              <input
+                type="text"
+                name="name"
+                required
+                value={addItemName}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  setAddItemName(event.target.value);
+                }}
+              />
             </div>
 
-            <label>URL</label>
+            <label>Link</label>
             <div className="input-container">
-              <input type="url" name="link" />
+              <input
+                type="url"
+                name="link"
+                defaultValue={addItemLink}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  setAddItemLink(event.target.value);
+                }}
+              />
             </div>
 
             <label>Description</label>
             <div className="input-container">
-              <textarea name="description"></textarea>
+              <textarea
+                name="description"
+                defaultValue={addItemDescription}
+                onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+                  setAddItemDescription(event.target.value);
+                }}
+              ></textarea>
             </div>
 
-            <Button icon="plus" label="Add item" />
+            <Button icon="plus" label="Add item to my list" type="submit" />
           </fieldset>
         </form>
 

@@ -86,13 +86,15 @@ function updateRemovedStatusForMyItem($userid, $removed, $giftid, $mysqli) {
 }
 
 
-function addItemToMyOwnList($userid, $name, $description, $link, $mysqli) {
+function addItemToMyOwnList($userid, $name, $description, $link, $groupid, $mysqli) {
     // Correct SQL query
-    $stmt = $mysqli->prepare("INSERT INTO items (userid, name, description, link) VALUES (?, ?, ?, ?)");
+    $addedByUserId = $userid;
+
+    $stmt = $mysqli->prepare("INSERT INTO items (userid, name, description, link, added_by_userid, groupid) VALUES (?, ?, ?, ?, ?, ?)");
 
     if ($stmt) {
         // Bind the parameters correctly
-        $stmt->bind_param('ssss', $userid, $name, $description, $link);
+        $stmt->bind_param('ssssss', $userid, $name, $description, $link, $addedByUserId, $groupid);
         
         // Execute the statement
         if ($stmt->execute()) {

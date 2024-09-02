@@ -5,7 +5,9 @@ import Icon from '@components/Icon';
 export interface ButtonProps {
   size?: 'small' | 'medium' | 'large';
   label?: string;
+  title?: string;
   icon?: string;
+  type?: 'submit' | 'button';
   onButtonClick?: (e: React.MouseEvent) => void;
 }
 
@@ -13,11 +15,19 @@ export interface ButtonProps {
  * Primary UI component for user interaction
  */
 export const Button = (props: ButtonProps) => {
-  const { icon, size = 'medium', label, onButtonClick } = props;
+  const {
+    icon,
+    size = 'medium',
+    label,
+    title,
+    type = 'button',
+    onButtonClick,
+  } = props;
 
   return (
     <button
-      type="button"
+      type={type}
+      title={title}
       className={`button button--${size}`}
       onClick={(e) => {
         if (onButtonClick) {
