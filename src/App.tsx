@@ -6,7 +6,7 @@ import routeConstants from '@routes/routeContstants';
 import { Me, User, Error404, Theme } from '@pages/';
 import { AuthContext } from '@context/AuthContext';
 import { NotificationsProvider } from '@context/NotificationsContext';
-import present from './assets/present-optimized.svg';
+import Present from '@assets/present-optimized.svg';
 import postReport from '@utilities/postReport';
 import { setThemeOnBody } from '@utilities/setThemeOnBody';
 import NotificationList from '@components/NotificationList';
@@ -64,7 +64,7 @@ function App() {
       <header>
         <Link to={routeConstants.ME} className="logo">
           <div className="logo__mark-container">
-            <img src={present} className="logo__mark" alt="GiftManager Logo" />
+            <Present />
           </div>
           <h1 className="logo__word">GiftManager</h1>
         </Link>

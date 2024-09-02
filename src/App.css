@@ -9,7 +9,7 @@
 :root {
   --font-size: 16px;
   --spacing: 20px;
-  --border-radius: 6px;
+  --border-radius: 0.5em;
 }
 /* this is in safari's user agent style sheet. setting it back to default h1 size */
 :is(article, aside, nav, section) h1 {
@@ -17,22 +17,98 @@
 }
 
 .theme__default {
-  /* these will eventually be in .default {} */
-  --primary-text-color: #171b18;
-  --secondary-text-color: #665048;
-  --primary-link-color: #3e5b24;
-  --primary-link-color-hover: #665048;
+  /* 
+  Text
+  */
+  --text-primary: #171b18;
+  --text-secondary: #665048;
+  --text-disabled: #ccc;
+  --link: #3e5b24;
+  --link-hover: #665048;
+
+  /* Icon */
+  --icon-primary: darkgrey;
+  --icon-secondary: #grey;
+  --icon-disabled: #lightgrey;
+  --icon-inverse: #fff;
+
+  /*
+Layout colors
+*/
+  --page-bg-primary: #fff;
+  --page-bg-accent: green; /* half circle color */
+
+  --container-bg-primary: #fff;
+  --container-bg-secondary: lightgrey;
+  --container-bg-warning: rgb(253, 220, 157);
+  --container-bg-error: lightred;
+  --container-bg-accent: darkgrey; /* each of these is just a bit darker than the previous. */
+
+  --container-border-primary: #lightgrey;
+  --container-border-secondary: grey;
+  --container-border-accent: darkgrey; /* each of these is just a bit darker than the previous. each not much darker than their corresponding bg color. */
+
+  /*
+UI
+*/
+  --body-bg-color: #fff;
+  --ui-primary: red;
+  --ui-primary-hover: darkred; /* same color, slightly darker */
+  --ui-primary-focus: red; /* same color */
+  --ui-primary-active: darkred; /* same color, darker than hover */
+  /* IDS had greys for secondary and tertiary - should do at least one as grey. */
+  --ui-secondary: blue;
+  --ui-secondary-hover: darkblue; /* same color, slightly darker */
+  --ui-secondary-focus: blue; /* same color */
+  --ui-secondary-active: darkblue; /* same color, darker than hover */
+
+  --ui-tertiary: green;
+  --ui-tertiary-hover: darkgreen; /* same color, slightly darker */
+  --ui-tertiary-focus: green; /* same color */
+  --ui-tertiary-active: darkgreen; /* same color, darker than hover */
+
+  --ui-info: lightblue; /* same as ui primary */
+  --ui-positive: lightgreen; /* green */
+
+  --ui-attention: orange; /* ttorange */
+  --ui-attention-hover: orange;
+  --ui-attention-active: orange;
+
+  --ui-negative: orange; /* ttorange */
+  --ui-negative-hover: orange;
+  --ui-negative-active: orange;
+
+  --ui-neutral: grey;
+  --ui-neutral-hover: grey; /* split the diff */
+  --ui-neutral-active: darkgrey;
+
   --primary-border-color: #96b23c;
   --secondary-border-color: #96b23c;
-  --button-bg-color: #96b23c;
-  --button-bg-color-hover: #f2cedd;
-  --button-text-color: #fff;
-  --button-text-color-hover: #665048;
   --primary-bg-color: #fff;
   --secondary-bg-color: #dfeaa6;
-  --body-bg-color: #fff;
+  --secondary-bg-color: #dfeaa6;
+
+  /* button */
+
+  --button-bg-color: #96b23c;
+  --button-bg-color-hover: #3e5b24;
+  --button-text-color: #fff;
+  --button-text-color-hover: #96b23c;
+
+  /*
+Input colors
+*/
+
   --input-bg-color: #fff;
   --input-text-color: #333;
+  --input-placeholder: lightgrey;
+  --input-bg-primary: #fff;
+  --input-bg-secondary: lightgrey;
+  --input-bg-accent: darkgrey; /* each of these is just a bit darker than the previous. */
+
+  --input-bg-disabled: #lightgrey;
+  --input-bg-error: lightpink;
+  --input-bg-warning: lightyellow;
 }
 
 /* CSS resets */
@@ -43,10 +119,11 @@
 }
 
 input,
-button,
 textarea,
 select {
   font: inherit;
+  background-color: var(--input-bg-color);
+  color: var(--input-text-color);
 }
 
 p,
@@ -75,7 +152,7 @@ body {
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light;
-  color: var(--primary-text-color);
+  color: var(--text-primary);
   background-color: var(--body-bg-color);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -85,11 +162,11 @@ body {
 }
 
 a {
-  color: var(--primary-link-color);
+  color: var(--link);
   text-decoration: inherit;
 }
 a:hover {
-  color: var(--primary-link-color-hover);
+  color: var(--link-hover);
   text-decoration: underline;
 }
 
@@ -126,17 +203,75 @@ footer {
 }
 
 button {
+  font: inherit;
   background: var(--button-bg-color);
   border: 0;
   font-size: var(--font-size);
-  padding: 6px 12px;
   border-radius: var(--border-radius);
   color: var(--button-text-color);
-  font-weight: normal;
+  font-weight: 600;
   white-space: normal;
-  padding: 0.3em 1.5em;
+  padding: 0.3em 1em;
   cursor: pointer;
   display: inline-block;
+  line-height: 1;
+}
+
+button > img {
+  height: 50px;
+  fill: red !important;
+  color: purple;
+}
+/* Form elements */
+
+form {
+  margin: 0;
+  padding: 0;
+}
+
+fieldset {
+  margin: 0;
+  padding: var(--spacing);
+  background-color: var(--container-bg-primary);
+  border-radius: var(--border-radius);
+  border-color: var(--container-border-primary);
+  border-width: 1px;
+  opacity: 80%;
+}
+
+legend {
+  font-weight: 600;
+  padding: calc(var(--spacing) / 4) var(--spacing);
+  background-color: var(--container-bg-secondary);
+  border-radius: var(--border-radius);
+}
+
+label {
+  display: block;
+  margin-bottom: calc(var(--spacing) / 4);
+}
+
+.input-container {
+  display: block;
+}
+.input-container input,
+.input-container textarea,
+.input-container select {
+  display: block;
+  width: 100%;
+  margin-bottom: var(--spacing);
+}
+
+.input-container textarea {
+  height: 100px;
+}
+
+.input-container:last-of-type {
+  margin-bottom: 0;
+}
+
+button + button {
+  margin-left: var(--spacing);
 }
 
 button:hover {
@@ -149,8 +284,21 @@ textarea,
 select {
   padding: 8px;
   border: 1px solid var(--primary-border-color);
-  background: var(--primary-bg-color);
+  background: var(--input-bg-color);
   border-radius: var(--border-radius);
+  color: var(--input-text-color);
+}
+
+input.error,
+textarea.error,
+select.error {
+  background-color: var(--input-bg-error);
+}
+
+input.warning,
+textarea.warning,
+select.warning {
+  background-color: var(--input-bg-warning);
 }
 
 /* the extension beyond the body allows for a more graceful curve */
@@ -173,7 +321,7 @@ select {
   align-items: center;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em var(--primary-link-color));
+  filter: drop-shadow(0 0 2em var(--link));
 }
 
 /* there is a bunch of whitespace above/below the SVG.  This crops it. */
@@ -198,7 +346,7 @@ select {
 }
 
 .text-secondary {
-  color: var(--secondary-text-color);
+  color: var(--text-secondary);
 }
 
 .notifications {
@@ -208,39 +356,34 @@ select {
   right: var(--spacing);
 }
 
-.notifications .notification {
-  animation: slide-down 0.7s ease-out;
+.page-heading {
+  margin-bottom: var(--spacing);
 }
-
-.notifications .notification.close {
-  animation: slide-up 0.7s ease-out;
-}
-
-@keyframes slide-in {
-  from {
-    transform: translate(0%, 100%);
-    display: none;
-  }
-
-  to {
-    display: block;
-  }
-}
-
-@keyframes slide-out {
-  from {
-    display: block;
-  }
-
-  to {
-    transform: translate(0%, 100%);
-    display: none;
-  }
-}
-
 /* tablet+ BP - using container queries to learn how. */
 @container (min-width: 768px) {
   .logo__word {
     display: block;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .responsive-grid-container > form {
+    margin-bottom: var(--spacing);
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .responsive-grid-container {
+    display: grid;
+    gap: var(--spacing);
+    margin: var(--spacing);
+  }
+
+  .responsive-grid-columns {
+    grid-auto-flow: column;
+  }
+
+  .responsive-grid-sidebar {
+    grid-template-columns: 2fr 6fr;
   }
 }

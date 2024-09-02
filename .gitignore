@@ -25,4 +25,4 @@ dist-ssr
 *.env*
 *storybook.log
 
-/php/*
+/php/includes/*-credentials.php
