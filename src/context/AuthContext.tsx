@@ -54,7 +54,7 @@ function AuthProvider(props: PropsWithChildren) {
     const { access_token, refresh_token } = authResponse;
     setAccessToken(access_token);
     localStorage.setItem('access_token', access_token);
-    localStorage.setItem('refresh_token', refresh_token);
+    localStorage.setItem('refresh_token', refresh_token || '');
     handleGoogleTokenExpiration();
   };
 
@@ -102,7 +102,7 @@ function AuthProvider(props: PropsWithChildren) {
     try {
       const response = await fetch(
         'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' +
-          accessToken
+        accessToken
       );
       const data = await response.json();
 

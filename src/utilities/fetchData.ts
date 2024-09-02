@@ -53,7 +53,7 @@ export const fetchData = (config: fetchInterface) => {
     groupid,
     archive,
   } = config;
-  // const accessToken = localStorage.getItem('access_token');
+  const accessToken = localStorage.getItem('access_token');
   const makeAsyncRequest = async (theFormData: fetchInterface) => {
     let jsonPayload = {};
 
@@ -74,25 +74,26 @@ export const fetchData = (config: fetchInterface) => {
     return jsonPayload;
   };
 
-  // if (accessToken) {
-  let formData = new FormData();
-  formData.append('task', task);
-  if (myuserid) formData.append('myuserid', myuserid);
-  if (userid) formData.append('userid', userid);
-  if (giftid) formData.append('giftid', giftid);
-  if (name) formData.append('name', name);
-  if (description) formData.append('description', description);
-  if (link) formData.append('link', link);
-  if (date_received) formData.append('date_received', date_received);
-  if (removed) formData.append('removed', removed);
-  if (status) formData.append('status', status);
-  if (qty) formData.append('qty', qty);
-  if (added_by_userid) formData.append('added_by_userid', added_by_userid);
-  if (groupid) formData.append('groupid', groupid);
-  if (archive) formData.append('archive', archive);
+  if (accessToken) {
+    let formData = new FormData();
+    formData.append('task', task);
+    formData.append('access_token', accessToken);
+    if (myuserid) formData.append('myuserid', myuserid);
+    if (userid) formData.append('userid', userid);
+    if (giftid) formData.append('giftid', giftid);
+    if (name) formData.append('name', name);
+    if (description) formData.append('description', description);
+    if (link) formData.append('link', link);
+    if (date_received) formData.append('date_received', date_received);
+    if (removed) formData.append('removed', removed);
+    if (status) formData.append('status', status);
+    if (qty) formData.append('qty', qty);
+    if (added_by_userid) formData.append('added_by_userid', added_by_userid);
+    if (groupid) formData.append('groupid', groupid);
+    if (archive) formData.append('archive', archive);
 
-  return makeAsyncRequest(formData);
-  // }
+    return makeAsyncRequest(formData);
+  }
 };
 
 export default fetchData;

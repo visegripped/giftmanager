@@ -5,19 +5,25 @@ import {
   ProfileContextInterface,
 } from '@context/ProfileContext';
 
+
+export const verifyUser = (email: string) => {
+
+}
+
 export const AuthButton = () => {
   const {
     logout,
     login,
     accessToken = '',
   } = useContext<AuthContextInterface>(AuthContext);
-  const { setProfile, fetchProfile, profile } =
+  const { setProfile, fetchGoogleProfile, profile } =
     useContext<ProfileContextInterface>(ProfileContext);
 
   useEffect(() => {
     // only need to get the profile once.
     if (accessToken && Object.keys(profile).length === 0) {
-      fetchProfile(accessToken);
+      /* need to verify user is in users. get all relevant fields from DB. if any are empty, update them (pic, for instance). abstract this so it's re-usable.*/
+      fetchGoogleProfile(accessToken);
     }
   }, [accessToken]);
 

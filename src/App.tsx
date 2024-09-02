@@ -82,9 +82,9 @@ function App() {
         <ErrorBoundary
           fallbackRender={fallbackRender}
           onError={logError}
-          // onReset={(details) => {
-          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-          // }}
+        // onReset={(details) => {
+        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+        // }}
         >
           <NotificationsProvider>
             <div className="notifications">
@@ -116,11 +116,10 @@ function App() {
 
       <footer>
         <div>
-          &copy; Copyright 2010 - {currentDate.getFullYear()}.<br />
-          All rights reserved.
+          &copy; Copyright 2010 - {currentDate.getFullYear()}. All rights reserved.
         </div>
         <div>
-          <a
+          {/* <a
             href="#"
             onClick={(e) => {
               e.preventDefault();
@@ -128,7 +127,7 @@ function App() {
             }}
           >
             Use default theme
-          </a>
+          </a> */}
         </div>
       </footer>
       <div className="half-circle"></div>
