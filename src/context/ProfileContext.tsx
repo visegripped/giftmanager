@@ -78,7 +78,7 @@ const ProfileProvider = (props) => {
       }
       const userProfile = await response.json();
       // const emailAddress = userProfile?.emailAddresses[0]?.value;
-      console.log(' -> got a google profile: ', userProfile)
+      console.log(' -> got a google profile: ', userProfile);
       setProfile(convertGoogleProfile2Custom(userProfile));
     } catch (error) {
       // TODO -> log this error
