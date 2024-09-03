@@ -84,9 +84,7 @@ const ProfileProvider = (props: React.PropsWithChildren) => {
       console.error(
         'Access token was not passed to fetchGoogleProfile.  No request attempt has been made to retrieve the user profile'
       );
-
     }
-
   };
 
   return (

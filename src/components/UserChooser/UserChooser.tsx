@@ -13,7 +13,10 @@ type ReactSelectType = {
   label: string;
 };
 
-export const getUserNameFromUsersList = (usersList: UserType[], userid: number) => {
+export const getUserNameFromUsersList = (
+  usersList: UserType[],
+  userid: number
+) => {
   // iterate thru userList
   const usersListClone = [...usersList]; // careful not to manipulate the original.
   let numberOfRemainingUsers = usersListClone.length;
@@ -29,14 +32,17 @@ export const getUserNameFromUsersList = (usersList: UserType[], userid: number) 
     } while (1 <= numberOfRemainingUsers);
   }
   return usernameInFocus;
-}
+};
 
 export const UserChooser = (props: UserChooserPropsInterface) => {
-  const paramsFromURL = useMatch("/User/:userid") || {};
+  const paramsFromURL = useMatch('/User/:userid') || {};
   const useridFromURL = paramsFromURL.params?.userid || '';
   let [usersList, setUsersList] = useState([]);
   let [currentUserid, setUserid] = useState(useridFromURL);
-  const usernameFromUsersList = getUserNameFromUsersList(usersList, useridFromURL);
+  const usernameFromUsersList = getUserNameFromUsersList(
+    usersList,
+    useridFromURL
+  );
   let [currentUsername, setUsername] = useState(usernameFromUsersList);
 
   const navigate = useNavigate();
@@ -88,10 +94,10 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
     }
   }, []);
   useEffect(() => {
-    console.log('BEGIN currentUserid useEffect')
+    console.log('BEGIN currentUserid useEffect');
     //on load, only fetch the list once.
     if (Number(useridFromURL) !== Number(currentUserid)) {
-      console.log(' -> condition met. do things.')
+      console.log(' -> condition met. do things.');
       navigate(`/User/${currentUserid}`);
     }
   }, [currentUserid]);
@@ -100,8 +106,14 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
     <>
       <Select
         // https://react-select.com/advanced#methods
-        onInputChange={(things: string, { action, prevInputValue }: InputActionMeta) => {
-          console.log('onChange for select was triggered.  WooHoo < - - - - - - - - - - - - - - - -', things);
+        onInputChange={(
+          things: string,
+          { action, prevInputValue }: InputActionMeta
+        ) => {
+          console.log(
+            'onChange for select was triggered.  WooHoo < - - - - - - - - - - - - - - - -',
+            things
+          );
           // userChangeHandler();
         }}
         defaultValue={selectedOption}
