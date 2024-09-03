@@ -118,6 +118,13 @@ function AuthProvider(props: PropsWithChildren) {
     }
   }, [accessToken, accessTokenExpiration]);
 
+  // const validateAndUpdateUser = (profile: userProfileInterface) => {
+  //   if (profile.email) { }
+  //   else {
+  //     Logout();
+  //   }
+  // }
+
   useEffect(() => {
     if (!accessToken || !tokenIsValid()) {
       logout();

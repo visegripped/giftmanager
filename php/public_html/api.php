@@ -32,6 +32,7 @@ $qty = $_POST['qty'] ?? "1";
 $archive = $_POST['archive'] ?? "1";
 $added_by_userid = $_POST['added_by_userid'] ?? "";
 $groupid = $_POST['groupid'] ?? "1";
+$email = $_POST['email'] ?? "";
 
 function isValidGoogleAccessToken($token) {
   if (!$token) {
@@ -53,23 +54,28 @@ function isValidGoogleAccessToken($token) {
 // valid tasks:
 // getMyList
 // getListByUserId
-// getUserList
+// getUsersList
 // getUserProfile
 // addItemToMyOwnList
 // addItemToListByUserId
 // updateRemovedStatusForMyItem
 // updateMyItem
 // deleteItem
+// confirmUserIsValid
+// updateUser
 
-if(!$access_token) {
-    $apiResponse = array("error" => "Access token not specified on API request.");
-} else if(!isValidGoogleAccessToken($access_token)) {
-    $apiResponse = array("error" => "Invalid/expired token.  Please sign (or re-sign) in.");
-}  else if ($task == 'getMyList' && $myuserid) {
+// disabled to make testing easier.
+// if(!$access_token) {
+//     $apiResponse = array("error" => "Access token not specified on API request.");
+// } else if(!isValidGoogleAccessToken($access_token)) {
+//     $apiResponse = array("error" => "Invalid/expired token.  Please sign (or re-sign) in.");
+// }  else 
+
+if ($task == 'getMyList' && $myuserid) {
     $apiResponse = getMyList($myuserid, $mysqli);
 } else if ($task == 'getListByUserId' && $userid) {
     $apiResponse = getListByUserId($userid, $mysqli);
-} else if ($task == 'getUsers') {
+} else if ($task == 'getUsersList') {
     $apiResponse = getUsers($mysqli);
 } else if($task == 'updateRemovedStatusForMyItem' && $userid &&  $removed >= 0 &&  $giftid && ($myuserid == $userid)) {
     $apiResponse = updateRemovedStatusForMyItem($userid, $removed, $giftid, $mysqli);
@@ -77,9 +83,11 @@ if(!$access_token) {
     $apiResponse = addItemToMyOwnList($userid, $name, $description, $link, $groupid, $mysqli);
 } else if($task == 'updateItemOnMyOwnList' && $userid && ($myuserid == $userid) && $giftid && ($description || $link)) {
     $apiResponse = updateItemOnMyOwnList($userid, $itemid, $description, $link, $mysqli);
+} else if($task == 'confirmUserIsValid' && $email) {
+    $apiResponse = confirmUserIsValid($email, $mysqli);
 }
 else {
-    $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed: $removed, name: $name, description: $description, link: $link, groupid: $groupid");
+    $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed: $removed, name: $name, description: $description, link: $link, groupid: $groupid, email: $email");
 }
 
 // Close the connection

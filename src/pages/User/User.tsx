@@ -3,20 +3,20 @@ import { useState, useEffect } from 'react';
 import './User.css';
 
 type propsInterface = {
-  userId: string | undefined;
+  userid: string | undefined;
 };
 
 const PageContent = (props: propsInterface) => {
-  const { userId } = props;
+  const { userid } = props;
 
   const [userProfile] = useState({}); //, setUserProfile
 
   useEffect(() => {
-    if (userId) {
+    if (userid) {
       // go fetch the users list.
-      console.log(` -> Go fetch the list for ${userId}`, userProfile);
+      console.log(` -> Go fetch the list for ${userid}`, userProfile);
     }
-  }, [userId]);
+  }, [userid]);
 
   return (
     <>
@@ -28,8 +28,8 @@ const PageContent = (props: propsInterface) => {
 };
 
 const Symbol = () => {
-  let { userId } = useParams();
-  return <PageContent userId={userId} />;
+  let { userid } = useParams();
+  return <PageContent userid={userid} />;
 };
 
 export default Symbol;
