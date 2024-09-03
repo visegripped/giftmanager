@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Icon from '@components/Icon';
 import Button from '@components/Button';
+import { UserType } from '@types/types';
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
@@ -10,37 +11,16 @@ import fetchData from '@utilities/fetchData';
 /*
 To do:
   Status column: 
-      if item is removed, row should turn warning/error color.
-      remove button needs to work
       edit button should allows changing the link and description, NOT the name.
   API response should be cleaned up to only return data that doesn't reveal anything.
-  Page needs to be responsive, for smaller browsers, left col should be on top.
-  Need an Add item section
-    includes: name, link, description (rename note)
-    updates DB
-    refetches list.
-    updates table.
 */
 
-type propsInterface = {
-  userid: number;
-  date_added: number;
-  name: string;
-  note: string;
-  date_received: number;
-  status: null | 'nochange' | 'uncancel' | 'remove' | 'purchased' | 'reserved';
-  removed: 1 | 0;
-  link: string;
-  giftid: number;
-  groupid: number;
-};
-
 type myItemListInterface = {
-  myItemList: propsInterface[];
+  myItemList: UserType[];
 };
 
 type tableDataInterface = {
-  data: propsInterface;
+  data: UserType;
 };
 
 const Me = () => {
@@ -73,7 +53,7 @@ const Me = () => {
     return response;
   };
 
-  const Link = (props: propsInterface) => {
+  const Link = (props: UserType) => {
     const { link, name } = props;
     return (
       <a href={link} target="_blank">
@@ -82,7 +62,7 @@ const Me = () => {
     );
   };
 
-  const StatusDD = (props: { data: propsInterface }) => {
+  const StatusDD = (props: { data: UserType }) => {
     const { removed, giftid, userid } = props.data;
     return (
       <>

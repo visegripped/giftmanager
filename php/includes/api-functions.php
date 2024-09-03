@@ -23,6 +23,26 @@ function getMyList($userid, $mysqli) {
 }
 
 
+function confirmUserIsValid($email, $mysqli) {
+    $query = "SELECT * FROM `users` WHERE email = ? AND groupid = 1";
+    $stmt = $mysqli->prepare($query);
+
+    if ($stmt) {
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+          $apiResponse = array("success" => $result->fetch_all(MYSQLI_ASSOC));
+        } else {
+            $apiResponse = array("error" => "No user found for $email");
+        }
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
+
 function getListByUserId($userid, $mysqli) {
     $query = "SELECT * FROM `items` WHERE userid = ? ORDER BY date_added ASC";
     $stmt = $mysqli->prepare($query);
@@ -63,9 +83,6 @@ function getUsers($mysqli) {
     }
     return $apiResponse;
 }
-
-
-
 
 function updateRemovedStatusForMyItem($userid, $removed, $giftid, $mysqli) {
     $query = "UPDATE items SET removed = ? WHERE giftid = ? AND userid = ?";

@@ -102,7 +102,7 @@ function AuthProvider(props: PropsWithChildren) {
     try {
       const response = await fetch(
         'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' +
-          accessToken
+        accessToken
       );
       const data = await response.json();
 
@@ -117,6 +117,13 @@ function AuthProvider(props: PropsWithChildren) {
       return false;
     }
   }, [accessToken, accessTokenExpiration]);
+
+  // const validateAndUpdateUser = (profile: userProfileInterface) => {
+  //   if (profile.email) { }
+  //   else {
+  //     Logout();
+  //   }
+  // }
 
   useEffect(() => {
     if (!accessToken || !tokenIsValid()) {

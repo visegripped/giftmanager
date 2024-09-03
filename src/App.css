@@ -217,6 +217,11 @@ button {
   line-height: 1;
 }
 
+nav {
+  background: pink;
+  min-width: 150px;
+}
+
 button > img {
   height: 50px;
   fill: red !important;

@@ -5,8 +5,6 @@ import {
   ProfileContextInterface,
 } from '@context/ProfileContext';
 
-export const verifyUser = (email: string) => {};
-
 export const AuthButton = () => {
   const {
     logout,

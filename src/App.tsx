@@ -11,6 +11,7 @@ import postReport from '@utilities/postReport';
 import { setThemeOnBody } from '@utilities/setThemeOnBody';
 import NotificationList from '@components/NotificationList';
 import AuthButton from '@components/AuthButton';
+import UserChooser from '@components/UserChooser';
 
 type fallbackRenderPropsInterface = {
   error: Error;
@@ -70,7 +71,8 @@ function App() {
         </Link>
 
         <nav className="navbar">
-          <Link to={routeConstants.USER}>user</Link> chooser
+          {/* <Link to={routeConstants.USER}>user</Link> chooser */}
+          {accessToken ? <UserChooser /> : <></>}
         </nav>
 
         <div className="auth">
@@ -82,9 +84,9 @@ function App() {
         <ErrorBoundary
           fallbackRender={fallbackRender}
           onError={logError}
-          // onReset={(details) => {
-          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-          // }}
+        // onReset={(details) => {
+        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+        // }}
         >
           <NotificationsProvider>
             <div className="notifications">
@@ -97,7 +99,7 @@ function App() {
                 <Route path={routeConstants.THEME} Component={Theme} />
                 <Route path={routeConstants.USER} Component={User} />
                 <Route
-                  path={`${routeConstants.User}/:userId`}
+                  path={`${routeConstants.USER}/:userid`}
                   Component={User}
                 />
                 <Route Component={Error404} />
