@@ -104,7 +104,7 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
   }, [currentUserid]);
 
   return (
-    <div className='userchooser-container'>
+    <div className="userchooser-container">
       <Select
         // https://react-select.com/advanced#methods
         onChange={userChangeHandler}

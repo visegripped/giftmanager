@@ -11,9 +11,9 @@ export const AuthButton = () => {
     logout,
     login,
     accessToken = '',
-  } = useContext<AuthContextInterface>(AuthContext);
+  } = useContext<AuthContextInterface>(AuthContext) || {};
   const { setProfile, fetchGoogleProfile, profile } =
-    useContext<ProfileContextInterface>(ProfileContext);
+    useContext<ProfileContextInterface>(ProfileContext) || {};
   const [emailAddress, setMyEmailAddress] = useState('');
 
   useEffect(() => {
