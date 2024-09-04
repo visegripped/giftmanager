@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useMatch } from 'react-router-dom';
-import Select, { InputActionMeta } from 'react-select'; // https://react-select.com/home
+import Select from 'react-select'; // https://react-select.com/home
 import { UserType } from '@types/types';
 import fetchData from '@utilities/fetchData';
 import './UserChooser.css';
@@ -81,7 +81,7 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
     theUsers.forEach((theUser) => {
       const option = {
         value: theUser.userid,
-        label: `${theUser.firstname} ${theUser.lastname}`,
+        label: `${theUser.firstname} ${theUser.lastname} ${theUser.userid}`,
       };
       formattedUsers.push(option);
     });
@@ -104,25 +104,16 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
   }, [currentUserid]);
 
   return (
-    <>
+    <div className='userchooser-container'>
       <Select
         // https://react-select.com/advanced#methods
-        onChange={(
-          things: string,
-          { action, prevInputValue }: InputActionMeta
-        ) => {
-          console.log(
-            'onChange for select was triggered.  WooHoo < - - - - - - - - - - - - - - - -',
-            things
-          );
-          // userChangeHandler();
-        }}
+        onChange={userChangeHandler}
         defaultValue={selectedOption}
         options={formatUsersListForSelect(usersList)}
         // styles={customStyles}
         aria-errormessage="userPickerErrors"
       />
-    </>
+    </div>
   );
 };
 
