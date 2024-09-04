@@ -3,6 +3,7 @@ import { useNavigate, useMatch } from 'react-router-dom';
 import Select, { InputActionMeta } from 'react-select'; // https://react-select.com/home
 import { UserType } from '@types/types';
 import fetchData from '@utilities/fetchData';
+import './UserChooser.css';
 
 export interface UserChooserPropsInterface {
   usersList: UserType[];
@@ -106,7 +107,7 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
     <>
       <Select
         // https://react-select.com/advanced#methods
-        onInputChange={(
+        onChange={(
           things: string,
           { action, prevInputValue }: InputActionMeta
         ) => {

@@ -7,6 +7,7 @@ type tasksInterface = {
     | 'getUserList'
     | 'getUserProfile'
     | 'addItemToListByUserId'
+    | 'confirmUserIsValid'
     | 'updateItem'
     | 'deleteItem';
 };
@@ -20,6 +21,7 @@ type fetchInterface = {
   userid: number;
   name: string;
   description?: string;
+  email_address?: string;
   link?: string;
   date_received?: string;
   removed?: 1 | 0;
@@ -46,6 +48,7 @@ export const fetchData = (config: fetchInterface) => {
     description,
     link,
     date_received,
+    email_address,
     removed,
     status,
     qty,
@@ -82,6 +85,7 @@ export const fetchData = (config: fetchInterface) => {
     if (userid) formData.append('userid', userid);
     if (giftid) formData.append('giftid', giftid);
     if (name) formData.append('name', name);
+    if (email_address) formData.append('email_address', email_address);
     if (description) formData.append('description', description);
     if (link) formData.append('link', link);
     if (date_received) formData.append('date_received', date_received);

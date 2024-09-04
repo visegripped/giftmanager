@@ -32,7 +32,7 @@ $qty = $_POST['qty'] ?? "1";
 $archive = $_POST['archive'] ?? "1";
 $added_by_userid = $_POST['added_by_userid'] ?? "";
 $groupid = $_POST['groupid'] ?? "1";
-$email = $_POST['email'] ?? "";
+$email_address = $_POST['email_address'] ?? "";
 
 function isValidGoogleAccessToken($token) {
   if (!$token) {
@@ -83,8 +83,8 @@ if ($task == 'getMyList' && $myuserid) {
     $apiResponse = addItemToMyOwnList($userid, $name, $description, $link, $groupid, $mysqli);
 } else if($task == 'updateItemOnMyOwnList' && $userid && ($myuserid == $userid) && $giftid && ($description || $link)) {
     $apiResponse = updateItemOnMyOwnList($userid, $itemid, $description, $link, $mysqli);
-} else if($task == 'confirmUserIsValid' && $email) {
-    $apiResponse = confirmUserIsValid($email, $mysqli);
+} else if($task == 'confirmUserIsValid' && $email_address) {
+    $apiResponse = confirmUserIsValid($email_address, $mysqli);
 }
 else {
     $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed: $removed, name: $name, description: $description, link: $link, groupid: $groupid, email: $email");
