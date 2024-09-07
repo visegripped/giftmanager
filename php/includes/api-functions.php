@@ -43,7 +43,7 @@ function confirmUserIsValid($email, $mysqli) {
     return $apiResponse;
 }
 
-function getListByUserId($userid, $mysqli) {
+function getItemListByUserId($userid, $mysqli) {
     $query = "SELECT * FROM `items` WHERE userid = ? ORDER BY date_added ASC";
     $stmt = $mysqli->prepare($query);
 
@@ -94,6 +94,25 @@ function updateRemovedStatusForMyItem($userid, $removed, $giftid, $mysqli) {
             $apiResponse = array("success" => "item $giftid updated");
         } else {
             $apiResponse = array("error" => "No items found for the specified user (affected rows: ".$stmt->affected_rows.").");
+        }
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
+
+
+function updateAvatar($email_address, $avatar, $mysqli) {
+    $query = "UPDATE users SET avatar = ? WHERE email = ?";
+    $stmt = $mysqli->prepare($query);
+    $stmt->bind_param('ss', $avatar, $email_address);
+    if ($stmt) {
+        $stmt->execute();
+        if ($stmt->affected_rows > 0) {
+            $apiResponse = array("success" => "Avatar has been updated");
+        } else {
+            $apiResponse = array("error" => "No matching user found with email $email_address (affected rows: ".$stmt->affected_rows.").");
         }
         $stmt->close();
     } else {

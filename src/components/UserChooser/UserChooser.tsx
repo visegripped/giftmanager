@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useMatch } from 'react-router-dom';
-import Select, { InputActionMeta } from 'react-select'; // https://react-select.com/home
+import Select from 'react-select'; // https://react-select.com/home
 import { UserType } from '@types/types';
 import fetchData from '@utilities/fetchData';
+import './UserChooser.css';
 
 export interface UserChooserPropsInterface {
   usersList: UserType[];
@@ -52,7 +53,6 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
   };
 
   const userChangeHandler = (event: ReactSelectType) => {
-    console.log('BEGIN onchange handler');
     const selectedUserid = event.value;
     const selectedUsername = event.label;
     setUserid(selectedUserid);
@@ -80,7 +80,7 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
     theUsers.forEach((theUser) => {
       const option = {
         value: theUser.userid,
-        label: `${theUser.firstname} ${theUser.lastname}`,
+        label: `${theUser.firstname} ${theUser.lastname} ${theUser.userid}`,
       };
       formattedUsers.push(option);
     });
@@ -94,34 +94,23 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
     }
   }, []);
   useEffect(() => {
-    console.log('BEGIN currentUserid useEffect');
     //on load, only fetch the list once.
     if (Number(useridFromURL) !== Number(currentUserid)) {
-      console.log(' -> condition met. do things.');
       navigate(`/User/${currentUserid}`);
     }
   }, [currentUserid]);
 
   return (
-    <>
+    <div className="userchooser-container">
       <Select
         // https://react-select.com/advanced#methods
-        onInputChange={(
-          things: string,
-          { action, prevInputValue }: InputActionMeta
-        ) => {
-          console.log(
-            'onChange for select was triggered.  WooHoo < - - - - - - - - - - - - - - - -',
-            things
-          );
-          // userChangeHandler();
-        }}
+        onChange={userChangeHandler}
         defaultValue={selectedOption}
         options={formatUsersListForSelect(usersList)}
         // styles={customStyles}
         aria-errormessage="userPickerErrors"
       />
-    </>
+    </div>
   );
 };
 

@@ -13,6 +13,7 @@ export interface GoogleProfileInterface {
   namesData: {
     metaData: {};
   };
+  photos: { url: string }[];
 }
 
 export interface userProfileInterface {
@@ -31,13 +32,19 @@ export interface ProfileContextInterface {
 const convertGoogleProfile2Custom = (googleProfile: GoogleProfileInterface) => {
   // need the following from the profile: email. avatar? name.
   let userProfile = { google: googleProfile };
-  const { resourceName, emailAddresses, names } =
+  const { resourceName, emailAddresses, names, photos } =
     googleProfile<GoogleProfileInterface>;
 
   userProfile.google.resourceName = resourceName;
   emailAddresses.forEach((emailData = {}) => {
     if (emailData?.metadata?.primary) {
       userProfile.emailAddress = emailData.value;
+    }
+  });
+
+  photos.forEach((photosData = {}) => {
+    if (photosData?.metadata?.primary) {
+      userProfile.avatar = photosData.url;
     }
   });
 
@@ -55,7 +62,7 @@ const ProfileProvider = (props: React.PropsWithChildren) => {
   const { accessToken } = useContext(AuthContext);
   const fetchGoogleProfile = async (accessToken) => {
     // Fetch user profile information
-    if (accessToken) {
+    if (accessToken && !profile.email) {
       try {
         //https://developers.google.com/people/api/rest/v1/people/get
         const response = await fetch(
@@ -73,7 +80,9 @@ const ProfileProvider = (props: React.PropsWithChildren) => {
         const userProfile = await response.json();
         // const emailAddress = userProfile?.emailAddresses[0]?.value;
         console.log(' -> got a google profile: ', userProfile);
-        setProfile(convertGoogleProfile2Custom(userProfile));
+        const convertedProfile = convertGoogleProfile2Custom(userProfile);
+        setProfile(convertedProfile);
+        return convertedProfile;
       } catch (error) {
         // TODO -> log this error
         console.error('Error fetching profile:', error);

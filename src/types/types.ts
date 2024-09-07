@@ -1,4 +1,4 @@
-export type UserType = {
+export type ItemType = {
   userid: number;
   date_added: number;
   name: string;
@@ -9,4 +9,14 @@ export type UserType = {
   link: string;
   giftid: number;
   groupid: number;
+};
+
+export type UserType = {
+  userid: number;
+  firstname: string;
+  lastname: string;
+  groupid: number;
+  created: number;
+  email: string;
+  avatar: string;
 };

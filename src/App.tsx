@@ -18,7 +18,7 @@ type fallbackRenderPropsInterface = {
 };
 
 function App() {
-  const { accessToken } = useContext(AuthContext);
+  const { accessToken } = useContext(AuthContext) || {};
   let currentDate = new Date();
 
   const selectedThemeAtLoad = localStorage.getItem('theme') || 'theme__default';
