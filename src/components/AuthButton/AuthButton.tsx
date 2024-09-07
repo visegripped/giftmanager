@@ -8,6 +8,11 @@ import {
 import validateUser from '@utilities/validateUser';
 import { UserType } from '@types/types';
 import fetchData from '@utilities/fetchData';
+import postReport from '@utilities/postReport';
+import {
+  NotificationsContext,
+  AddNotificationProps,
+} from '@context/NotificationsContext';
 
 export const AuthButton = () => {
   const {
@@ -15,6 +20,8 @@ export const AuthButton = () => {
     login,
     accessToken = '',
   } = useContext<AuthContextInterface>(AuthContext) || {};
+  const { addNotification } =
+    useContext<AddNotificationProps>(NotificationsContext);
   const { setProfile, fetchGoogleProfile, profile } =
     useContext<ProfileContextInterface>(ProfileContext) || {};
   const [emailAddress, setMyEmailAddress] = useState('');
@@ -30,7 +37,21 @@ export const AuthButton = () => {
             setRemoteProfile(validationResponse.success);
           } else {
             logout();
-            // TODO - log that this happened and what email address failed.
+            postReport({
+              type: 'warn',
+              report: 'Unauthorized user attempted to log in',
+              body: {
+                origin: 'AuthButton',
+                email: emailAddress,
+              },
+            });
+            addNotification({
+              message: `The email address ${emailAddress} is not recognized as a valid user.
+              If you think you have received this message in error, reach out to the site administrator.
+              If you don't know who the site administrator is, you probably don't belong here.`,
+              type: 'warn',
+              persist: true,
+            });
           }
         }
       );
@@ -47,8 +68,14 @@ export const AuthButton = () => {
       response &&
         response.then((data: { success: string; error: string }) => {
           if (data.error) {
-            // TODO - log this.
-            console.log(' -> error adding avatar: ', data.error);
+            postReport({
+              type: 'error',
+              report: 'Avatar update failed.',
+              body: {
+                origin: 'AuthButton',
+                error: data.error,
+              },
+            });
           }
         });
     }

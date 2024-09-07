@@ -1,5 +1,6 @@
 import { useState, createContext, useContext } from 'react';
 import { AuthContext } from './AuthContext';
+import postReport from '@utilities/postReport';
 
 const ProfileContext = createContext(null);
 
@@ -75,24 +76,42 @@ const ProfileProvider = (props: React.PropsWithChildren) => {
         );
 
         if (!response.ok) {
+          postReport({
+            type: 'error',
+            report: 'Error fetching Google profile',
+            body: {
+              origin: 'ProfileContext',
+              error: `HTTP error! status: ${response.status}`,
+            },
+          });
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const userProfile = await response.json();
-        // const emailAddress = userProfile?.emailAddresses[0]?.value;
         console.log(' -> got a google profile: ', userProfile);
         const convertedProfile = convertGoogleProfile2Custom(userProfile);
         setProfile(convertedProfile);
         return convertedProfile;
       } catch (error) {
-        // TODO -> log this error
-        console.error('Error fetching profile:', error);
+        postReport({
+          type: 'error',
+          report: 'Error fetching Google profile',
+          body: {
+            origin: 'ProfileContext',
+            error,
+          },
+        });
       }
       return;
     } else {
-      // TODO -> log this error.
-      console.error(
-        'Access token was not passed to fetchGoogleProfile.  No request attempt has been made to retrieve the user profile'
-      );
+      postReport({
+        type: 'error',
+        report: 'Error fetching Google profile',
+        body: {
+          origin: 'ProfileContext',
+          error:
+            'Access token was not passed to fetchGoogleProfile.  No request attempt has been made to retrieve the user profile',
+        },
+      });
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Icon from '@components/Icon';
 import Button from '@components/Button';
 import { UserType } from '@types/types';
@@ -7,6 +7,11 @@ import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the 
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
 import './Me.css';
 import fetchData from '@utilities/fetchData';
+import {
+  NotificationsContext,
+  AddNotificationProps,
+} from '@context/NotificationsContext';
+import postReport from '@utilities/postReport';
 
 /*
 To do:
@@ -28,6 +33,8 @@ const Me = () => {
   const [addItemName, setAddItemName] = useState('');
   const [addItemDescription, setAddItemDescription] = useState('');
   const [addItemLink, setAddItemLink] = useState('');
+  const { addNotification } =
+    useContext<AddNotificationProps>(NotificationsContext);
 
   const updateRemoveStatus = (
     removed: number,
@@ -46,8 +53,20 @@ const Me = () => {
         if (data.success) {
           fetchItemList();
         } else {
-          //TODO - log this.
-          console.log(data.error);
+          postReport({
+            type: 'error',
+            report: 'Unable to remove/re-add item from item list',
+            body: {
+              stackTrace: data.error,
+              origin: 'Me',
+            },
+          });
+          addNotification({
+            message: `Something has gone wrong with removing the item from your list.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+            type: 'error',
+          });
         }
       });
     return response;
@@ -154,8 +173,20 @@ const Me = () => {
           setAddItemLink('');
           fetchItemList();
         } else {
-          //TODO -> log this.
-          console.log(data.error);
+          postReport({
+            type: 'error',
+            report: 'Unable to add item to item list',
+            body: {
+              stackTrace: data.error,
+              origin: 'Me',
+            },
+          });
+          addNotification({
+            message: `Something has gone wrong with adding the item to your list.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+            type: 'error',
+          });
         }
       });
     return response;

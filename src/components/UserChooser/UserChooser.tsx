@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useMatch } from 'react-router-dom';
 import Select from 'react-select'; // https://react-select.com/home
 import { UserType } from '@types/types';
 import fetchData from '@utilities/fetchData';
 import './UserChooser.css';
+import {
+  NotificationsContext,
+  AddNotificationProps,
+} from '@context/NotificationsContext';
+import postReport from '@utilities/postReport';
 
 export interface UserChooserPropsInterface {
   usersList: UserType[];
@@ -38,6 +43,8 @@ export const getUserNameFromUsersList = (
 export const UserChooser = (props: UserChooserPropsInterface) => {
   const paramsFromURL = useMatch('/User/:userid') || {};
   const useridFromURL = paramsFromURL.params?.userid || '';
+  const { addNotification } =
+    useContext<AddNotificationProps>(NotificationsContext);
   let [usersList, setUsersList] = useState([]);
   let [currentUserid, setUserid] = useState(useridFromURL);
   const usernameFromUsersList = getUserNameFromUsersList(
@@ -68,8 +75,21 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
         if (data.success) {
           setUsersList(data.success);
         } else {
-          //TODO - log this.
-          console.log(data.error);
+          postReport({
+            type: 'error',
+            report: 'Unable to fetch user list',
+            body: {
+              origin: 'AuthButton',
+              email: data.error,
+            },
+          });
+          addNotification({
+            message: `Something went wrong while trying to get the list of users.
+            Try refreshing your browser.  
+            If the user chooser still does not appear, reach out to the site administrator.`,
+            type: 'error',
+            persist: true,
+          });
         }
       });
     return response;
