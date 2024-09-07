@@ -23,6 +23,7 @@ $myuserid = $_POST['myuserid'] ?? "";
 $userid = $_POST['userid'] ?? "";
 $giftid = $_POST['giftid'] ?? "";
 $name = $_POST['name'] ?? "";
+$avatar = $_POST['avatar'] ?? "";
 $note = $_POST['note'] ?? "";
 $link = $_POST['link'] ?? "";
 $date_received = $_POST['date_received'] ?? "";
@@ -53,12 +54,13 @@ function isValidGoogleAccessToken($token) {
 
 // valid tasks:
 // getMyList
-// getListByUserId
+// getItemListByUserId
 // getUsersList
 // getUserProfile
 // addItemToMyOwnList
 // addItemToListByUserId
 // updateRemovedStatusForMyItem
+// updateAvatar
 // updateMyItem
 // deleteItem
 // confirmUserIsValid
@@ -73,11 +75,13 @@ function isValidGoogleAccessToken($token) {
 
 if ($task == 'getMyList' && $myuserid) {
     $apiResponse = getMyList($myuserid, $mysqli);
-} else if ($task == 'getListByUserId' && $userid) {
-    $apiResponse = getListByUserId($userid, $mysqli);
+} else if ($task == 'getItemListByUserId' && $userid) {
+    $apiResponse = getItemListByUserId($userid, $mysqli);
 } else if ($task == 'getUsersList') {
     $apiResponse = getUsers($mysqli);
-} else if($task == 'updateRemovedStatusForMyItem' && $userid &&  $removed >= 0 &&  $giftid && ($myuserid == $userid)) {
+} else if($task == 'updateAvatar' && $email_address && $avatar) {
+    $apiResponse = updateAvatar($email_address, $avatar, $mysqli);
+}  else if($task == 'updateRemovedStatusForMyItem' && $userid &&  $removed >= 0 &&  $giftid && ($myuserid == $userid)) {
     $apiResponse = updateRemovedStatusForMyItem($userid, $removed, $giftid, $mysqli);
 }  else if($task == 'addItemToMyOwnList' && $userid && ($added_by_userid == $userid) && $name && $groupid) {
     $apiResponse = addItemToMyOwnList($userid, $name, $description, $link, $groupid, $mysqli);
@@ -87,7 +91,7 @@ if ($task == 'getMyList' && $myuserid) {
     $apiResponse = confirmUserIsValid($email_address, $mysqli);
 }
 else {
-    $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed: $removed, name: $name, description: $description, link: $link, groupid: $groupid, email: $email");
+    $apiResponse = array("error" => "Invalid task ($task) or userid ($userid) or missing params: myuserid: $myuserid, giftid: $giftid, removed: $removed, name: $name, description: $description, link: $link, groupid: $groupid, email: $email_address, avatar: $avatar");
 }
 
 // Close the connection

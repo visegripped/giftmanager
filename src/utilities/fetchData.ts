@@ -3,13 +3,13 @@ const apiUrl = 'https://gm.visegripped.com/api.php';
 type tasksInterface = {
   task:
     | 'getMyList'
-    | 'getListByUserId'
+    | 'getItemListByUserId'
     | 'getUserList'
-    | 'getUserProfile'
-    | 'addItemToListByUserId'
-    | 'confirmUserIsValid'
-    | 'updateItem'
-    | 'deleteItem';
+    | 'updateAvatar'
+    | 'updateRemovedStatusForMyItem'
+    | 'addItemToMyOwnList'
+    | 'updateItemOnMyOwnList'
+    | 'confirmUserIsValid';
 };
 
 type statusInterface = 'cancelled' | 'uncancel' | 'purchased' | 'reserved';
@@ -20,6 +20,7 @@ type fetchInterface = {
   giftid: number;
   userid: number;
   name: string;
+  avatar: string;
   description?: string;
   email_address?: string;
   link?: string;
@@ -45,6 +46,7 @@ export const fetchData = (config: fetchInterface) => {
     userid,
     giftid,
     name,
+    avatar,
     description,
     link,
     date_received,
@@ -85,6 +87,7 @@ export const fetchData = (config: fetchInterface) => {
     if (userid) formData.append('userid', userid);
     if (giftid) formData.append('giftid', giftid);
     if (name) formData.append('name', name);
+    if (avatar) formData.append('avatar', avatar);
     if (email_address) formData.append('email_address', email_address);
     if (description) formData.append('description', description);
     if (link) formData.append('link', link);

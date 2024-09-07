@@ -13,6 +13,7 @@ export interface GoogleProfileInterface {
   namesData: {
     metaData: {};
   };
+  photos: { url: string }[];
 }
 
 export interface userProfileInterface {
@@ -31,13 +32,19 @@ export interface ProfileContextInterface {
 const convertGoogleProfile2Custom = (googleProfile: GoogleProfileInterface) => {
   // need the following from the profile: email. avatar? name.
   let userProfile = { google: googleProfile };
-  const { resourceName, emailAddresses, names } =
+  const { resourceName, emailAddresses, names, photos } =
     googleProfile<GoogleProfileInterface>;
 
   userProfile.google.resourceName = resourceName;
   emailAddresses.forEach((emailData = {}) => {
     if (emailData?.metadata?.primary) {
       userProfile.emailAddress = emailData.value;
+    }
+  });
+
+  photos.forEach((photosData = {}) => {
+    if (photosData?.metadata?.primary) {
+      userProfile.avatar = photosData.url;
     }
   });
 

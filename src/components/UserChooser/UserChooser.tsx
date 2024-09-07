@@ -53,7 +53,6 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
   };
 
   const userChangeHandler = (event: ReactSelectType) => {
-    console.log('BEGIN onchange handler');
     const selectedUserid = event.value;
     const selectedUsername = event.label;
     setUserid(selectedUserid);
@@ -95,10 +94,8 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
     }
   }, []);
   useEffect(() => {
-    console.log('BEGIN currentUserid useEffect');
     //on load, only fetch the list once.
     if (Number(useridFromURL) !== Number(currentUserid)) {
-      console.log(' -> condition met. do things.');
       navigate(`/User/${currentUserid}`);
     }
   }, [currentUserid]);
