@@ -7,7 +7,7 @@ export type ItemType = {
   status: null | 'nochange' | 'uncancel' | 'removed' | 'purchased' | 'reserved';
   removed: 1 | 0;
   link: string;
-  giftid: number;
+  itemid: number;
   groupid: number;
 };
 
@@ -20,3 +20,28 @@ export type UserType = {
   email: string;
   avatar: string;
 };
+
+export type tasksInterface = {
+  task: //my
+  | 'addItemToMyList'
+    | 'getMyItemList'
+    | 'updateItemOnMyList'
+    | 'updateRemovedStatusForMyItem'
+
+    //their
+    | 'getTheirItemList'
+    | 'addItemToTheirList'
+    | 'updateStatusForTheirItem'
+
+    //generic
+    | 'getUserProfileByUserId'
+    | 'confirmUserIsValid'
+    | 'getUsers'
+    | 'updateAvatar';
+};
+
+export type itemStatusInterface =
+  | 'cancelled'
+  | 'uncancel'
+  | 'purchased'
+  | 'reserved';

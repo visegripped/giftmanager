@@ -11,6 +11,10 @@ import {
   NotificationsContext,
   AddNotificationProps,
 } from '@context/NotificationsContext';
+import {
+  ProfileContext,
+  ProfileContextInterface,
+} from '@context/ProfileContext';
 import postReport from '@utilities/postReport';
 
 /*
@@ -33,32 +37,34 @@ const Me = () => {
   const [addItemName, setAddItemName] = useState('');
   const [addItemDescription, setAddItemDescription] = useState('');
   const [addItemLink, setAddItemLink] = useState('');
+  const { myProfile } =
+    useContext<ProfileContextInterface>(ProfileContext) || {};
+  const [myUserid, setMyUserid] = useState(myProfile.userid || '');
+
   const { addNotification } =
     useContext<AddNotificationProps>(NotificationsContext);
 
   const updateRemoveStatus = (
     removed: number,
-    giftid: number,
-    userid: number
+    itemid: number,
+    userid: string
   ) => {
     const response = fetchData({
       task: 'updateRemovedStatusForMyItem',
-      giftid,
-      myuserid: 1, // TODO -> fix this
-      userid,
+      itemid,
+      myuserid: userid,
       removed,
     });
     response &&
       response.then((data: { success: string; error: string }) => {
-        if (data.success) {
-          fetchItemList();
-        } else {
+        if (data.error) {
           postReport({
             type: 'error',
             report: 'Unable to remove/re-add item from item list',
             body: {
-              stackTrace: data.error,
-              origin: 'Me',
+              error: data.error,
+              page: 'Me',
+              origin: 'response.error',
             },
           });
           addNotification({
@@ -67,6 +73,9 @@ const Me = () => {
             If the error persists, reach out to the site administrator`,
             type: 'error',
           });
+        } else {
+          fetchItemList(userid);
+
         }
       });
     return response;
@@ -82,7 +91,7 @@ const Me = () => {
   };
 
   const StatusDD = (props: { data: UserType }) => {
-    const { removed, giftid, userid } = props.data;
+    const { removed, itemid, userid } = props.data;
     return (
       <>
         {removed === 1 ? (
@@ -90,7 +99,7 @@ const Me = () => {
             icon="plus"
             title="Re-add item to my list"
             onButtonClick={() => {
-              updateRemoveStatus(0, giftid, userid);
+              updateRemoveStatus(0, itemid, userid);
             }}
           />
         ) : (
@@ -100,7 +109,7 @@ const Me = () => {
               icon="delete"
               title="Remove item from my list"
               onButtonClick={() => {
-                updateRemoveStatus(1, giftid, userid);
+                updateRemoveStatus(1, itemid, myUserid);
               }}
             />
           </>
@@ -113,7 +122,6 @@ const Me = () => {
     return <Link {...props.data} />;
   };
 
-  // change status title to actions: add a remove button.
   const Table = (props: myItemListInterface) => {
     const { myItemList } = props;
     const [colDefs] = useState([
@@ -142,11 +150,10 @@ const Me = () => {
     );
   };
 
-  const fetchItemList = () => {
+  const fetchItemList = (userid: string) => {
     const response = fetchData({
-      task: 'getMyList',
-      myuserid: 1,
-      userid: 1,
+      task: 'getMyItemList',
+      myuserid: userid,
     });
     response &&
       response.then((data: { success: [] }) => {
@@ -157,9 +164,8 @@ const Me = () => {
 
   const addItemToMyList = (name: string, description: string, link: string) => {
     const response = fetchData({
-      task: 'addItemToMyOwnList',
-      userid: 1, // TODO -> fix this so it is not hard coded
-      added_by_userid: 1,
+      task: 'addItemToMyList',
+      myuserid: myUserid,
       groupid: 1,
       name,
       description,
@@ -167,17 +173,12 @@ const Me = () => {
     });
     response &&
       response.then((data: { success: string; error: string }) => {
-        if (data.success) {
-          setAddItemName('');
-          setAddItemDescription('');
-          setAddItemLink('');
-          fetchItemList();
-        } else {
+        if (data.error) {
           postReport({
             type: 'error',
             report: 'Unable to add item to item list',
             body: {
-              stackTrace: data.error,
+              error: data.error,
               origin: 'Me',
             },
           });
@@ -187,21 +188,30 @@ const Me = () => {
             If the error persists, reach out to the site administrator`,
             type: 'error',
           });
+        } else {
+          setAddItemName('');
+          setAddItemDescription('');
+          setAddItemLink('');
+          fetchItemList(myUserid);
+
         }
       });
     return response;
   };
 
   useEffect(() => {
-    //on load, only fetch the list once.
-    if (!myItemList.length) {
-      fetchItemList();
+    if (!myUserid && myProfile.userid) {
+      setMyUserid(myProfile.userid);
     }
-  }, []);
+    //only fetch the list once.
+    if (myProfile.userid && !myItemList?.length) {
+      fetchItemList(myProfile.userid);
+    }
+  }, [myProfile.userid]);
 
   return (
     <>
-      <h2 className="page-heading">YOURNAME's List</h2>
+      <h2 className="page-heading">Welcome to your list.</h2>
       <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
         <form
           className="form"
@@ -230,7 +240,7 @@ const Me = () => {
               <input
                 type="url"
                 name="link"
-                defaultValue={addItemLink}
+                value={addItemLink}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setAddItemLink(event.target.value);
                 }}
@@ -241,7 +251,7 @@ const Me = () => {
             <div className="input-container">
               <textarea
                 name="description"
-                defaultValue={addItemDescription}
+                value={addItemDescription}
                 onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
                   setAddItemDescription(event.target.value);
                 }}
@@ -253,10 +263,10 @@ const Me = () => {
         </form>
 
         <>
-          {myItemList.length ? (
+          {myItemList?.length ? (
             <Table myItemList={myItemList} />
           ) : (
-            <h3>Fetching data...</h3>
+            <h3>There are no items in this your list. Please add some.</h3>
           )}
         </>
       </section>

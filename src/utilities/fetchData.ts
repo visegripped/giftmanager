@@ -1,23 +1,12 @@
+import { tasksInterface, itemStatusInterface } from '../types/types';
+('@types/types');
 const apiUrl = 'https://gm.visegripped.com/api.php';
-
-type tasksInterface = {
-  task:
-    | 'getMyList'
-    | 'getItemListByUserId'
-    | 'getUserList'
-    | 'updateAvatar'
-    | 'updateRemovedStatusForMyItem'
-    | 'addItemToMyOwnList'
-    | 'updateItemOnMyOwnList'
-    | 'confirmUserIsValid';
-};
-
-type statusInterface = 'cancelled' | 'uncancel' | 'purchased' | 'reserved';
 
 type fetchInterface = {
   task: tasksInterface;
   myuserid: number;
-  giftid: number;
+  theiruserid: number;
+  itemid: number;
   userid: number;
   name: string;
   avatar: string;
@@ -26,7 +15,7 @@ type fetchInterface = {
   link?: string;
   date_received?: string;
   removed?: 1 | 0;
-  status?: statusInterface;
+  status?: itemStatusInterface;
   qty?: number;
   added_by_userid?: number;
   groupid?: number;
@@ -43,8 +32,9 @@ export const fetchData = (config: fetchInterface) => {
   const {
     task,
     myuserid,
+    theiruserid,
     userid,
-    giftid,
+    itemid,
     name,
     avatar,
     description,
@@ -72,7 +62,6 @@ export const fetchData = (config: fetchInterface) => {
     } else {
       throw new Error(apiResponse.status);
     }
-    // console.log(`Historical data for ${symbol} was fetched`, jsonPayload);
     if (jsonPayload.err) {
       throw new Error(jsonPayload.err);
     }
@@ -83,9 +72,11 @@ export const fetchData = (config: fetchInterface) => {
     let formData = new FormData();
     formData.append('task', task);
     formData.append('access_token', accessToken);
+    // TODO -> loop through config and add these dynamically.
     if (myuserid) formData.append('myuserid', myuserid);
+    if (theiruserid) formData.append('theiruserid', theiruserid);
     if (userid) formData.append('userid', userid);
-    if (giftid) formData.append('giftid', giftid);
+    if (itemid) formData.append('itemid', itemid);
     if (name) formData.append('name', name);
     if (avatar) formData.append('avatar', avatar);
     if (email_address) formData.append('email_address', email_address);
