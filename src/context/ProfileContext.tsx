@@ -1,6 +1,5 @@
 import { useState, createContext, useContext } from 'react';
 import { AuthContext } from './AuthContext';
-import postReport from '@utilities/postReport';
 
 const ProfileContext = createContext(null);
 
