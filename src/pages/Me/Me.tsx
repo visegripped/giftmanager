@@ -75,7 +75,6 @@ const Me = () => {
           });
         } else {
           fetchItemList(userid);
-
         }
       });
     return response;
@@ -193,7 +192,6 @@ const Me = () => {
           setAddItemDescription('');
           setAddItemLink('');
           fetchItemList(myUserid);
-
         }
       });
     return response;
