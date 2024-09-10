@@ -1,0 +1,12 @@
+.table-container {
+  height: 90%;
+  padding: var(--spacing);
+}
+
+.ag-root-wrapper {
+  opacity: 80%;
+}
+
+.row-removed {
+  background-color: var(--container-bg-warning);
+}

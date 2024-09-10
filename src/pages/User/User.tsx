@@ -1,35 +1,283 @@
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import postReport from '@utilities/postReport';
+import fetchData from '@utilities/fetchData';
+import {
+  NotificationsContext,
+  AddNotificationProps,
+} from '@context/NotificationsContext';
+import {
+  ProfileContext,
+  ProfileContextInterface,
+} from '@context/ProfileContext';
+import { UserType, ItemType } from '@types/types';
+import AddItemForm from '@components/AddItemForm';
+import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
+import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
+import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 import './User.css';
 
-type propsInterface = {
-  userid: string | undefined;
+type theirItemListInterface = {
+  theirItemList: UserType[];
+  myUserid: string;
+  theirUserid: string;
+  fetchTheirItemList: (a: string) => {};
 };
 
-const PageContent = (props: propsInterface) => {
-  const { userid } = props;
+type tableDataInterface = {
+  data: UserType;
+};
 
-  const [userProfile] = useState({}); //, setUserProfile
+const Link = (props: UserType) => {
+  const { link, name } = props;
+  return (
+    <a href={link} target="_blank">
+      {name}
+    </a>
+  );
+};
 
-  useEffect(() => {
-    if (userid) {
-      // go fetch the users list.
-      console.log(` -> Go fetch the list for ${userid}`, userProfile);
-    }
-  }, [userid]);
+const linkedName = (props: tableDataInterface) => {
+  return <Link {...props.data} />;
+};
+
+const Table = (props: theirItemListInterface) => {
+  const { theirItemList, theirUserid, myUserid, fetchTheirItemList } = props;
+  const [statusSelectValue, setStatusSelectValue] = useState('no change');
+  const onSelectChange = (itemid: number, status: string) => {
+    updateStatusForTheirItem(itemid, status);
+  };
+  const { addNotification } =
+    useContext<AddNotificationProps>(NotificationsContext);
+  const updateStatusForTheirItem = (itemid: number, status: string) => {
+    const response = fetchData({
+      task: 'updateStatusForTheirItem',
+      itemid,
+      status,
+      myuserid: myUserid,
+      theiruserid: theirUserid,
+    });
+    response &&
+      response.then((data: { success: string; error: string }) => {
+        if (data.error) {
+          postReport({
+            type: 'error',
+            report: 'Unable to remove/re-add item from item list',
+            body: {
+              error: data.error,
+              origin: 'Me',
+            },
+          });
+          addNotification({
+            message: `Something has gone wrong with removing the item from your list.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+            type: 'error',
+          });
+        } else {
+          fetchTheirItemList(theirUserid);
+        }
+      });
+    return response;
+  };
+
+  const StatusDD = (props: { data: UserType }) => {
+    const { itemid } = props.data;
+    return (
+      <>
+        <select
+          value={statusSelectValue}
+          onChange={(event: React.ChangeEventHandler<HTMLSelectElement>) => {
+            const status = event.target.value;
+            setStatusSelectValue(status);
+            onSelectChange(itemid, status);
+          }}
+        >
+          <option value="no change">No change/reset</option>
+          <option value="reserved">Flag as reserved</option>
+          <option value="purchased">Flag as purchased</option>
+        </select>
+      </>
+    );
+  };
+
+  const [colDefs] = useState([
+    { field: 'name', sortable: true, cellRenderer: linkedName, sort: 'asc' },
+    { field: 'description', flex: 2 },
+    {
+      field: 'removed',
+      cellRenderer: StatusDD,
+      headerName: 'actions',
+    },
+  ]);
+
+  const rowClassRules = {
+    'row-removed': 'data.removed >= 1',
+  };
 
   return (
     <>
-      <section>
-        <h2>This is the User page - view other peoples lists.</h2>
+      <AgGridReact
+        rowData={theirItemList}
+        columnDefs={colDefs}
+        rowClassRules={rowClassRules}
+        style={{ width: '100%', height: '100%' }}
+      />
+    </>
+  );
+};
+
+const PageContent = () => {
+  let { userid: theirUserid } = useParams() || '';
+  const { myProfile } =
+    useContext<ProfileContextInterface>(ProfileContext) || {};
+  const { addNotification } =
+    useContext<AddNotificationProps>(NotificationsContext);
+
+  const [myUserid, setMyUserid] = useState(myProfile.userid || '');
+  const [theirUserProfile, setTheirUserProfile] = useState<UserType>({});
+  const [theirItemList, setTheirItemList] = useState<ItemType[]>([]);
+
+  const fetchTheirUserProfile = (theirUserid: string) => {
+    if (theirUserid) {
+      const response = fetchData({
+        task: 'getUserProfileByUserId',
+        userid: theirUserid,
+      });
+      response &&
+        response.then((data: { success: UserType[]; error: string }) => {
+          if (data.error) {
+            postReport({
+              type: 'error',
+              report: 'Unable to fetch user profile',
+              body: {
+                error: data.error,
+                origin: 'response.error',
+                page: 'User',
+              },
+            });
+            addNotification({
+              message: `Something has gone wrong getting this user's profile.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+              type: 'error',
+            });
+          } else {
+            setTheirUserProfile(data.success[0]);
+          }
+        });
+    }
+  };
+
+  const fetchTheirItemList = (theirUserid: string = '') => {
+    const response = fetchData({
+      task: 'getTheirItemList',
+      theiruserid: theirUserid,
+    });
+    response &&
+      response.then((data: { success: []; error: string }) => {
+        if (data.error) {
+          postReport({
+            type: 'error',
+            report: `Unable to fetch item list`,
+            body: {
+              error: data.error,
+              origin: 'User',
+            },
+          });
+          addNotification({
+            message: `Something has gone wrong getting this user's profile.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+            type: 'error',
+          });
+        } else {
+          setTheirItemList(data.success);
+        }
+      });
+  };
+
+  const onSubmit = (
+    name: string,
+    description: string = '',
+    link: string = ''
+  ) => {
+    const response = fetchData({
+      task: 'updateStatusForTheirItem',
+      myuserid: myUserid,
+      theiruserid: theirUserid,
+      name,
+      description,
+      link,
+    });
+    response &&
+      response.then((data: { success: string; error: string }) => {
+        if (data.error) {
+          postReport({
+            type: 'error',
+            report: 'Unable to remove/re-add item from item list',
+            body: {
+              error: data.error,
+              origin: 'Me',
+            },
+          });
+          addNotification({
+            message: `Something has gone wrong with removing the item from your list.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+            type: 'error',
+          });
+        } else {
+          fetchTheirItemList(theirUserid);
+        }
+      });
+    return response;
+  };
+
+  useEffect(() => {
+    if (!myUserid && myProfile.userid) {
+      setMyUserid(myProfile.userid);
+    }
+  }, [myProfile.userid]);
+
+  useEffect(() => {
+    if (theirUserid) {
+      console.log(` -> theirUserid: ${theirUserid}`);
+      fetchTheirUserProfile(theirUserid);
+    }
+    if (theirUserid) {
+      fetchTheirItemList(theirUserid);
+    }
+  }, [theirUserid]);
+
+  return (
+    <>
+      <h2>
+        Welcome to {theirUserProfile.firstname} {theirUserProfile.lastname}'s
+        list
+      </h2>
+      <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
+        <AddItemForm
+          legendText={`Add to  ${theirUserProfile.firstname}'s list`}
+          onAddItemFormSubmit={onSubmit}
+        />
+        <>
+          {theirItemList?.length ? (
+            <Table
+              fetchTheirItemList={fetchTheirItemList}
+              theirItemList={theirItemList}
+              myUserid={myUserid}
+              theirUserid={theirUserid}
+            />
+          ) : (
+            <h3>
+              There are no items in this {theirUserProfile.firstname}'s list.{' '}
+            </h3>
+          )}
+        </>
       </section>
     </>
   );
 };
 
-const Symbol = () => {
-  let { userid } = useParams();
-  return <PageContent userid={userid} />;
-};
-
-export default Symbol;
+export default PageContent;

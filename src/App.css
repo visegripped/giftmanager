@@ -354,6 +354,7 @@ select.warning {
   width: 400px;
   position: absolute;
   right: var(--spacing);
+  z-index: 10;
 }
 
 .page-heading {
