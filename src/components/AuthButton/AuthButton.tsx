@@ -1,59 +1,32 @@
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext, AuthContextInterface } from '@context/AuthContext';
+import { AuthContext, AuthContextInterface } from '../../context/AuthContext';
 import {
   ProfileContext,
   ProfileContextInterface,
-  GoogleProfileInterface,
-} from '@context/ProfileContext';
-import validateUser from '@utilities/validateUser';
-import { UserType } from '@types/types';
-import fetchData from '@utilities/fetchData';
-import postReport from '@utilities/postReport';
+} from '../../context/ProfileContext';
+import validateUser from '../../utilities/validateUser';
+import { responseInterface, GoogleProfileInterface, UserProfileInterface, GoogleProfileEmailInterface, GoogleProfilePhotoInterface } from '../../types/types';
+import fetchData from '../../utilities/fetchData';
+import postReport from '../../utilities/postReport';
 import {
   NotificationsContext,
-  AddNotificationProps,
-} from '@context/NotificationsContext';
+  NotificationContextProps,
+} from '../../context/NotificationsContext';
 
-export interface GoogleProfileInterface {
-  resourceName: string;
-  emailAddresses: [];
-  emailData: {
-    metaData: {};
-  };
-  names: string;
-  namesData: {
-    metaData: {};
-  };
-  photos: { url: string }[];
-}
-
-export interface userProfileInterface {
-  emailAddress: string;
-  givenName: string;
-  familyName: string;
-  google: GoogleProfileInterface;
-}
-
-export interface ProfileContextInterface {
-  myProfile: userProfileInterface;
-  setMyProfile: () => {};
-  fetchGoogleProfile: () => {};
-}
 
 const convertGoogleProfile2Custom = (googleProfile: GoogleProfileInterface) => {
   // need the following from the profile: email. avatar? name.
-  let userProfile = { google: googleProfile };
-  const { resourceName, emailAddresses, names, photos } =
-    googleProfile<GoogleProfileInterface>;
+  let userProfile = { google: googleProfile } as UserProfileInterface;
+  const { resourceName, emailAddresses, names, photos } = googleProfile;
 
   userProfile.google.resourceName = resourceName;
-  emailAddresses.forEach((emailData = {}) => {
+  emailAddresses.forEach((emailData: GoogleProfileEmailInterface) => {
     if (emailData?.metadata?.primary) {
       userProfile.emailAddress = emailData.value;
     }
   });
 
-  photos.forEach((photosData = {}) => {
+  photos.forEach((photosData: GoogleProfilePhotoInterface) => {
     if (photosData?.metadata?.primary) {
       userProfile.avatar = photosData.url;
     }
@@ -73,17 +46,15 @@ export const AuthButton = () => {
     logout,
     login,
     accessToken = '',
-  } = useContext<AuthContextInterface>(AuthContext) || {};
-  const { addNotification } =
-    useContext<AddNotificationProps>(NotificationsContext);
-  const { setMyProfile, myProfile } =
-    useContext<ProfileContextInterface>(ProfileContext) || {};
+  } = useContext(AuthContext) as AuthContextInterface;
+  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
+  const { setMyProfile, myProfile } = useContext(ProfileContext) as ProfileContextInterface;
   const [emailAddress, setMyEmailAddress] = useState('');
   const [myAvatar, setMyAvatar] = useState('');
 
   const fetchGoogleProfile = async (accessToken: string) => {
     // Fetch user profile information
-    if (accessToken && !myProfile.email) {
+    if (accessToken && !myProfile.emailAddress) {
       try {
         //https://developers.google.com/people/api/rest/v1/people/get
         const response = await fetch(
@@ -100,7 +71,8 @@ export const AuthButton = () => {
             type: 'error',
             report: 'Error fetching Google profile',
             body: {
-              origin: 'ProfileContext',
+              file: 'AuthButton',
+              origin: 'apiResponse',
               error: `HTTP error! status: ${response.status}`,
             },
           });
@@ -110,14 +82,18 @@ export const AuthButton = () => {
         console.log(' -> got a google profile: ', userProfile);
         const convertedProfile = convertGoogleProfile2Custom(userProfile);
         setMyEmailAddress(userProfile.emailAddress);
+        if (userProfile.avatar) {
+          setMyAvatar(userProfile.avatar);
+        }
         return convertedProfile;
-      } catch (error) {
+      } catch (error: unknown) {
         postReport({
           type: 'error',
           report: 'Error fetching Google profile',
           body: {
-            origin: 'ProfileContext',
-            error,
+            file: 'AuthButton',
+            origin: 'apiResponse',
+            error: JSON.stringify(error),
           },
         });
       }
@@ -127,7 +103,8 @@ export const AuthButton = () => {
         type: 'error',
         report: 'Error fetching Google profile',
         body: {
-          origin: 'ProfileContext',
+          file: 'AuthButton',
+          origin: 'apiResponse',
           error:
             'Access token was not passed to fetchGoogleProfile.  No request attempt has been made to retrieve the user profile',
         },
@@ -139,16 +116,16 @@ export const AuthButton = () => {
     if (emailAddress) {
       const userValidationResponse = validateUser(emailAddress);
       userValidationResponse.then(
-        (validationResponse: { success: UserType[] }) => {
-          if (validationResponse.success) {
-            setMyProfile(validationResponse.success[0]);
-          } else {
+        // @ts-ignore: todo - remove this and address TS issue.
+        (validationResponse: responseInterface) => {
+          if (validationResponse?.warn) {
             logout();
             postReport({
               type: 'warn',
               report: 'Unauthorized user attempted to log in',
               body: {
-                origin: 'AuthButton',
+                file: 'AuthButton',
+                origin: 'apiResponse',
                 email: emailAddress,
               },
             });
@@ -157,6 +134,26 @@ export const AuthButton = () => {
               If you think you have received this message in error, reach out to the site administrator.
               If you don't know who the site administrator is, you probably don't belong here.`,
               type: 'warn',
+              persist: true,
+            });
+          } else if (validationResponse.success) {
+            // @ts-ignore: todo - remove this and address TS issue.
+            setMyProfile(validationResponse.success[0]);
+          } else {
+            postReport({
+              type: 'warn',
+              report: 'Error while attempting to validate user',
+              body: {
+                file: 'AuthButton',
+                origin: 'apiResponse',
+                email: emailAddress,
+              },
+            });
+            addNotification({
+              message: `Something went wrong while trying to validate your account.
+              If you think you have received this message in error, reach out to the site administrator.
+              If you don't know who the site administrator is, you probably don't belong here.`,
+              type: 'error',
               persist: true,
             });
           }
@@ -173,13 +170,14 @@ export const AuthButton = () => {
         avatar: myAvatar,
       });
       response &&
-        response.then((data: { success: string; error: string }) => {
+        response.then((data: responseInterface) => {
           if (data.error) {
             postReport({
               type: 'error',
               report: 'Avatar update failed.',
               body: {
-                origin: 'AuthButton',
+                file: 'AuthButton',
+                origin: 'apiResponse',
                 error: data.error,
               },
             });
@@ -197,13 +195,7 @@ export const AuthButton = () => {
   useEffect(() => {
     // only need to get the profile once.
     if (accessToken && Object.keys(myProfile).length === 0) {
-      const userProfile = fetchGoogleProfile(accessToken);
-      userProfile.then((theProfile: GoogleProfileInterface) => {
-        setMyEmailAddress(theProfile.emailAddress);
-        if (theProfile.avatar) {
-          setMyAvatar(theProfile.avatar);
-        }
-      });
+      fetchGoogleProfile(accessToken);
     }
   }, [accessToken]);
 

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './AddItemForm.css';
-import Button from '@components/Button';
+import Button from '../Button/Button';
 
 export interface AddItemFormProps {
   onAddItemFormSubmit?: (
@@ -15,7 +15,7 @@ export interface AddItemFormProps {
  * Primary UI component for user interaction
  */
 export const AddItemForm = (props: AddItemFormProps) => {
-  const { onAddItemFormSubmit = () => {}, legendText = 'Add item to list' } =
+  const { onAddItemFormSubmit = () => { }, legendText = 'Add item to list' } =
     props;
 
   const [addItemName, setAddItemName] = useState('');

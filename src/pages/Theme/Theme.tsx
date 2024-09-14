@@ -1,27 +1,23 @@
 import { useContext } from 'react';
-import Button from '@components/Button';
-import Notification from '@components/Notification';
+import Button from '../../components/Button/Button';
+import Notification from '../../components/Notification/Notification';
+
 import {
   NotificationsContext,
   AddNotificationProps,
-} from '@context/NotificationsContext';
+  NotificationContextProps,
+  AddNotificationTypeProp,
+} from '../../context/NotificationsContext';
 import './Theme.css';
-
-/*
-  type: string;
-  message: string;
-  persist?: boolean;
-  clearDuration?: number;
-  */
 
 const Theme = () => {
   const body = document.body;
   const theme = body.classList.value || 'theme__default';
-  const { addNotification } = useContext(NotificationsContext);
+  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
 
   const notify = (report: AddNotificationProps) => {
     const {
-      type = '',
+      type = '' as AddNotificationTypeProp,
       message = '',
       persist = false,
       clearDuration = 10000,
@@ -182,7 +178,7 @@ const Theme = () => {
           <div className="element">
             <Button
               label="Throw message - error"
-              onClick={() => {
+              onButtonClick={() => {
                 notify({
                   persist: true,
                   type: 'error',
@@ -194,7 +190,7 @@ const Theme = () => {
           <div className="element">
             <Button
               label="Throw message - info"
-              onClick={() => {
+              onButtonClick={() => {
                 notify({
                   persist: true,
                   type: 'info',
@@ -206,7 +202,7 @@ const Theme = () => {
           <div className="element">
             <Button
               label="Throw message - success"
-              onClick={() => {
+              onButtonClick={() => {
                 notify({
                   persist: true,
                   type: 'success',
@@ -218,7 +214,7 @@ const Theme = () => {
           <div className="element">
             <Button
               label="Throw message - warn"
-              onClick={() => {
+              onButtonClick={() => {
                 notify({
                   persist: true,
                   type: 'warn',

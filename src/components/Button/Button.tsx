@@ -1,12 +1,12 @@
 // import React from 'react';
 import './Button.css';
-import Icon from '@components/Icon';
+import Icon, { SupportedIcons } from '../Icon/Icon';
 
 export interface ButtonProps {
+  title?: string;
+  icon?: SupportedIcons;
   size?: 'small' | 'medium' | 'large';
   label?: string;
-  title?: string;
-  icon?: string;
   type?: 'submit' | 'button';
   onButtonClick?: (e: React.MouseEvent) => void;
 }
@@ -17,9 +17,9 @@ export interface ButtonProps {
 export const Button = (props: ButtonProps) => {
   const {
     icon,
-    size = 'medium',
-    label,
     title,
+    size,
+    label,
     type = 'button',
     onButtonClick,
   } = props;
@@ -35,7 +35,7 @@ export const Button = (props: ButtonProps) => {
         }
       }}
     >
-      {icon ? <Icon icon={icon} size="small" /> : ''}
+      {icon ? <Icon icon={icon} /> : ''}
       {label ? <span>{label}</span> : ''}
     </button>
   );

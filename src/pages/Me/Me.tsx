@@ -1,21 +1,20 @@
 import { useState, useEffect, useContext } from 'react';
-import Icon from '@components/Icon';
-import Button from '@components/Button';
-import { UserType } from '@types/types';
+import Button from '../../components/Button/Button';
+import { UserType, ItemType, ItemRemovedType, responseInterface } from '../../types/types';
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
 import './Me.css';
-import fetchData from '@utilities/fetchData';
+import fetchData from '../../utilities/fetchData';
 import {
   NotificationsContext,
-  AddNotificationProps,
-} from '@context/NotificationsContext';
+  NotificationContextProps,
+} from '../../context/NotificationsContext';
 import {
   ProfileContext,
   ProfileContextInterface,
-} from '@context/ProfileContext';
-import postReport from '@utilities/postReport';
+} from '../../context/ProfileContext';
+import postReport from '../../utilities/postReport';
 
 /*
 To do:
@@ -37,17 +36,15 @@ const Me = () => {
   const [addItemName, setAddItemName] = useState('');
   const [addItemDescription, setAddItemDescription] = useState('');
   const [addItemLink, setAddItemLink] = useState('');
-  const { myProfile } =
-    useContext<ProfileContextInterface>(ProfileContext) || {};
+  const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
+  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
   const [myUserid, setMyUserid] = useState(myProfile.userid || '');
 
-  const { addNotification } =
-    useContext<AddNotificationProps>(NotificationsContext);
 
   const updateRemoveStatus = (
-    removed: number,
-    itemid: number,
-    userid: string
+    removed: ItemRemovedType,
+    itemid: number | string,
+    userid: number | string
   ) => {
     const response = fetchData({
       task: 'updateRemovedStatusForMyItem',
@@ -56,15 +53,15 @@ const Me = () => {
       removed,
     });
     response &&
-      response.then((data: { success: string; error: string }) => {
+      response.then((data: responseInterface) => {
         if (data.error) {
           postReport({
             type: 'error',
             report: 'Unable to remove/re-add item from item list',
             body: {
               error: data.error,
-              page: 'Me',
-              origin: 'response.error',
+              file: 'Me',
+              origin: 'apiResponse',
             },
           });
           addNotification({
@@ -80,7 +77,7 @@ const Me = () => {
     return response;
   };
 
-  const Link = (props: UserType) => {
+  const Link = (props: ItemType) => {
     const { link, name } = props;
     return (
       <a href={link} target="_blank">
@@ -89,7 +86,7 @@ const Me = () => {
     );
   };
 
-  const StatusDD = (props: { data: UserType }) => {
+  const StatusDD = (props: { data: ItemType }) => {
     const { removed, itemid, userid } = props.data;
     return (
       <>
@@ -118,6 +115,7 @@ const Me = () => {
   };
 
   const linkedName = (props: tableDataInterface) => {
+    // @ts-ignore
     return <Link {...props.data} />;
   };
 
@@ -141,6 +139,7 @@ const Me = () => {
       <>
         <AgGridReact
           rowData={myItemList}
+          // @ts-ignore
           columnDefs={colDefs}
           rowClassRules={rowClassRules}
           style={{ width: '100%', height: '100%' }}
@@ -149,14 +148,14 @@ const Me = () => {
     );
   };
 
-  const fetchItemList = (userid: string) => {
+  const fetchItemList = (userid: string | number) => {
     const response = fetchData({
       task: 'getMyItemList',
       myuserid: userid,
     });
     response &&
-      response.then((data: { success: [] }) => {
-        setMyItemList(data.success);
+      response.then((data: responseInterface) => {
+        setMyItemList(data.success as []);
       });
   };
   // const [userProfile] = useState({ }); //, setUserProfile
@@ -165,20 +164,21 @@ const Me = () => {
     const response = fetchData({
       task: 'addItemToMyList',
       myuserid: myUserid,
-      groupid: 1,
+      groupid: "1",
       name,
       description,
       link,
     });
     response &&
-      response.then((data: { success: string; error: string }) => {
+      response.then((data: responseInterface) => {
         if (data.error) {
           postReport({
             type: 'error',
             report: 'Unable to add item to item list',
             body: {
               error: data.error,
-              origin: 'Me',
+              file: 'Me',
+              origin: 'apiResponse'
             },
           });
           addNotification({

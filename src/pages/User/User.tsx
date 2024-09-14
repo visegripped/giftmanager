@@ -1,35 +1,35 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
-import postReport from '@utilities/postReport';
-import fetchData from '@utilities/fetchData';
+import postReport from '../../utilities/postReport';
+import fetchData from '../../utilities/fetchData';
 import {
   NotificationsContext,
-  AddNotificationProps,
-} from '@context/NotificationsContext';
+  NotificationContextProps,
+} from '../../context/NotificationsContext';
 import {
   ProfileContext,
   ProfileContextInterface,
-} from '@context/ProfileContext';
-import { UserType, ItemType } from '@types/types';
-import AddItemForm from '@components/AddItemForm';
+} from '../../context/ProfileContext';
+import { UserType, ItemType, itemStatusInterface, responseInterface } from '../../types/types';
+import AddItemForm from '../../components/AddItemForm/AddItemForm';
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 import './User.css';
 
 type theirItemListInterface = {
-  theirItemList: UserType[];
+  theirItemList: ItemType[];
   myUserid: string;
   theirUserid: string;
-  fetchTheirItemList: (a: string) => {};
+  fetchTheirItemList: (a?: string) => void;
 };
 
 type tableDataInterface = {
-  data: UserType;
+  data: ItemType;
 };
 
-const Link = (props: UserType) => {
-  const { link, name } = props;
+const Link = (props: { link: string, name: string }) => {
+  const { link = '', name = '' } = props;
   return (
     <a href={link} target="_blank">
       {name}
@@ -38,18 +38,18 @@ const Link = (props: UserType) => {
 };
 
 const linkedName = (props: tableDataInterface) => {
+  //@ts-ignore
   return <Link {...props.data} />;
 };
 
 const Table = (props: theirItemListInterface) => {
   const { theirItemList, theirUserid, myUserid, fetchTheirItemList } = props;
   const [statusSelectValue, setStatusSelectValue] = useState('no change');
-  const onSelectChange = (itemid: number, status: string) => {
+  const onSelectChange = (itemid: string | number, status: itemStatusInterface) => {
     updateStatusForTheirItem(itemid, status);
   };
-  const { addNotification } =
-    useContext<AddNotificationProps>(NotificationsContext);
-  const updateStatusForTheirItem = (itemid: number, status: string) => {
+  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
+  const updateStatusForTheirItem = (itemid: string | number, status: itemStatusInterface) => {
     const response = fetchData({
       task: 'updateStatusForTheirItem',
       itemid,
@@ -58,14 +58,15 @@ const Table = (props: theirItemListInterface) => {
       theiruserid: theirUserid,
     });
     response &&
-      response.then((data: { success: string; error: string }) => {
+      response.then((data: responseInterface) => {
         if (data.error) {
           postReport({
             type: 'error',
             report: 'Unable to remove/re-add item from item list',
             body: {
               error: data.error,
-              origin: 'Me',
+              file: 'User',
+              origin: 'apiResponse'
             },
           });
           addNotification({
@@ -81,22 +82,22 @@ const Table = (props: theirItemListInterface) => {
     return response;
   };
 
-  const StatusDD = (props: { data: UserType }) => {
+  const StatusDD = (props: { data: ItemType }) => {
     const { itemid } = props.data;
     return (
       <>
         <select
           value={statusSelectValue}
-          onChange={(event: React.ChangeEventHandler<HTMLSelectElement>) => {
+          onChange={(event) => {
             const status = event.target.value;
             setStatusSelectValue(status);
-            onSelectChange(itemid, status);
+            onSelectChange(itemid, status as itemStatusInterface);
           }}
         >
           <option value="no change">No change/reset</option>
           <option value="reserved">Flag as reserved</option>
           <option value="purchased">Flag as purchased</option>
-        </select>
+        </select >
       </>
     );
   };
@@ -119,6 +120,7 @@ const Table = (props: theirItemListInterface) => {
     <>
       <AgGridReact
         rowData={theirItemList}
+        // @ts-ignore
         columnDefs={colDefs}
         rowClassRules={rowClassRules}
         style={{ width: '100%', height: '100%' }}
@@ -129,13 +131,21 @@ const Table = (props: theirItemListInterface) => {
 
 const PageContent = () => {
   let { userid: theirUserid } = useParams() || '';
+  const emptyUserProfile = {
+    userid: '',
+    firstname: '',
+    lastname: '',
+    groupid: '',
+    created: '',
+    email: '',
+    avatar: '',
+  }
   const { myProfile } =
-    useContext<ProfileContextInterface>(ProfileContext) || {};
-  const { addNotification } =
-    useContext<AddNotificationProps>(NotificationsContext);
+    useContext(ProfileContext) as ProfileContextInterface;
+  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
 
   const [myUserid, setMyUserid] = useState(myProfile.userid || '');
-  const [theirUserProfile, setTheirUserProfile] = useState<UserType>({});
+  const [theirUserProfile, setTheirUserProfile] = useState<UserType>(emptyUserProfile);
   const [theirItemList, setTheirItemList] = useState<ItemType[]>([]);
 
   const fetchTheirUserProfile = (theirUserid: string) => {
@@ -145,15 +155,15 @@ const PageContent = () => {
         userid: theirUserid,
       });
       response &&
-        response.then((data: { success: UserType[]; error: string }) => {
+        response.then((data: responseInterface) => {
           if (data.error) {
             postReport({
               type: 'error',
               report: 'Unable to fetch user profile',
               body: {
                 error: data.error,
-                origin: 'response.error',
-                page: 'User',
+                origin: 'apiResponse',
+                file: 'User',
               },
             });
             addNotification({
@@ -163,38 +173,59 @@ const PageContent = () => {
               type: 'error',
             });
           } else {
-            setTheirUserProfile(data.success[0]);
+            const up = (data.success && data.success[0]) ? data.success[0] : emptyUserProfile;
+            setTheirUserProfile(up as UserType);
           }
         });
     }
   };
 
   const fetchTheirItemList = (theirUserid: string = '') => {
-    const response = fetchData({
-      task: 'getTheirItemList',
-      theiruserid: theirUserid,
-    });
-    response &&
-      response.then((data: { success: []; error: string }) => {
-        if (data.error) {
-          postReport({
-            type: 'error',
-            report: `Unable to fetch item list`,
-            body: {
-              error: data.error,
-              origin: 'User',
-            },
-          });
-          addNotification({
-            message: `Something has gone wrong getting this user's profile.
+    if (theirUserid) {
+      const response = fetchData({
+        task: 'getTheirItemList',
+        theiruserid: theirUserid,
+      });
+      response &&
+        response.then((data: responseInterface) => {
+          if (data.error) {
+            postReport({
+              type: 'error',
+              report: `Unable to fetch item list`,
+              body: {
+                error: data.error,
+                file: 'User',
+                origin: 'apiResponse'
+              },
+            });
+            addNotification({
+              message: `Something has gone wrong getting this user's profile.
             Try refreshing the page.
             If the error persists, reach out to the site administrator`,
-            type: 'error',
-          });
-        } else {
-          setTheirItemList(data.success);
-        }
+              type: 'error',
+            });
+          } else {
+            setTheirItemList(data.success as []);
+          }
+        });
+    } else {
+      postReport({
+        type: 'error',
+        report: `Unable to fetch item list`,
+        body: {
+          error: 'no userid was passed in to fetchTheirItemList',
+          file: 'User',
+          origin: 'apiResponse'
+        },
       });
+      addNotification({
+        message: `Something has gone wrong getting this user's profile.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+        type: 'error',
+      });
+    }
+
   };
 
   const onSubmit = (
@@ -211,14 +242,15 @@ const PageContent = () => {
       link,
     });
     response &&
-      response.then((data: { success: string; error: string }) => {
+      response.then((data: responseInterface) => {
         if (data.error) {
           postReport({
             type: 'error',
             report: 'Unable to remove/re-add item from item list',
             body: {
               error: data.error,
-              origin: 'Me',
+              file: 'Me',
+              origin: 'apiResponse'
             },
           });
           addNotification({
@@ -242,7 +274,6 @@ const PageContent = () => {
 
   useEffect(() => {
     if (theirUserid) {
-      console.log(` -> theirUserid: ${theirUserid}`);
       fetchTheirUserProfile(theirUserid);
     }
     if (theirUserid) {
@@ -253,12 +284,12 @@ const PageContent = () => {
   return (
     <>
       <h2>
-        Welcome to {theirUserProfile.firstname} {theirUserProfile.lastname}'s
+        Welcome to {theirUserProfile?.firstname} {theirUserProfile?.lastname}'s
         list
       </h2>
       <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
         <AddItemForm
-          legendText={`Add to  ${theirUserProfile.firstname}'s list`}
+          legendText={`Add to  ${theirUserProfile?.firstname}'s list`}
           onAddItemFormSubmit={onSubmit}
         />
         <>
@@ -267,11 +298,11 @@ const PageContent = () => {
               fetchTheirItemList={fetchTheirItemList}
               theirItemList={theirItemList}
               myUserid={myUserid}
-              theirUserid={theirUserid}
+              theirUserid={theirUserid || ''}
             />
           ) : (
             <h3>
-              There are no items in this {theirUserProfile.firstname}'s list.{' '}
+              There are no items in {theirUserProfile?.firstname}'s list.{' '}
             </h3>
           )}
         </>

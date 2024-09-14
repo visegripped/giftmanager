@@ -9,8 +9,8 @@ import {
 import { googleLogout, useGoogleLogin } from '@react-oauth/google'; // docs: https://www.npmjs.com/package/@react-oauth/google
 import {
   NotificationsContext,
-  AddNotificationProps,
-} from '@context/NotificationsContext';
+  NotificationContextProps,
+} from './NotificationsContext';
 
 export interface AuthContextInterface {
   login: () => {};
@@ -19,7 +19,7 @@ export interface AuthContextInterface {
   setAccessToken: (accessToken: string) => {};
 }
 
-const AuthContext = createContext(null);
+const AuthContext = createContext({});
 // const refreshTokenUrl = import.meta.env.VITE_REFRESH_TOKEN_URL;
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -40,8 +40,7 @@ function AuthProvider(props: PropsWithChildren) {
     Date | string
   >(localStorage.getItem('access_token_expiration') || '');
 
-  const { addNotification } =
-    useContext<AddNotificationProps>(NotificationsContext);
+  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
 
   const handleGoogleTokenExpiration = () => {
     let currentTime = new Date().getTime();
@@ -69,6 +68,7 @@ function AuthProvider(props: PropsWithChildren) {
 
   const login = useGoogleLogin({
     onSuccess: onLoginSuccess,
+    // @ts-ignore: todo - remove this and address TS issue.
     onError: onLoginFailure,
     client_id: googleClientId,
     scope: 'openid profile email',
@@ -102,7 +102,7 @@ function AuthProvider(props: PropsWithChildren) {
     try {
       const response = await fetch(
         'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' +
-          accessToken
+        accessToken
       );
       const data = await response.json();
 
@@ -117,13 +117,6 @@ function AuthProvider(props: PropsWithChildren) {
       return false;
     }
   }, [accessToken, accessTokenExpiration]);
-
-  // const validateAndUpdateUser = (profile: userProfileInterface) => {
-  //   if (profile.email) { }
-  //   else {
-  //     Logout();
-  //   }
-  // }
 
   useEffect(() => {
     if (!accessToken || !tokenIsValid()) {

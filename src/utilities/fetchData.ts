@@ -1,25 +1,25 @@
-import { tasksInterface, itemStatusInterface } from '../types/types';
-('@types/types');
+import { itemStatusInterface, ItemRemovedType } from '../types/types';
+
 const apiUrl = 'https://gm.visegripped.com/api.php';
 
 type fetchInterface = {
-  task: tasksInterface;
-  myuserid: number;
-  theiruserid: number;
-  itemid: number;
-  userid: number;
-  name: string;
-  avatar: string;
+  task: string;
+  myuserid?: string | number;
+  theiruserid?: string | number;
+  itemid?: string | number;
+  userid?: string | number;
+  name?: string;
+  avatar?: string;
   description?: string;
   email_address?: string;
   link?: string;
   date_received?: string;
-  removed?: 1 | 0;
+  removed?: ItemRemovedType;
   status?: itemStatusInterface;
-  qty?: number;
-  added_by_userid?: number;
-  groupid?: number;
-  archive?: number;
+  qty?: string;
+  added_by_userid?: string;
+  groupid?: string;
+  archive?: string;
 };
 
 export const formatDate = (date: Date) => {
@@ -29,30 +29,31 @@ export const formatDate = (date: Date) => {
 };
 
 export const fetchData = (config: fetchInterface) => {
-  const {
-    task,
-    myuserid,
-    theiruserid,
-    userid,
-    itemid,
-    name,
-    avatar,
-    description,
-    link,
-    date_received,
-    email_address,
-    removed,
-    status,
-    qty,
-    added_by_userid,
-    groupid,
-    archive,
-  } = config;
+  const configWhiteList = [
+    'task',
+    'myuserid',
+    'theiruserid',
+    'userid',
+    'itemid',
+    'name',
+    'avatar',
+    'description',
+    'link',
+    'date_received',
+    'email_address',
+    'removed',
+    'status',
+    'qty',
+    'added_by_userid',
+    'groupid',
+    'archive',
+  ];
   const accessToken = localStorage.getItem('access_token');
-  const makeAsyncRequest = async (theFormData: fetchInterface) => {
-    let jsonPayload = {};
+  const makeAsyncRequest = async (theFormData: {}) => {
+    let jsonPayload = { err: '' };
 
     const apiResponse = await fetch(apiUrl, {
+      // @ts-ignore
       body: theFormData,
       method: 'POST',
     });
@@ -60,9 +61,9 @@ export const fetchData = (config: fetchInterface) => {
     if (apiResponse.status >= 200 && apiResponse.status < 300) {
       jsonPayload = await apiResponse.json();
     } else {
-      throw new Error(apiResponse.status);
+      throw new Error(`API responded with a ${apiResponse.status}`);
     }
-    if (jsonPayload.err) {
+    if (jsonPayload?.err) {
       throw new Error(jsonPayload.err);
     }
     return jsonPayload;
@@ -70,25 +71,11 @@ export const fetchData = (config: fetchInterface) => {
 
   if (accessToken) {
     let formData = new FormData();
-    formData.append('task', task);
     formData.append('access_token', accessToken);
-    // TODO -> loop through config and add these dynamically.
-    if (myuserid) formData.append('myuserid', myuserid);
-    if (theiruserid) formData.append('theiruserid', theiruserid);
-    if (userid) formData.append('userid', userid);
-    if (itemid) formData.append('itemid', itemid);
-    if (name) formData.append('name', name);
-    if (avatar) formData.append('avatar', avatar);
-    if (email_address) formData.append('email_address', email_address);
-    if (description) formData.append('description', description);
-    if (link) formData.append('link', link);
-    if (date_received) formData.append('date_received', date_received);
-    if (removed) formData.append('removed', removed);
-    if (status) formData.append('status', status);
-    if (qty) formData.append('qty', qty);
-    if (added_by_userid) formData.append('added_by_userid', added_by_userid);
-    if (groupid) formData.append('groupid', groupid);
-    if (archive) formData.append('archive', archive);
+    for (let key of configWhiteList) {
+      // @ts-ignore: todo - remove this and address TS issue.
+      formData.append(key, config[key]);
+    }
 
     return makeAsyncRequest(formData);
   }
