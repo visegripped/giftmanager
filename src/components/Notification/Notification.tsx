@@ -9,7 +9,9 @@ import {
 export const Notification = (props: NotificationProps) => {
   const { type, message, uuid, persist, clearDuration = 5000 } = props;
 
-  const { removeNotification } = useContext(NotificationsContext) as NotificationContextProps;
+  const { removeNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
   let wasManuallyCleared = false;
 
   const handleClick = () => {

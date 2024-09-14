@@ -1,6 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import Button from '../../components/Button/Button';
-import { UserType, ItemType, ItemRemovedType, responseInterface } from '../../types/types';
+import {
+  UserType,
+  ItemType,
+  ItemRemovedType,
+  responseInterface,
+} from '../../types/types';
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
@@ -37,9 +42,10 @@ const Me = () => {
   const [addItemDescription, setAddItemDescription] = useState('');
   const [addItemLink, setAddItemLink] = useState('');
   const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
-  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
+  const { addNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
   const [myUserid, setMyUserid] = useState(myProfile.userid || '');
-
 
   const updateRemoveStatus = (
     removed: ItemRemovedType,
@@ -164,7 +170,7 @@ const Me = () => {
     const response = fetchData({
       task: 'addItemToMyList',
       myuserid: myUserid,
-      groupid: "1",
+      groupid: '1',
       name,
       description,
       link,
@@ -178,7 +184,7 @@ const Me = () => {
             body: {
               error: data.error,
               file: 'Me',
-              origin: 'apiResponse'
+              origin: 'apiResponse',
             },
           });
           addNotification({

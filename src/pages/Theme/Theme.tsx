@@ -13,7 +13,9 @@ import './Theme.css';
 const Theme = () => {
   const body = document.body;
   const theme = body.classList.value || 'theme__default';
-  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
+  const { addNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
 
   const notify = (report: AddNotificationProps) => {
     const {

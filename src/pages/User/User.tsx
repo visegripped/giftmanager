@@ -10,7 +10,12 @@ import {
   ProfileContext,
   ProfileContextInterface,
 } from '../../context/ProfileContext';
-import { UserType, ItemType, itemStatusInterface, responseInterface } from '../../types/types';
+import {
+  UserType,
+  ItemType,
+  itemStatusInterface,
+  responseInterface,
+} from '../../types/types';
 import AddItemForm from '../../components/AddItemForm/AddItemForm';
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
@@ -28,7 +33,7 @@ type tableDataInterface = {
   data: ItemType;
 };
 
-const Link = (props: { link: string, name: string }) => {
+const Link = (props: { link: string; name: string }) => {
   const { link = '', name = '' } = props;
   return (
     <a href={link} target="_blank">
@@ -45,11 +50,19 @@ const linkedName = (props: tableDataInterface) => {
 const Table = (props: theirItemListInterface) => {
   const { theirItemList, theirUserid, myUserid, fetchTheirItemList } = props;
   const [statusSelectValue, setStatusSelectValue] = useState('no change');
-  const onSelectChange = (itemid: string | number, status: itemStatusInterface) => {
+  const onSelectChange = (
+    itemid: string | number,
+    status: itemStatusInterface
+  ) => {
     updateStatusForTheirItem(itemid, status);
   };
-  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
-  const updateStatusForTheirItem = (itemid: string | number, status: itemStatusInterface) => {
+  const { addNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
+  const updateStatusForTheirItem = (
+    itemid: string | number,
+    status: itemStatusInterface
+  ) => {
     const response = fetchData({
       task: 'updateStatusForTheirItem',
       itemid,
@@ -66,7 +79,7 @@ const Table = (props: theirItemListInterface) => {
             body: {
               error: data.error,
               file: 'User',
-              origin: 'apiResponse'
+              origin: 'apiResponse',
             },
           });
           addNotification({
@@ -97,7 +110,7 @@ const Table = (props: theirItemListInterface) => {
           <option value="no change">No change/reset</option>
           <option value="reserved">Flag as reserved</option>
           <option value="purchased">Flag as purchased</option>
-        </select >
+        </select>
       </>
     );
   };
@@ -139,13 +152,15 @@ const PageContent = () => {
     created: '',
     email: '',
     avatar: '',
-  }
-  const { myProfile } =
-    useContext(ProfileContext) as ProfileContextInterface;
-  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
+  };
+  const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
+  const { addNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
 
   const [myUserid, setMyUserid] = useState(myProfile.userid || '');
-  const [theirUserProfile, setTheirUserProfile] = useState<UserType>(emptyUserProfile);
+  const [theirUserProfile, setTheirUserProfile] =
+    useState<UserType>(emptyUserProfile);
   const [theirItemList, setTheirItemList] = useState<ItemType[]>([]);
 
   const fetchTheirUserProfile = (theirUserid: string) => {
@@ -173,7 +188,10 @@ const PageContent = () => {
               type: 'error',
             });
           } else {
-            const up = (data.success && data.success[0]) ? data.success[0] : emptyUserProfile;
+            const up =
+              data.success && data.success[0]
+                ? data.success[0]
+                : emptyUserProfile;
             setTheirUserProfile(up as UserType);
           }
         });
@@ -195,7 +213,7 @@ const PageContent = () => {
               body: {
                 error: data.error,
                 file: 'User',
-                origin: 'apiResponse'
+                origin: 'apiResponse',
               },
             });
             addNotification({
@@ -215,7 +233,7 @@ const PageContent = () => {
         body: {
           error: 'no userid was passed in to fetchTheirItemList',
           file: 'User',
-          origin: 'apiResponse'
+          origin: 'apiResponse',
         },
       });
       addNotification({
@@ -225,7 +243,6 @@ const PageContent = () => {
         type: 'error',
       });
     }
-
   };
 
   const onSubmit = (
@@ -250,7 +267,7 @@ const PageContent = () => {
             body: {
               error: data.error,
               file: 'Me',
-              origin: 'apiResponse'
+              origin: 'apiResponse',
             },
           });
           addNotification({

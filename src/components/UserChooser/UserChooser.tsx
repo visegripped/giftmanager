@@ -29,8 +29,12 @@ export const getUserNameFromUsersList = (
   let usernameInFocus = '';
   if (numberOfRemainingUsers && Number(userid) >= 0) {
     do {
-      let user = usersListClone.shift() ?? { userid: '', firstname: '', lastname: '' };
-      if (user.userid && (Number(user.userid) === Number(userid))) {
+      let user = usersListClone.shift() ?? {
+        userid: '',
+        firstname: '',
+        lastname: '',
+      };
+      if (user.userid && Number(user.userid) === Number(userid)) {
         usernameInFocus = `${user.firstname} ${user.lastname}`;
         numberOfRemainingUsers = 0; // exit.
       }
@@ -43,7 +47,9 @@ export const getUserNameFromUsersList = (
 export const UserChooser = () => {
   const paramsFromURL = useMatch('/User/:userid') || { params: { userid: '' } };
   const useridFromURL = paramsFromURL.params?.userid || '';
-  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
+  const { addNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
   let [usersList, setUsersList] = useState([]);
   let [currentUserid, setUserid] = useState(useridFromURL);
   const usernameFromUsersList = getUserNameFromUsersList(

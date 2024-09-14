@@ -1,11 +1,7 @@
 import { useState, createContext, PropsWithChildren } from 'react';
 import { UUID } from 'uuidjs';
 
-export type AddNotificationTypeProp =
-  | 'error'
-  | 'success'
-  | 'info'
-  | 'warn';
+export type AddNotificationTypeProp = 'error' | 'success' | 'info' | 'warn';
 
 export interface AddNotificationProps {
   type: AddNotificationTypeProp;
@@ -21,7 +17,7 @@ export interface NotificationProps extends AddNotificationProps {
 export interface NotificationContextProps {
   notifications: { [k: string]: NotificationProps };
   setNotifications: () => {};
-  addNotification: ({ }: AddNotificationProps) => {};
+  addNotification: ({}: AddNotificationProps) => {};
   removeNotification: (u: string | number) => {};
 }
 
@@ -31,13 +27,17 @@ const NotificationsProvider = (props: PropsWithChildren) => {
   const [notifications, setNotifications] = useState({});
 
   const removeNotification = (uuid: string | number) => {
-    let updatedNotifications: { [k: string]: NotificationProps } = { ...notifications };
+    let updatedNotifications: { [k: string]: NotificationProps } = {
+      ...notifications,
+    };
     delete updatedNotifications[uuid];
     setNotifications(updatedNotifications);
   };
 
   const addNotification = (notificationObj: NotificationProps) => {
-    let updatedNotifications: { [k: string]: NotificationProps } = { ...notifications };
+    let updatedNotifications: { [k: string]: NotificationProps } = {
+      ...notifications,
+    };
     const uuid = UUID.generate();
     notificationObj.uuid = uuid; // add to the individual notification for easy lookup later.
     updatedNotifications[uuid] = notificationObj;

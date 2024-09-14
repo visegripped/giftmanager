@@ -40,7 +40,9 @@ function AuthProvider(props: PropsWithChildren) {
     Date | string
   >(localStorage.getItem('access_token_expiration') || '');
 
-  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
+  const { addNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
 
   const handleGoogleTokenExpiration = () => {
     let currentTime = new Date().getTime();
@@ -102,7 +104,7 @@ function AuthProvider(props: PropsWithChildren) {
     try {
       const response = await fetch(
         'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' +
-        accessToken
+          accessToken
       );
       const data = await response.json();
 

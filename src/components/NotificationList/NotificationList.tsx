@@ -7,7 +7,9 @@ import {
 import Notification from '../Notification/Notification';
 
 export const NotificationList = () => {
-  const { notifications } = useContext(NotificationsContext) as NotificationContextProps;
+  const { notifications } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
   const notificationList: React.ReactElement[] = [];
   const keys = Object.keys(notifications);
 

@@ -5,14 +5,19 @@ import {
   ProfileContextInterface,
 } from '../../context/ProfileContext';
 import validateUser from '../../utilities/validateUser';
-import { responseInterface, GoogleProfileInterface, UserProfileInterface, GoogleProfileEmailInterface, GoogleProfilePhotoInterface } from '../../types/types';
+import {
+  responseInterface,
+  GoogleProfileInterface,
+  UserProfileInterface,
+  GoogleProfileEmailInterface,
+  GoogleProfilePhotoInterface,
+} from '../../types/types';
 import fetchData from '../../utilities/fetchData';
 import postReport from '../../utilities/postReport';
 import {
   NotificationsContext,
   NotificationContextProps,
 } from '../../context/NotificationsContext';
-
 
 const convertGoogleProfile2Custom = (googleProfile: GoogleProfileInterface) => {
   // need the following from the profile: email. avatar? name.
@@ -47,8 +52,12 @@ export const AuthButton = () => {
     login,
     accessToken = '',
   } = useContext(AuthContext) as AuthContextInterface;
-  const { addNotification } = useContext(NotificationsContext) as NotificationContextProps;
-  const { setMyProfile, myProfile } = useContext(ProfileContext) as ProfileContextInterface;
+  const { addNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
+  const { setMyProfile, myProfile } = useContext(
+    ProfileContext
+  ) as ProfileContextInterface;
   const [emailAddress, setMyEmailAddress] = useState('');
   const [myAvatar, setMyAvatar] = useState('');
 

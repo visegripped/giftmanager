@@ -15,14 +15,7 @@ export interface ButtonProps {
  * Primary UI component for user interaction
  */
 export const Button = (props: ButtonProps) => {
-  const {
-    icon,
-    title,
-    size,
-    label,
-    type = 'button',
-    onButtonClick,
-  } = props;
+  const { icon, title, size, label, type = 'button', onButtonClick } = props;
 
   return (
     <button
