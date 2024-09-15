@@ -1,11 +1,43 @@
-const reportingUrl = import.meta.env.VITE_REPORTING_API_URL;
+import { responseInterface as ApiResponse } from '../types/types';
+const reportingUrl = import.meta.env.VITE_REPORTING_API_URL as string;
 
 // SANITY -> DO NOT THROW ERRORS FROM THIS FILE.
 // There is a method listening for uncaught errors that uses this.
 // if you throw an error, you could start a loop of error reporting.
 // just log it to the console.
 
-export const gatherStandardBodyData = (win) => {
+export interface WindowData {
+  document: Document;
+  navigator: Navigator;
+}
+
+export interface ReportBodyContext {
+  pageUrl: string;
+  userAgent: string;
+  cookieEnabled: boolean;
+  viewport: string;
+  platform: string;
+  appName: string;
+  localTime: string;
+}
+
+export interface ReportBody {
+  stackTrace?: string;
+  error?: string;
+  email?: string | unknown;
+  origin: 'apiResponse' | 'errorBoundary' | 'handledException';
+  file: string;
+}
+
+export interface ReportData {
+  report: string;
+  type: 'warn' | 'info' | 'success' | 'error';
+  body: ReportBody;
+}
+
+export const gatherStandardBodyData = (
+  win?: Window
+): ReportBodyContext | undefined => {
   const date = new Date();
   if (!win) {
     return;
@@ -14,7 +46,7 @@ export const gatherStandardBodyData = (win) => {
     pageUrl: win.document.location.href,
     userAgent: win.navigator.userAgent,
     cookieEnabled: win.navigator.cookieEnabled,
-    viewport: `${window.innerWidth}x${window.innerHeight}`,
+    viewport: `${win.innerWidth}x${win.innerHeight}`,
     platform: win.navigator.platform,
     appName: win.navigator.appName,
     localTime: date.toISOString().slice(0, 19).replace('T', ' '),
@@ -23,12 +55,14 @@ export const gatherStandardBodyData = (win) => {
 
 // TODO - need a generic postReport, which should be the default. allows for other types and if error is set, can go through postReport instead.
 
-export const postReport = async (theReport) => {
+export const postReport = async (
+  theReport: ReportData
+): Promise<ApiResponse | undefined> => {
   const { report, type, body } = theReport;
-  const theReportBody = { ...body, ...gatherStandardBodyData() };
-  let jsonPayload;
+  const theReportBody = { ...body, ...gatherStandardBodyData(window) };
+  let jsonPayload: ApiResponse | undefined;
 
-  let formData = new FormData();
+  const formData = new FormData();
   formData.append('report', report); // api hasn't been updated yet to use access_token.
   formData.append('body', JSON.stringify(theReportBody));
   formData.append('type', type);
@@ -40,7 +74,7 @@ export const postReport = async (theReport) => {
   });
 
   if (apiResponse.status >= 200 && apiResponse.status < 300) {
-    jsonPayload = await apiResponse.json();
+    jsonPayload = (await apiResponse.json()) as ApiResponse;
   } else {
     console.log('ERROR IN REPORTING: response was non 20X');
   }

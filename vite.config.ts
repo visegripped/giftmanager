@@ -2,15 +2,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
     alias: {
       '@assets': '/src/assets',
-      '@types': '/src/types',
-      '@components': '/src/components',
-      '@pages': '/src/pages',
+      '@types': path.resolve(__dirname, './src/types/'),
+      '@components': path.resolve(__dirname, './src/components/'),
+      '@pages': path.resolve(__dirname, './src/pages/'),
       '@utilities': '/src/utilities',
       '@context': '/src/context',
       '@routes': '/src/routes',

@@ -1,24 +1,27 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { ErrorBoundary, useErrorBoundary } from 'react-error-boundary';
 import './App.css';
-import routeConstants from '@routes/routeContstants';
-import { Me, User, Error404, Theme } from '@pages/';
-import { AuthContext } from '@context/AuthContext';
-import { NotificationsProvider } from '@context/NotificationsContext';
+import routeConstants from './routes/routeContstants';
+import Error404 from './pages/Error404/Error404';
+import Theme from './pages/Theme/Theme';
+import Me from './pages/Me/Me';
+import User from './pages/User/User';
+import { AuthContext, AuthContextInterface } from './context/AuthContext';
+import { NotificationsProvider } from './context/NotificationsContext';
 import Present from '@assets/present-optimized.svg';
-import postReport from '@utilities/postReport';
-import { setThemeOnBody } from '@utilities/setThemeOnBody';
-import NotificationList from '@components/NotificationList';
-import AuthButton from '@components/AuthButton';
-import UserChooser from '@components/UserChooser';
+import postReport from './utilities/postReport';
+import { setThemeOnBody } from './utilities/setThemeOnBody';
+import NotificationList from './components/NotificationList/NotificationList';
+import AuthButton from './components/AuthButton/AuthButton';
+import UserChooser from './components/UserChooser/UserChooser';
 
 type fallbackRenderPropsInterface = {
   error: Error;
 };
 
 function App() {
-  const { accessToken } = useContext(AuthContext) || {};
+  const { accessToken } = useContext(AuthContext) as AuthContextInterface;
   let currentDate = new Date();
 
   const selectedThemeAtLoad = localStorage.getItem('theme') || 'theme__default';
@@ -40,10 +43,12 @@ function App() {
   const logError = (error: Error, info: { componentStack: string }) => {
     postReport({
       type: 'error',
-      report: error,
+      report: 'Error caught by errorBoundary',
       body: {
-        stackTrace: info,
+        stackTrace: JSON.stringify(info),
+        error: JSON.stringify(error),
         origin: 'errorBoundary',
+        file: 'App',
       },
     });
   };
@@ -83,6 +88,7 @@ function App() {
       <main>
         <ErrorBoundary
           fallbackRender={fallbackRender}
+          // @ts-ignore: todo - remove this and address TS issue.
           onError={logError}
           // onReset={(details) => {
           //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
@@ -122,7 +128,7 @@ function App() {
           reserved.
         </div>
         <div>
-          {/* <a
+          <a
             href="#"
             onClick={(e) => {
               e.preventDefault();
@@ -130,7 +136,7 @@ function App() {
             }}
           >
             Use default theme
-          </a> */}
+          </a>
         </div>
       </footer>
       <div className="half-circle"></div>

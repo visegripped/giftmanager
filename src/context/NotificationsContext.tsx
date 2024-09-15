@@ -1,22 +1,24 @@
 import { useState, createContext, PropsWithChildren } from 'react';
 import { UUID } from 'uuidjs';
 
+export type AddNotificationTypeProp = 'error' | 'success' | 'info' | 'warn';
+
 export interface AddNotificationProps {
-  type: 'error' | 'success' | 'info' | 'warn';
+  type: AddNotificationTypeProp;
   message: string;
   persist?: boolean | null;
   clearDuration?: number;
 }
 
 export interface NotificationProps extends AddNotificationProps {
-  uuid: number;
+  uuid: string | number;
 }
 
 export interface NotificationContextProps {
-  notifications: { [k: number]: NotificationProps };
+  notifications: { [k: string]: NotificationProps };
   setNotifications: () => {};
-  addNotifications: ({}: AddNotificationProps) => {};
-  removeNotification: (number: NotificationProps) => {};
+  addNotification: ({}: AddNotificationProps) => {};
+  removeNotification: (u: string | number) => {};
 }
 
 const NotificationsContext = createContext({});
@@ -24,14 +26,18 @@ const NotificationsContext = createContext({});
 const NotificationsProvider = (props: PropsWithChildren) => {
   const [notifications, setNotifications] = useState({});
 
-  const removeNotification = (uuid: string) => {
-    let updatedNotifications: object = { ...notifications };
+  const removeNotification = (uuid: string | number) => {
+    let updatedNotifications: { [k: string]: NotificationProps } = {
+      ...notifications,
+    };
     delete updatedNotifications[uuid];
     setNotifications(updatedNotifications);
   };
 
   const addNotification = (notificationObj: NotificationProps) => {
-    let updatedNotifications = { ...notifications };
+    let updatedNotifications: { [k: string]: NotificationProps } = {
+      ...notifications,
+    };
     const uuid = UUID.generate();
     notificationObj.uuid = uuid; // add to the individual notification for easy lookup later.
     updatedNotifications[uuid] = notificationObj;

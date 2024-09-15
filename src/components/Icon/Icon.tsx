@@ -1,11 +1,13 @@
 import './Icon.css';
-import IconDelete from '@assets/icon-delete.svg';
-import IconEdit from '@assets/icon-edit.svg';
-import IconPlus from '@assets/icon-plus.svg';
-import IconClose from '@assets/icon-close.svg';
+import IconDelete from '../../assets/icon-delete.svg';
+import IconEdit from '../../assets/icon-edit.svg';
+import IconPlus from '../../assets/icon-plus.svg';
+import IconClose from '../../assets/icon-close.svg';
+
+export type SupportedIcons = 'delete' | 'edit' | 'plus' | 'close';
 
 export interface IconProps {
-  icon: 'delete' | 'edit' | 'plus' | 'close';
+  icon: SupportedIcons;
   title?: string;
 }
 

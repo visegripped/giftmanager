@@ -1,11 +1,16 @@
-import { useState, createContext, useContext } from 'react';
-import { AuthContext } from './AuthContext';
+import { useState, createContext } from 'react';
+import { UserProfileInterface } from '../types/types';
 
-const ProfileContext = createContext(null);
+export interface ProfileContextInterface {
+  myProfile: UserProfileInterface;
+  setMyProfile: (a: object) => {};
+  fetchGoogleProfile: () => {};
+}
+
+const ProfileContext = createContext({});
 
 const ProfileProvider = (props: React.PropsWithChildren) => {
   const [myProfile, setMyProfile] = useState({});
-  const { accessToken } = useContext(AuthContext);
 
   return (
     <ProfileContext.Provider

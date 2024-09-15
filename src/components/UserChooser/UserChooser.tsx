@@ -1,36 +1,40 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useMatch } from 'react-router-dom';
 import Select from 'react-select'; // https://react-select.com/home
-import { UserType } from '@types/types';
-import fetchData from '@utilities/fetchData';
+import { responseInterface, UserType } from '../../types/types';
 import './UserChooser.css';
 import {
   NotificationsContext,
-  AddNotificationProps,
-} from '@context/NotificationsContext';
-import postReport from '@utilities/postReport';
+  NotificationContextProps,
+} from '../../context/NotificationsContext';
+import postReport from '../../utilities/postReport';
+import fetchData from '../../utilities/fetchData';
 
 export interface UserChooserPropsInterface {
   usersList: UserType[];
 }
 
 type ReactSelectType = {
-  value: string;
+  value: string | number;
   label: string;
 };
 
 export const getUserNameFromUsersList = (
   usersList: UserType[],
-  userid: number
+  userid: number | string
 ) => {
   // iterate thru userList
   const usersListClone = [...usersList]; // careful not to manipulate the original.
   let numberOfRemainingUsers = usersListClone.length;
   let usernameInFocus = '';
-  if (numberOfRemainingUsers && userid >= 0) {
+  if (numberOfRemainingUsers && Number(userid) >= 0) {
     do {
-      let user = usersListClone.shift() ?? '';
-      if (Number(user.userid) === Number(userid)) {
+      let user = usersListClone.shift() ?? {
+        userid: '',
+        firstname: '',
+        lastname: '',
+      };
+      if (user.userid && Number(user.userid) === Number(userid)) {
         usernameInFocus = `${user.firstname} ${user.lastname}`;
         numberOfRemainingUsers = 0; // exit.
       }
@@ -40,11 +44,12 @@ export const getUserNameFromUsersList = (
   return usernameInFocus;
 };
 
-export const UserChooser = (props: UserChooserPropsInterface) => {
-  const paramsFromURL = useMatch('/User/:userid') || {};
+export const UserChooser = () => {
+  const paramsFromURL = useMatch('/User/:userid') || { params: { userid: '' } };
   const useridFromURL = paramsFromURL.params?.userid || '';
-  const { addNotification } =
-    useContext<AddNotificationProps>(NotificationsContext);
+  const { addNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
   let [usersList, setUsersList] = useState([]);
   let [currentUserid, setUserid] = useState(useridFromURL);
   const usernameFromUsersList = getUserNameFromUsersList(
@@ -62,6 +67,7 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
   const userChangeHandler = (event: ReactSelectType) => {
     const selectedUserid = event.value;
     const selectedUsername = event.label;
+    //@ts-ignore
     setUserid(selectedUserid);
     setUsername(selectedUsername);
   };
@@ -71,16 +77,17 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
       task: 'getUsersList',
     });
     response &&
-      response.then((data: { success: []; error: string }) => {
+      response.then((data: responseInterface) => {
         if (data.success) {
-          setUsersList(data.success);
+          setUsersList(data.success as []);
         } else {
           postReport({
             type: 'error',
             report: 'Unable to fetch user list',
             body: {
-              origin: 'AuthButton',
-              email: data.error,
+              file: 'UserChooser',
+              origin: 'apiResponse',
+              error: data.error,
             },
           });
           addNotification({
@@ -124,8 +131,10 @@ export const UserChooser = (props: UserChooserPropsInterface) => {
     <div className="userchooser-container">
       <Select
         // https://react-select.com/advanced#methods
+        //@ts-ignore
         onChange={userChangeHandler}
         defaultValue={selectedOption}
+        //@ts-ignore
         options={formatUsersListForSelect(usersList)}
         // styles={customStyles}
         aria-errormessage="userPickerErrors"
