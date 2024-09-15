@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { ErrorBoundary, useErrorBoundary } from 'react-error-boundary';
 import './App.css';
@@ -11,7 +11,7 @@ import { AuthContext, AuthContextInterface } from './context/AuthContext';
 import { NotificationsProvider } from './context/NotificationsContext';
 import Present from '@assets/present-optimized.svg';
 import postReport from './utilities/postReport';
-// import { setThemeOnBody } from './utilities/setThemeOnBody';
+import { setThemeOnBody } from './utilities/setThemeOnBody';
 import NotificationList from './components/NotificationList/NotificationList';
 import AuthButton from './components/AuthButton/AuthButton';
 import UserChooser from './components/UserChooser/UserChooser';
@@ -24,21 +24,21 @@ function App() {
   const { accessToken } = useContext(AuthContext) as AuthContextInterface;
   let currentDate = new Date();
 
-  // const selectedThemeAtLoad = localStorage.getItem('theme') || 'theme__default';
-  // const [theme, setTheme] = useState(selectedThemeAtLoad);
+  const selectedThemeAtLoad = localStorage.getItem('theme') || 'theme__default';
+  const [theme, setTheme] = useState(selectedThemeAtLoad);
 
-  // useEffect(() => {
-  //   if (theme) {
-  //     setThemeOnBody(theme);
-  //   }
-  // }, [theme]);
+  useEffect(() => {
+    if (theme) {
+      setThemeOnBody(theme);
+    }
+  }, [theme]);
 
-  // const updateTheme = () => {
-  //   const newTheme = 'theme__default';
-  //   localStorage.setItem('theme', newTheme);
-  //   setTheme(newTheme);
-  //   setThemeOnBody(newTheme);
-  // };
+  const updateTheme = () => {
+    const newTheme = 'theme__default';
+    localStorage.setItem('theme', newTheme);
+    setTheme(newTheme);
+    setThemeOnBody(newTheme);
+  };
 
   const logError = (error: Error, info: { componentStack: string }) => {
     postReport({
@@ -128,7 +128,7 @@ function App() {
           reserved.
         </div>
         <div>
-          {/* <a
+          <a
             href="#"
             onClick={(e) => {
               e.preventDefault();
@@ -136,7 +136,7 @@ function App() {
             }}
           >
             Use default theme
-          </a> */}
+          </a>
         </div>
       </footer>
       <div className="half-circle"></div>

@@ -90,9 +90,9 @@ export const AuthButton = () => {
         const userProfile = await response.json();
         console.log(' -> got a google profile: ', userProfile);
         const convertedProfile = convertGoogleProfile2Custom(userProfile);
-        setMyEmailAddress(userProfile.emailAddress);
-        if (userProfile.avatar) {
-          setMyAvatar(userProfile.avatar);
+        setMyEmailAddress(convertedProfile.emailAddress);
+        if (convertedProfile.avatar) {
+          setMyAvatar(convertedProfile.avatar);
         }
         return convertedProfile;
       } catch (error: unknown) {
@@ -122,6 +122,7 @@ export const AuthButton = () => {
   };
 
   useEffect(() => {
+    console.log(`BEGIN useEffect for emailAddress change. ${emailAddress}`);
     if (emailAddress) {
       const userValidationResponse = validateUser(emailAddress);
       userValidationResponse.then(
@@ -146,6 +147,7 @@ export const AuthButton = () => {
               persist: true,
             });
           } else if (validationResponse.success) {
+            console.log(' GOT HERE!!! ', validationResponse.success);
             // @ts-ignore: todo - remove this and address TS issue.
             setMyProfile(validationResponse.success[0]);
           } else {

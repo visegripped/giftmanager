@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import Button from '../../components/Button/Button';
 import {
-  UserType,
   ItemType,
   ItemRemovedType,
   responseInterface,
@@ -29,11 +28,11 @@ To do:
 */
 
 type myItemListInterface = {
-  myItemList: UserType[];
+  myItemList: ItemType[];
 };
 
 type tableDataInterface = {
-  data: UserType;
+  data: ItemType;
 };
 
 const Me = () => {
@@ -155,6 +154,7 @@ const Me = () => {
   };
 
   const fetchItemList = (userid: string | number) => {
+    console.log(`myuserid: ${userid}`);
     const response = fetchData({
       task: 'getMyItemList',
       myuserid: userid,
@@ -204,6 +204,10 @@ const Me = () => {
   };
 
   useEffect(() => {
+    console.log(
+      `BEGIN useffect for userid change. myUserid: ${myUserid} and myProfile.userid: ${myProfile.userid}`,
+      myProfile
+    );
     if (!myUserid && myProfile.userid) {
       setMyUserid(myProfile.userid);
     }
