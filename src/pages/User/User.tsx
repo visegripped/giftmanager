@@ -69,6 +69,7 @@ const Table = (props: theirItemListInterface) => {
       status,
       myuserid: myUserid,
       theiruserid: theirUserid,
+      groupid: '1',
     });
     response &&
       response.then((data: responseInterface) => {
