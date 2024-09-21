@@ -49,7 +49,7 @@ const linkedName = (props: tableDataInterface) => {
 
 const Table = (props: theirItemListInterface) => {
   const { theirItemList, theirUserid, myUserid, fetchTheirItemList } = props;
-  const [statusSelectValue, setStatusSelectValue] = useState('no change');
+
   const onSelectChange = (
     itemid: string | number,
     status: itemStatusInterface
@@ -97,14 +97,13 @@ const Table = (props: theirItemListInterface) => {
   };
 
   const StatusDD = (props: { data: ItemType }) => {
-    const { itemid } = props.data;
+    const { itemid, status } = props.data;
     return (
       <>
         <select
-          value={statusSelectValue}
+          defaultValue={status as string}
           onChange={(event) => {
             const status = event.target.value;
-            setStatusSelectValue(status);
             onSelectChange(itemid, status as itemStatusInterface);
           }}
         >
@@ -311,7 +310,7 @@ const PageContent = () => {
           onAddItemFormSubmit={onSubmit}
         />
         <>
-          {theirItemList?.length ? (
+          {theirItemList?.length && myUserid ? (
             <Table
               fetchTheirItemList={fetchTheirItemList}
               theirItemList={theirItemList}

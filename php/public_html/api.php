@@ -56,14 +56,14 @@ function isValidGoogleAccessToken($token) {
 // Types has the list of supported tasks
 
 // disabled to make testing easier.
-// if(!$access_token) {
-//     $apiResponse = array("error" => "Access token not specified on API request.");
-// } else if(!isValidGoogleAccessToken($access_token)) {
-//     $apiResponse = array("error" => "Invalid/expired token.  Please sign (or re-sign) in.");
-// }  else 
+if(!$access_token) {
+    $apiResponse = array("error" => "Access token not specified on API request.");
+} else if(!isValidGoogleAccessToken($access_token)) {
+    $apiResponse = array("error" => "Invalid/expired token.  Please sign (or re-sign) in.");
+}   
 
 // my tasks
-if($task == 'addItemToMyList' && $myuserid && $name && $groupid) {
+ else if($task == 'addItemToMyList' && $myuserid && $name && $groupid) {
     $apiResponse = addItemToMyList($myuserid, $name, $description, $link, $groupid, $mysqli);
 } else if ($task == 'getMyItemList' && $myuserid) {
     $apiResponse = getMyItemList($myuserid, $mysqli);
@@ -82,7 +82,7 @@ else if ($task == 'getTheirItemList' && $theiruserid) {
 else if ($task == 'updateStatusForTheirItem' && $theiruserid && $status && $myuserid && $itemid) {
     $apiResponse = updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli);
 }
-//generic
+//general
  else if ($task == 'getUserProfileByUserId' && $userid) {
     $apiResponse = getUserProfileByUserId($userid, $mysqli);
 }
