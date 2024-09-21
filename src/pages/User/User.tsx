@@ -303,31 +303,36 @@ const PageContent = () => {
 
   return (
     <>
-      {myUserid == theirUserid ? <Me /> : <><h2>
-        Welcome to {theirUserProfile?.firstname} {theirUserProfile?.lastname}'s
-        list
-      </h2>
-        <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
-          <AddItemForm
-            legendText={`Add to  ${theirUserProfile?.firstname}'s list`}
-            onAddItemFormSubmit={onSubmit}
-          />
-          <>
-            {theirItemList?.length && myUserid ? (
-              <Table
-                fetchTheirItemList={fetchTheirItemList}
-                theirItemList={theirItemList}
-                myUserid={myUserid}
-                theirUserid={theirUserid || ''}
-              />
-            ) : (
-              <h3>
-                There are no items in {theirUserProfile?.firstname}'s list.{' '}
-              </h3>
-            )}
-          </>
-        </section></>}
-
+      {myUserid == theirUserid ? (
+        <Me />
+      ) : (
+        <>
+          <h2>
+            Welcome to {theirUserProfile?.firstname}{' '}
+            {theirUserProfile?.lastname}'s list
+          </h2>
+          <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
+            <AddItemForm
+              legendText={`Add to  ${theirUserProfile?.firstname}'s list`}
+              onAddItemFormSubmit={onSubmit}
+            />
+            <>
+              {theirItemList?.length && myUserid ? (
+                <Table
+                  fetchTheirItemList={fetchTheirItemList}
+                  theirItemList={theirItemList}
+                  myUserid={myUserid}
+                  theirUserid={theirUserid || ''}
+                />
+              ) : (
+                <h3>
+                  There are no items in {theirUserProfile?.firstname}'s list.{' '}
+                </h3>
+              )}
+            </>
+          </section>
+        </>
+      )}
     </>
   );
 };
