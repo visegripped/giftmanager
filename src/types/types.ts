@@ -10,6 +10,7 @@ export type ItemType = {
   removed: ItemRemovedType;
   link?: string;
   itemid: number;
+  added_by_userid: number;
   groupid: number;
 };
 

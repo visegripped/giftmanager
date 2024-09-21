@@ -107,7 +107,7 @@ export const UserChooser = () => {
     theUsers.forEach((theUser) => {
       const option = {
         value: theUser.userid,
-        label: `${theUser.firstname} ${theUser.lastname} ${theUser.userid}`,
+        label: `${theUser.firstname} ${theUser.lastname}`,
       };
       formattedUsers.push(option);
     });

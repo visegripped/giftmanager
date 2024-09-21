@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
 import postReport from '../../utilities/postReport';
 import fetchData from '../../utilities/fetchData';
+import Me from '../Me/Me';
 import {
   NotificationsContext,
   NotificationContextProps,
@@ -49,7 +50,7 @@ const linkedName = (props: tableDataInterface) => {
 
 const Table = (props: theirItemListInterface) => {
   const { theirItemList, theirUserid, myUserid, fetchTheirItemList } = props;
-  const [statusSelectValue, setStatusSelectValue] = useState('no change');
+
   const onSelectChange = (
     itemid: string | number,
     status: itemStatusInterface
@@ -69,6 +70,7 @@ const Table = (props: theirItemListInterface) => {
       status,
       myuserid: myUserid,
       theiruserid: theirUserid,
+      groupid: '1',
     });
     response &&
       response.then((data: responseInterface) => {
@@ -96,14 +98,14 @@ const Table = (props: theirItemListInterface) => {
   };
 
   const StatusDD = (props: { data: ItemType }) => {
-    const { itemid } = props.data;
+    const { itemid, status, userid, added_by_userid } = props.data;
     return (
       <>
         <select
-          value={statusSelectValue}
+          defaultValue={status as string}
+          disabled={added_by_userid === userid ? false : true}
           onChange={(event) => {
             const status = event.target.value;
-            setStatusSelectValue(status);
             onSelectChange(itemid, status as itemStatusInterface);
           }}
         >
@@ -121,7 +123,7 @@ const Table = (props: theirItemListInterface) => {
     {
       field: 'removed',
       cellRenderer: StatusDD,
-      headerName: 'actions',
+      headerName: 'Actions',
     },
   ]);
 
@@ -251,7 +253,8 @@ const PageContent = () => {
     link: string = ''
   ) => {
     const response = fetchData({
-      task: 'updateStatusForTheirItem',
+      task: 'addItemToTheirList',
+      groupid: '1',
       myuserid: myUserid,
       theiruserid: theirUserid,
       name,
@@ -263,15 +266,15 @@ const PageContent = () => {
         if (data.error) {
           postReport({
             type: 'error',
-            report: 'Unable to remove/re-add item from item list',
+            report: 'Unable to add item to users list',
             body: {
               error: data.error,
-              file: 'Me',
+              file: 'User',
               origin: 'apiResponse',
             },
           });
           addNotification({
-            message: `Something has gone wrong with removing the item from your list.
+            message: `Something has gone wrong with adding an item to this users list.
             Try refreshing the page.
             If the error persists, reach out to the site administrator`,
             type: 'error',
@@ -300,30 +303,36 @@ const PageContent = () => {
 
   return (
     <>
-      <h2>
-        Welcome to {theirUserProfile?.firstname} {theirUserProfile?.lastname}'s
-        list
-      </h2>
-      <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
-        <AddItemForm
-          legendText={`Add to  ${theirUserProfile?.firstname}'s list`}
-          onAddItemFormSubmit={onSubmit}
-        />
+      {myUserid == theirUserid ? (
+        <Me />
+      ) : (
         <>
-          {theirItemList?.length ? (
-            <Table
-              fetchTheirItemList={fetchTheirItemList}
-              theirItemList={theirItemList}
-              myUserid={myUserid}
-              theirUserid={theirUserid || ''}
+          <h2>
+            Welcome to {theirUserProfile?.firstname}{' '}
+            {theirUserProfile?.lastname}'s list
+          </h2>
+          <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
+            <AddItemForm
+              legendText={`Add to  ${theirUserProfile?.firstname}'s list`}
+              onAddItemFormSubmit={onSubmit}
             />
-          ) : (
-            <h3>
-              There are no items in {theirUserProfile?.firstname}'s list.{' '}
-            </h3>
-          )}
+            <>
+              {theirItemList?.length && myUserid ? (
+                <Table
+                  fetchTheirItemList={fetchTheirItemList}
+                  theirItemList={theirItemList}
+                  myUserid={myUserid}
+                  theirUserid={theirUserid || ''}
+                />
+              ) : (
+                <h3>
+                  There are no items in {theirUserProfile?.firstname}'s list.{' '}
+                </h3>
+              )}
+            </>
+          </section>
         </>
-      </section>
+      )}
     </>
   );
 };
