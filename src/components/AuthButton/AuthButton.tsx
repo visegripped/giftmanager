@@ -147,7 +147,6 @@ export const AuthButton = () => {
               persist: true,
             });
           } else if (validationResponse.success) {
-            console.log(' GOT HERE!!! ', validationResponse.success);
             // @ts-ignore: todo - remove this and address TS issue.
             setMyProfile(validationResponse.success[0]);
           } else {

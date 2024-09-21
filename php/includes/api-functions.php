@@ -128,7 +128,7 @@ function updateRemovedStatusForMyItem($userid, $removed, $itemid, $mysqli) {
 // their
 function addItemToTheirList($myuserid, $theiruserid, $name, $description, $link, $groupid, $mysqli) {
     $apiResponse = '';
-    $stmt = $mysqli->prepare("INSERT INTO items (userid, name, description, link, added_by_userid, status_userid, groupid) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $mysqli->prepare("INSERT INTO items (userid, name, description, link, added_by_userid, status_userid, groupid, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'purchased')");
     if ($stmt) {
         // Bind the parameters correctly
         $stmt->bind_param('sssssss', $theiruserid, $name, $description, $link, $myuserid,  $myuserid, $groupid);
