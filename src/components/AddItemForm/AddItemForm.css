@@ -1,0 +1,5 @@
+@media screen and (min-width: 992px) {
+  .addItemForm {
+    margin-top: -12px; /* align w/ the table */
+  }
+}

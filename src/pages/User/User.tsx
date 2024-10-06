@@ -43,6 +43,16 @@ const Link = (props: { link: string; name: string }) => {
   );
 };
 
+export const dropdownShouldBeDisabled = (addedByUserId: number, userId: number, myUserId: number, status: string | null, statusUserId: number) => {
+  if (addedByUserId !== userId) {
+    return true; /* items was added to list by another user. Should always be purchased and unchangeable */
+  }
+  if (status !== 'no change' && (statusUserId !== myUserId)) {
+    return true; /* item is reserved or purchased by another user.  */
+  }
+  return false;
+}
+
 const linkedName = (props: tableDataInterface) => {
   //@ts-ignore
   return <Link {...props.data} />;
@@ -97,13 +107,16 @@ const Table = (props: theirItemListInterface) => {
     return response;
   };
 
+
+
   const StatusDD = (props: { data: ItemType }) => {
-    const { itemid, status, userid, added_by_userid } = props.data;
+    const { itemid, status, userid, added_by_userid, status_userid } = props.data;
+    console.log(`item ${props.data.name} has status: ${status}`)
     return (
       <>
         <select
           defaultValue={status as string}
-          disabled={added_by_userid === userid ? false : true}
+          disabled={dropdownShouldBeDisabled(added_by_userid, userid, Number(myUserid), status, status_userid)}
           onChange={(event) => {
             const status = event.target.value;
             onSelectChange(itemid, status as itemStatusInterface);
