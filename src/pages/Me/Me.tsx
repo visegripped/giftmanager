@@ -203,10 +203,6 @@ const Me = () => {
   };
 
   useEffect(() => {
-    console.log(
-      `BEGIN useffect for userid change. myUserid: ${myUserid} and myProfile.userid: ${myProfile.userid}`,
-      myProfile
-    );
     if (!myUserid && myProfile.userid) {
       setMyUserid(myProfile.userid);
     }

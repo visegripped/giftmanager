@@ -15,7 +15,7 @@ export interface AddItemFormProps {
  * Primary UI component for user interaction
  */
 export const AddItemForm = (props: AddItemFormProps) => {
-  const { onAddItemFormSubmit = () => { }, legendText = 'Add item to list' } =
+  const { onAddItemFormSubmit = () => {}, legendText = 'Add item to list' } =
     props;
 
   const [addItemName, setAddItemName] = useState('');
