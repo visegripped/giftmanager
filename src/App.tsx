@@ -76,7 +76,6 @@ function App() {
         </Link>
 
         <nav className="navbar">
-          {/* <Link to={routeConstants.USER}>user</Link> chooser */}
           {accessToken ? <UserChooser /> : <></>}
         </nav>
 
@@ -90,9 +89,9 @@ function App() {
           fallbackRender={fallbackRender}
           // @ts-ignore: todo - remove this and address TS issue.
           onError={logError}
-          // onReset={(details) => {
-          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-          // }}
+        // onReset={(details) => {
+        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+        // }}
         >
           <NotificationsProvider>
             <div className="notifications">

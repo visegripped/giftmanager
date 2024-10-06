@@ -154,7 +154,6 @@ const Me = () => {
   };
 
   const fetchItemList = (userid: string | number) => {
-    console.log(`myuserid: ${userid}`);
     const response = fetchData({
       task: 'getMyItemList',
       myuserid: userid,
