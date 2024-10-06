@@ -13,6 +13,7 @@ export type ItemType = {
   added_by_userid: number;
   groupid: number;
   status_userid: number;
+  role: 'user' | 'admin';
 };
 
 export type UserType = {

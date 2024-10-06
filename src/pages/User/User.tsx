@@ -116,7 +116,7 @@ const Table = (props: theirItemListInterface) => {
   const StatusDD = (props: { data: ItemType }) => {
     const { itemid, status, userid, added_by_userid, status_userid } =
       props.data;
-    console.log(`item ${props.data.name} has status: ${status}`);
+
     return (
       <>
         <select
