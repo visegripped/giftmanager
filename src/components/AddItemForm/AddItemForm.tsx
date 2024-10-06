@@ -24,7 +24,7 @@ export const AddItemForm = (props: AddItemFormProps) => {
 
   return (
     <form
-      className="form"
+      className="addItemForm"
       onSubmit={(formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
         formSubmitEvent.preventDefault();
         onAddItemFormSubmit(addItemName, addItemDescription, addItemLink);

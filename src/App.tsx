@@ -75,10 +75,7 @@ function App() {
           <h1 className="logo__word">GiftManager</h1>
         </Link>
 
-        <nav className="navbar">
-          {/* <Link to={routeConstants.USER}>user</Link> chooser */}
-          {accessToken ? <UserChooser /> : <></>}
-        </nav>
+        <nav className="navbar">{accessToken ? <UserChooser /> : <></>}</nav>
 
         <div className="auth">
           <AuthButton />

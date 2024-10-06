@@ -149,7 +149,7 @@ function addItemToTheirList($myuserid, $theiruserid, $name, $description, $link,
     return $apiResponse;
 }
 function getTheirItemList($userid, $mysqli) {
-    $query = "SELECT * FROM `items` WHERE userid = ? AND `archive` = 0 ORDER BY date_added ASC";
+    $query = "SELECT * FROM `items` WHERE userid = ? AND `archive` = 0 AND ((removed = 0) OR (removed = 1 AND status != 'no change')) ORDER BY date_added ASC";
     $stmt = $mysqli->prepare($query);
 
     if ($stmt) {
