@@ -107,13 +107,15 @@ export const UserChooser = () => {
     return (
       <>
         <option>Please choose</option>
-        {usersList.map((user: UserType) =>
-          <option value={user.userid} key={user.userid}> {user.firstname} {user.lastname}</option>
-        )}
+        {usersList.map((user: UserType) => (
+          <option value={user.userid} key={user.userid}>
+            {' '}
+            {user.firstname} {user.lastname}
+          </option>
+        ))}
       </>
-    )
-  }
-
+    );
+  };
 
   return (
     <div className="userchooser-container">
@@ -124,9 +126,13 @@ export const UserChooser = () => {
         value={currentUserid}
         aria-errormessage="userPickerErrors"
       >
-        {usersList.length ? <UserOptions usersList={usersList} /> : <option>loading...</option>}
+        {usersList.length ? (
+          <UserOptions usersList={usersList} />
+        ) : (
+          <option>loading...</option>
+        )}
       </select>
-    </div >
+    </div>
   );
 };
 
