@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useMatch } from 'react-router-dom';
-import Select from 'react-select'; // https://react-select.com/home
 import { responseInterface, UserType } from '../../types/types';
 import './UserChooser.css';
 import {
@@ -52,24 +51,13 @@ export const UserChooser = () => {
   ) as NotificationContextProps;
   let [usersList, setUsersList] = useState([]);
   let [currentUserid, setUserid] = useState(useridFromURL);
-  const usernameFromUsersList = getUserNameFromUsersList(
-    usersList,
-    useridFromURL
-  );
-  let [currentUsername, setUsername] = useState(usernameFromUsersList);
 
   const navigate = useNavigate();
-  const selectedOption = {
-    value: currentUserid, //should be the selected user
-    label: currentUsername, //should be the selected userid
-  };
 
-  const userChangeHandler = (event: ReactSelectType) => {
-    const selectedUserid = event.value;
-    const selectedUsername = event.label;
+  const userChangeHandler = (event: any) => {
+    const selectedUserid = event.target.value;
     //@ts-ignore
     setUserid(selectedUserid);
-    setUsername(selectedUsername);
   };
 
   const fetchUsersList = () => {
@@ -102,18 +90,6 @@ export const UserChooser = () => {
     return response;
   };
 
-  const formatUsersListForSelect = (theUsers: UserType[] = []) => {
-    const formattedUsers = [] as ReactSelectType[];
-    theUsers.forEach((theUser) => {
-      const option = {
-        value: theUser.userid,
-        label: `${theUser.firstname} ${theUser.lastname}`,
-      };
-      formattedUsers.push(option);
-    });
-    return formattedUsers;
-  };
-
   useEffect(() => {
     //on load, only fetch the list once.
     if (!usersList.length) {
@@ -121,25 +97,36 @@ export const UserChooser = () => {
     }
   }, []);
   useEffect(() => {
-    //on load, only fetch the list once.
     if (Number(useridFromURL) !== Number(currentUserid)) {
       navigate(`/User/${currentUserid}`);
     }
   }, [currentUserid]);
 
+  const UserOptions = (props: { usersList: UserType[] }) => {
+    const { usersList } = props;
+    return (
+      <>
+        <option>Please choose</option>
+        {usersList.map((user: UserType) =>
+          <option value={user.userid} key={user.userid}> {user.firstname} {user.lastname}</option>
+        )}
+      </>
+    )
+  }
+
+
   return (
     <div className="userchooser-container">
-      <Select
+      <select
         // https://react-select.com/advanced#methods
         //@ts-ignore
         onChange={userChangeHandler}
-        defaultValue={selectedOption}
-        //@ts-ignore
-        options={formatUsersListForSelect(usersList)}
-        // styles={customStyles}
+        value={currentUserid}
         aria-errormessage="userPickerErrors"
-      />
-    </div>
+      >
+        {usersList.length ? <UserOptions usersList={usersList} /> : <option>loading...</option>}
+      </select>
+    </div >
   );
 };
 
