@@ -141,11 +141,11 @@ const Table = (props: theirItemListInterface) => {
         >
           <option value="no change">No change/reset</option>
           <option value="reserved">
-            Flag as reserved {status_username ? `by ${status_username}` : ''}
+            Flag as reserved {status_username ? ` by ${status_username}` : ''}
           </option>
           <option value="purchased">
-            Flag as purchased by{' '}
-            {status_username ? `by ${status_username}` : ''}
+            Flag as purchased
+            {status_username ? ` by ${status_username}` : ''}
           </option>
         </select>
       </>
