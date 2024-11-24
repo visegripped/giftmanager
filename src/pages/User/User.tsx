@@ -48,8 +48,7 @@ export const dropdownShouldBeDisabled = (
   userId: number,
   myUserId: number,
   status: string | null,
-  statusUserId: number,
-  statusUsername: string | null | undefined
+  statusUserId: number
 ) => {
   if (addedByUserId !== userId) {
     return true; /* items was added to list by another user. Should always be purchased and unchangeable */
@@ -133,8 +132,7 @@ const Table = (props: theirItemListInterface) => {
             userid,
             Number(myUserid),
             status,
-            status_userid,
-            status_username
+            status_userid
           )}
           onChange={(event) => {
             const status = event.target.value;
