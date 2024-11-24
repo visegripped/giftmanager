@@ -149,7 +149,26 @@ function addItemToTheirList($myuserid, $theiruserid, $name, $description, $link,
     return $apiResponse;
 }
 function getTheirItemList($userid, $mysqli) {
-    $query = "SELECT * FROM `items` WHERE userid = ? AND `archive` = 0 AND ((removed = 0) OR (removed = 1 AND status != 'no change')) ORDER BY date_added ASC";
+    // $query = "SELECT * FROM `items` WHERE userid = ? AND `archive` = 0 AND ((removed = 0) OR (removed = 1 AND status != 'no change')) ORDER BY date_added ASC";
+    $query = "
+    SELECT 
+        items.*, 
+        CONCAT(users.firstname, ' ', users.lastname) AS status_username
+    FROM 
+        `items`
+    LEFT JOIN 
+        `users` 
+    ON 
+        items.status_userid = users.userid
+    WHERE 
+        items.userid = ? 
+        AND items.archive = 0 
+        AND (
+            items.removed = 0 
+            OR (items.removed = 1 AND items.status != 'no change')
+        )
+    ORDER BY 
+        items.date_added ASC";
     $stmt = $mysqli->prepare($query);
 
     if ($stmt) {

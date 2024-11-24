@@ -114,8 +114,14 @@ const Table = (props: theirItemListInterface) => {
   };
 
   const StatusDD = (props: { data: ItemType }) => {
-    const { itemid, status, userid, added_by_userid, status_userid } =
-      props.data;
+    const {
+      itemid,
+      status,
+      userid,
+      added_by_userid,
+      status_userid,
+      status_username,
+    } = props.data;
 
     return (
       <>
@@ -134,8 +140,13 @@ const Table = (props: theirItemListInterface) => {
           }}
         >
           <option value="no change">No change/reset</option>
-          <option value="reserved">Flag as reserved</option>
-          <option value="purchased">Flag as purchased</option>
+          <option value="reserved">
+            Flag as reserved {status_username ? ` by ${status_username}` : ''}
+          </option>
+          <option value="purchased">
+            Flag as purchased
+            {status_username ? ` by ${status_username}` : ''}
+          </option>
         </select>
       </>
     );
