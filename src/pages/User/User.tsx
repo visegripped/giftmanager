@@ -48,7 +48,8 @@ export const dropdownShouldBeDisabled = (
   userId: number,
   myUserId: number,
   status: string | null,
-  statusUserId: number
+  statusUserId: number,
+  statusUsername: string | null | undefined
 ) => {
   if (addedByUserId !== userId) {
     return true; /* items was added to list by another user. Should always be purchased and unchangeable */
@@ -114,7 +115,7 @@ const Table = (props: theirItemListInterface) => {
   };
 
   const StatusDD = (props: { data: ItemType }) => {
-    const { itemid, status, userid, added_by_userid, status_userid } =
+    const { itemid, status, userid, added_by_userid, status_userid, status_username } =
       props.data;
 
     return (
@@ -126,7 +127,8 @@ const Table = (props: theirItemListInterface) => {
             userid,
             Number(myUserid),
             status,
-            status_userid
+            status_userid,
+            status_username,
           )}
           onChange={(event) => {
             const status = event.target.value;
@@ -134,8 +136,8 @@ const Table = (props: theirItemListInterface) => {
           }}
         >
           <option value="no change">No change/reset</option>
-          <option value="reserved">Flag as reserved</option>
-          <option value="purchased">Flag as purchased</option>
+          <option value="reserved">Flag as reserved {status_username ? `by ${status_username}` : ''}</option>
+          <option value="purchased">Flag as purchased by {status_username ? `by ${status_username}` : ''}</option>
         </select>
       </>
     );

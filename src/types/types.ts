@@ -14,6 +14,7 @@ export type ItemType = {
   groupid: number;
   status_userid: number;
   role: 'user' | 'admin';
+  status_username?: string | null;
 };
 
 export type UserType = {
