@@ -115,8 +115,14 @@ const Table = (props: theirItemListInterface) => {
   };
 
   const StatusDD = (props: { data: ItemType }) => {
-    const { itemid, status, userid, added_by_userid, status_userid, status_username } =
-      props.data;
+    const {
+      itemid,
+      status,
+      userid,
+      added_by_userid,
+      status_userid,
+      status_username,
+    } = props.data;
 
     return (
       <>
@@ -128,7 +134,7 @@ const Table = (props: theirItemListInterface) => {
             Number(myUserid),
             status,
             status_userid,
-            status_username,
+            status_username
           )}
           onChange={(event) => {
             const status = event.target.value;
@@ -136,8 +142,13 @@ const Table = (props: theirItemListInterface) => {
           }}
         >
           <option value="no change">No change/reset</option>
-          <option value="reserved">Flag as reserved {status_username ? `by ${status_username}` : ''}</option>
-          <option value="purchased">Flag as purchased by {status_username ? `by ${status_username}` : ''}</option>
+          <option value="reserved">
+            Flag as reserved {status_username ? `by ${status_username}` : ''}
+          </option>
+          <option value="purchased">
+            Flag as purchased by{' '}
+            {status_username ? `by ${status_username}` : ''}
+          </option>
         </select>
       </>
     );
