@@ -160,12 +160,15 @@ const Table = (props: theirItemListInterface) => {
       sort: 'asc',
       wrapText: true,
       autoHeight: true,
+      flex: 2
     },
-    { field: 'description', flex: 2, wrapText: true, autoHeaight: true },
+    { field: 'description', wrapText: true, flex: 3 },
     {
       field: 'removed',
       cellRenderer: StatusDD,
       headerName: 'Actions',
+      flex: 1,
+      resizeable: false
     },
   ]);
 
