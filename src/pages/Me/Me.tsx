@@ -127,12 +127,14 @@ const Me = () => {
   const Table = (props: myItemListInterface) => {
     const { myItemList } = props;
     const [colDefs] = useState([
-      { field: 'name', sortable: true, cellRenderer: linkedName, sort: 'asc' },
-      { field: 'description', flex: 2 },
+      { field: 'name', sortable: true, cellRenderer: linkedName, sort: 'asc', wrapText: true, autoHeight: true, flex: 4 },
+      { field: 'description', flex: 5, wrapText: true, autoHeight: true },
       {
         field: 'removed',
         cellRenderer: StatusDD,
         headerName: 'actions',
+        flex: 1,
+        resizeable: false,
       },
     ]);
 
