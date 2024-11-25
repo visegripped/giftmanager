@@ -153,7 +153,14 @@ const Table = (props: theirItemListInterface) => {
   };
 
   const [colDefs] = useState([
-    { field: 'name', sortable: true, cellRenderer: linkedName, sort: 'asc', wrapText: true, autoHeight: true },
+    {
+      field: 'name',
+      sortable: true,
+      cellRenderer: linkedName,
+      sort: 'asc',
+      wrapText: true,
+      autoHeight: true,
+    },
     { field: 'description', flex: 2, wrapText: true, autoHeaight: true },
     {
       field: 'removed',
