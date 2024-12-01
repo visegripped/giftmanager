@@ -142,7 +142,6 @@ const Me = () => {
         cellRenderer: StatusDD,
         headerName: 'actions',
         flex: 1,
-        resizeable: false,
       },
     ]);
 

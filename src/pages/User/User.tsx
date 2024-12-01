@@ -162,13 +162,12 @@ const Table = (props: theirItemListInterface) => {
       autoHeight: true,
       flex: 2,
     },
-    { field: 'description', wrapText: true, flex: 3 },
+    { field: 'description', wrapText: true, autoHeight: true, flex: 3 },
     {
       field: 'removed',
       cellRenderer: StatusDD,
       headerName: 'Actions',
       flex: 1,
-      resizeable: false,
     },
   ]);
 
@@ -338,6 +337,7 @@ const PageContent = () => {
   }, [myProfile.userid]);
 
   useEffect(() => {
+    console.log(`User useEffect detected a userId change to ${theirUserid}`);
     if (theirUserid) {
       fetchTheirUserProfile(theirUserid);
     }
