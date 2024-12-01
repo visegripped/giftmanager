@@ -105,7 +105,9 @@ export const UserChooser = () => {
               className={`userlist-user ${currentUserid == user.userid ? 'userlist-user-active' : ''}`}
             >
               {/* <span className='userlist-user-avatar-container'>{user.avatar ? <img src={user.avatar} height='40' width='40' alt={`${user.lastname} avatar`} /> : ''}</span> */}
-              <span>{user.firstname} {user.lastname}</span>
+              <span>
+                {user.firstname} {user.lastname}
+              </span>
             </Link>
           </li>
         ))}
