@@ -16,10 +16,6 @@ export interface UserChooserPropsInterface {
   usersList: UserType[];
 }
 
-export interface UserListProps extends UserType {
-  currentUserID: number;
-}
-
 export const getUserNameFromUsersList = (
   usersList: UserType[],
   userid: number | string
@@ -89,7 +85,7 @@ export const UserChooser = () => {
     return response;
   };
 
-  const UserList = (props: { usersList: UserListProps[] }) => {
+  const UserList = (props: { usersList: UserType[] }) => {
     const { usersList } = props;
     return (
       <>
@@ -153,7 +149,7 @@ export const UserChooser = () => {
         <div className="userchooser-container">
           <ul className="userchooser-menu">
             {usersList.length ? (
-              <UserList usersList={usersList} currentUserID={currentUserid} />
+              <UserList usersList={usersList} />
             ) : (
               <li>loading...</li>
             )}
