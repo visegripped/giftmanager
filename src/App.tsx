@@ -75,28 +75,10 @@ function App() {
           <h1 className="logo__word">GiftManager</h1>
         </Link>
 
+        <nav className="navbar">{accessToken ? <UserChooser /> : <></>}</nav>
+
         <div className="auth">
           <AuthButton />
-        </div>
-
-        <div>
-          <nav className="navbar">
-            {accessToken ? (
-              <UserChooser
-                buttonLabel="Single dropdown"
-                items={[
-                  { title: 'Edit Profile', url: '/edit' },
-                  { title: 'View Activity', url: '/view' },
-                  {
-                    title: 'Logout',
-                    action: () => alert('Logged out!'),
-                  },
-                ]}
-              />
-            ) : (
-              <></>
-            )}
-          </nav>
         </div>
       </header>
 
@@ -105,9 +87,9 @@ function App() {
           fallbackRender={fallbackRender}
           // @ts-ignore: todo - remove this and address TS issue.
           onError={logError}
-          // onReset={(details) => {
-          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-          // }}
+        // onReset={(details) => {
+        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+        // }}
         >
           <NotificationsProvider>
             <div className="notifications">

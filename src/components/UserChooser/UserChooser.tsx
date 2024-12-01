@@ -16,6 +16,10 @@ export interface UserChooserPropsInterface {
   usersList: UserType[];
 }
 
+export interface UserListProps extends UserType {
+  currentUserID: number;
+}
+
 export const getUserNameFromUsersList = (
   usersList: UserType[],
   userid: number | string
@@ -41,15 +45,6 @@ export const getUserNameFromUsersList = (
   return usernameInFocus;
 };
 
-// interface UserChooserProps {
-//   buttonLabel: string;
-//   items: {
-//     title: string;
-//     url?: string;
-//     icon?: JSX.Element;
-//     action?: () => void;
-//   }[];
-// }
 export const UserChooser = () => {
   const [open, setOpen] = useState(false);
   const handleToggle = () => {
@@ -57,7 +52,7 @@ export const UserChooser = () => {
   };
   const menuRef = useRef<HTMLDivElement | null>(null);
   const paramsFromURL = useMatch('/User/:userid') || { params: { userid: '' } };
-  const useridFromURL = paramsFromURL.params?.userid || '';
+  const useridFromURL = Number(paramsFromURL.params?.userid) || '';
   const { addNotification } = useContext(
     NotificationsContext
   ) as NotificationContextProps;
@@ -94,7 +89,7 @@ export const UserChooser = () => {
     return response;
   };
 
-  const UserList = (props: { usersList: UserType[] }) => {
+  const UserList = (props: { usersList: UserListProps[] }) => {
     const { usersList } = props;
     return (
       <>
@@ -107,14 +102,10 @@ export const UserChooser = () => {
                 setUserid(user.userid);
                 setOpen(false);
               }}
+              className={`userlist-user ${currentUserid == user.userid ? 'userlist-user-active' : ''}`}
             >
-              <span
-                className={
-                  currentUserid == user.userid ? 'active-user user' : 'user'
-                }
-              >
-                {user.firstname} {user.lastname}
-              </span>
+              {/* <span className='userlist-user-avatar-container'>{user.avatar ? <img src={user.avatar} height='40' width='40' alt={`${user.lastname} avatar`} /> : ''}</span> */}
+              <span>{user.firstname} {user.lastname}</span>
             </Link>
           </li>
         ))}

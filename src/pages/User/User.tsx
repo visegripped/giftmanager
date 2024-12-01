@@ -162,7 +162,7 @@ const Table = (props: theirItemListInterface) => {
       autoHeight: true,
       flex: 2,
     },
-    { field: 'description', wrapText: true, flex: 3 },
+    { field: 'description', wrapText: true, autoHeight: true, flex: 3 },
     {
       field: 'removed',
       cellRenderer: StatusDD,

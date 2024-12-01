@@ -5,21 +5,49 @@
 /* absolute left-1/2 -translate-x-1/2 top-12 */
 .userchooser-container {
   position: absolute;
-  top: 30px;
-  right: 30ppx;
+  top: 28px;
+  background: var(--container-bg-primary);
+  border: 1px solid var(--container-border-primary);
+  border-radius: var(--border-radius);
+  overflow: hidden;
 }
 
 /* w-56 h-auto shadow-md rounded-md p-1 border bg-white */
 .userchooser-menu {
-  width: 200px;
-  background: green;
+  width: 250px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.active-user {
+.userlist-user {
+  white-space: normal;
+  padding: 0.3em 1em;
+  display: block;
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border-bottom: 1px solid var(--container-border-primary);
+  display: flex;
+}
+
+.userlist-user:hover {
+  background-color: var(--button-bg-color-hover);
+  color: var(--button-text-color-hover);
+  text-decoration: none;
+}
+
+.userlist-user-active {
   font-weight: bold;
 }
 
-.user {
+.userlist-user-avatar-container {
+  width: 40px;
+  height: 40px;
+}
+
+/* .userlist-user-no-avatar {
+} */
+/* .user {
   display: inline-block;
   padding-right: 30px;
-}
+} */
