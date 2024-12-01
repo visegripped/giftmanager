@@ -41,7 +41,6 @@ export const getUserNameFromUsersList = (
   return usernameInFocus;
 };
 
-
 // interface UserChooserProps {
 //   buttonLabel: string;
 //   items: {
@@ -95,19 +94,26 @@ export const UserChooser = () => {
     return response;
   };
 
-
-
   const UserList = (props: { usersList: UserType[] }) => {
     const { usersList } = props;
     return (
       <>
         {usersList.map((user: UserType) => (
           <li>
-            <Link to={`${routeConstants.USER}/${user.userid}`} key={user.userid} onClick={() => {
-              setUserid(user.userid);
-              setOpen(false);
-            }}>
-              <span className={currentUserid == user.userid ? 'active-user user' : 'user'}>{user.firstname} {user.lastname}
+            <Link
+              to={`${routeConstants.USER}/${user.userid}`}
+              key={user.userid}
+              onClick={() => {
+                setUserid(user.userid);
+                setOpen(false);
+              }}
+            >
+              <span
+                className={
+                  currentUserid == user.userid ? 'active-user user' : 'user'
+                }
+              >
+                {user.firstname} {user.lastname}
               </span>
             </Link>
           </li>
@@ -115,7 +121,6 @@ export const UserChooser = () => {
       </>
     );
   };
-
 
   useEffect(() => {
     //on load, only fetch the list once.
@@ -134,14 +139,13 @@ export const UserChooser = () => {
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    document.addEventListener("touchstart", handler);
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
     return () => {
-      document.removeEventListener("mousedown", handler);
-      document.removeEventListener("touchstart", handler);
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
     };
   }, [open]);
-
 
   return (
     <div className="userchooser" ref={menuRef}>
@@ -166,12 +170,5 @@ export const UserChooser = () => {
     </div>
   );
 };
-
-
-
-
-
-
-
 
 export default UserChooser;

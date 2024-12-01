@@ -337,7 +337,7 @@ const PageContent = () => {
   }, [myProfile.userid]);
 
   useEffect(() => {
-    console.log(`User useEffect detected a userId change to ${theirUserid}`)
+    console.log(`User useEffect detected a userId change to ${theirUserid}`);
     if (theirUserid) {
       fetchTheirUserProfile(theirUserid);
     }
