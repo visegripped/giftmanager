@@ -168,7 +168,6 @@ const Table = (props: theirItemListInterface) => {
       cellRenderer: StatusDD,
       headerName: 'Actions',
       flex: 1,
-      resizeable: false,
     },
   ]);
 
@@ -338,6 +337,7 @@ const PageContent = () => {
   }, [myProfile.userid]);
 
   useEffect(() => {
+    console.log(`User useEffect detected a userId change to ${theirUserid}`)
     if (theirUserid) {
       fetchTheirUserProfile(theirUserid);
     }

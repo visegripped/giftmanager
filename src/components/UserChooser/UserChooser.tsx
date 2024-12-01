@@ -1,13 +1,16 @@
-import { useState, useEffect, useContext } from 'react';
-import { useNavigate, useMatch } from 'react-router-dom';
+import { useState, useEffect, useRef, useContext } from 'react';
+import { Link, useMatch } from 'react-router-dom';
 import { responseInterface, UserType } from '../../types/types';
 import './UserChooser.css';
 import {
   NotificationsContext,
   NotificationContextProps,
 } from '../../context/NotificationsContext';
+import routeConstants from '../../routes/routeContstants';
 import postReport from '../../utilities/postReport';
 import fetchData from '../../utilities/fetchData';
+
+// borrowed from https://blog.logrocket.com/how-create-dropdown-menu-react/
 
 export interface UserChooserPropsInterface {
   usersList: UserType[];
@@ -38,7 +41,22 @@ export const getUserNameFromUsersList = (
   return usernameInFocus;
 };
 
+
+// interface UserChooserProps {
+//   buttonLabel: string;
+//   items: {
+//     title: string;
+//     url?: string;
+//     icon?: JSX.Element;
+//     action?: () => void;
+//   }[];
+// }
 export const UserChooser = () => {
+  const [open, setOpen] = useState(false);
+  const handleToggle = () => {
+    setOpen((prev) => !prev);
+  };
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const paramsFromURL = useMatch('/User/:userid') || { params: { userid: '' } };
   const useridFromURL = paramsFromURL.params?.userid || '';
   const { addNotification } = useContext(
@@ -46,14 +64,6 @@ export const UserChooser = () => {
   ) as NotificationContextProps;
   let [usersList, setUsersList] = useState([]);
   let [currentUserid, setUserid] = useState(useridFromURL);
-
-  const navigate = useNavigate();
-
-  const userChangeHandler = (event: any) => {
-    const selectedUserid = event.target.value;
-    //@ts-ignore
-    setUserid(selectedUserid);
-  };
 
   const fetchUsersList = () => {
     const response = fetchData({
@@ -85,50 +95,83 @@ export const UserChooser = () => {
     return response;
   };
 
+
+
+  const UserList = (props: { usersList: UserType[] }) => {
+    const { usersList } = props;
+    return (
+      <>
+        {usersList.map((user: UserType) => (
+          <li>
+            <Link to={`${routeConstants.USER}/${user.userid}`} key={user.userid} onClick={() => {
+              setUserid(user.userid);
+              setOpen(false);
+            }}>
+              <span className={currentUserid == user.userid ? 'active-user user' : 'user'}>{user.firstname} {user.lastname}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </>
+    );
+  };
+
+
   useEffect(() => {
     //on load, only fetch the list once.
     if (!usersList.length) {
       fetchUsersList();
     }
   }, []);
-  useEffect(() => {
-    if (Number(useridFromURL) !== Number(currentUserid)) {
-      navigate(`/User/${currentUserid}`);
-    }
-  }, [currentUserid]);
 
-  const UserOptions = (props: { usersList: UserType[] }) => {
-    const { usersList } = props;
-    return (
-      <>
-        <option>Please choose</option>
-        {usersList.map((user: UserType) => (
-          <option value={user.userid} key={user.userid}>
-            {' '}
-            {user.firstname} {user.lastname}
-          </option>
-        ))}
-      </>
-    );
-  };
+  useEffect(() => {
+    const handler = (event: MouseEvent | TouchEvent) => {
+      if (
+        open &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("touchstart", handler);
+    };
+  }, [open]);
+
 
   return (
-    <div className="userchooser-container">
-      <select
-        // https://react-select.com/advanced#methods
-        //@ts-ignore
-        onChange={userChangeHandler}
-        value={currentUserid}
-        aria-errormessage="userPickerErrors"
+    <div className="userchooser" ref={menuRef}>
+      <button
+        type="button"
+        className="inline-flex items-center justify-center rounded-md text-sm border border-[#e4e4e7] h-10 px-4 py-2"
+        onClick={handleToggle}
       >
-        {usersList.length ? (
-          <UserOptions usersList={usersList} />
-        ) : (
-          <option>loading...</option>
-        )}
-      </select>
+        Choose User
+      </button>
+      {open && (
+        <div className="userchooser-container">
+          <ul className="userchooser-menu">
+            {usersList.length ? (
+              <UserList usersList={usersList} currentUserID={currentUserid} />
+            ) : (
+              <li>loading...</li>
+            )}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
+
+
+
+
+
+
+
 
 export default UserChooser;

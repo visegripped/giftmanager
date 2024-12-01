@@ -1,3 +1,25 @@
+.userchooser {
+  position: relative;
+}
+
+/* absolute left-1/2 -translate-x-1/2 top-12 */
 .userchooser-container {
-  min-width: 250px;
+  position: absolute;
+  top: 30px;
+  right: 30ppx;
+}
+
+/* w-56 h-auto shadow-md rounded-md p-1 border bg-white */
+.userchooser-menu {
+  width: 200px;
+  background: green;
+}
+
+.active-user {
+  font-weight: bold;
+}
+
+.user {
+  display: inline-block;
+  padding-right: 30px;
 }
