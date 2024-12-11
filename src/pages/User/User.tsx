@@ -141,10 +141,10 @@ const Table = (props: theirItemListInterface) => {
         >
           <option value="no change">No change/reset</option>
           <option value="reserved">
-            Flag as reserved {status_username ? ` by ${status_username}` : ''}
+            Reserved {status_username ? ` by ${status_username}` : ''}
           </option>
           <option value="purchased">
-            Flag as purchased
+            Purchased
             {status_username ? ` by ${status_username}` : ''}
           </option>
         </select>
@@ -160,14 +160,13 @@ const Table = (props: theirItemListInterface) => {
       sort: 'asc',
       wrapText: true,
       autoHeight: true,
-      flex: 2,
     },
-    { field: 'description', wrapText: true, autoHeight: true, flex: 3 },
+    { field: 'description', wrapText: true, autoHeight: true, flex: 1 },
     {
       field: 'removed',
       cellRenderer: StatusDD,
       headerName: 'Actions',
-      flex: 1,
+      width: 300,
     },
   ]);
 
