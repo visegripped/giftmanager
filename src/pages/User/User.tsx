@@ -61,7 +61,7 @@ export const dropdownShouldBeDisabled = (
 
 const linkedName = (props: tableDataInterface) => {
   //@ts-ignore
-  return <Link {...props.data} />;
+  return props.data.link ? <Link {...props.data} /> : props.data.name;
 };
 
 const Table = (props: theirItemListInterface) => {
