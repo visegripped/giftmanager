@@ -1,7 +1,5 @@
 import { useContext, useState } from 'react';
-import {
-  responseInterface,
-} from '../../types/types';
+import { responseInterface } from '../../types/types';
 import Button from '../../components/Button/Button';
 import fetchData from '../../utilities/fetchData';
 import postReport from '../../utilities/postReport';
@@ -49,12 +47,12 @@ const Admin = () => {
           });
         } else {
           addNotification({
-            message: data.success as string || data.warn as string,
+            message: (data.success as string) || (data.warn as string),
             type: 'success',
           });
         }
       });
-  }
+  };
   const handleArchiveRemovedItemsClick = () => {
     const response = fetchData({
       task: 'archivePurchasedItems',
@@ -80,23 +78,30 @@ const Admin = () => {
           });
         } else {
           addNotification({
-            message: data.success as string || data.warn as string,
+            message: (data.success as string) || (data.warn as string),
             type: 'success',
           });
         }
       });
-  }
+  };
 
   return (
     <>
       <div className="element">
-        <h2>
-          Administration
-        </h2>
+        <h2>Administration</h2>
       </div>
       <section>
-        <Button onButtonClick={handleArchivePurchasedItemsClick} title='Remove all items from all lists where items are tagged as purchased' label='Archive purchased items' /><br />
-        <Button onButtonClick={handleArchiveRemovedItemsClick} title='Remove all items from all lists where items are tagged as purchased' label='Archive removed items' />
+        <Button
+          onButtonClick={handleArchivePurchasedItemsClick}
+          title="Remove all items from all lists where items are tagged as purchased"
+          label="Archive purchased items"
+        />
+        <br />
+        <Button
+          onButtonClick={handleArchiveRemovedItemsClick}
+          title="Remove all items from all lists where items are tagged as purchased"
+          label="Archive removed items"
+        />
       </section>
     </>
   );
