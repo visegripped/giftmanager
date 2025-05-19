@@ -88,9 +88,9 @@ function App() {
           fallbackRender={fallbackRender}
           // @ts-ignore: todo - remove this and address TS issue.
           onError={logError}
-        // onReset={(details) => {
-        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-        // }}
+          // onReset={(details) => {
+          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+          // }}
         >
           <NotificationsProvider>
             <div className="notifications">
@@ -136,14 +136,8 @@ function App() {
           >
             Use default theme
           </a>
-          |{' '}
-          <Link to={routeConstants.ADMIN}>
-            Admin
-          </Link>
-          |{' '}
-          <Link to={routeConstants.THEME}>
-            Theme Test
-          </Link>
+          | <Link to={routeConstants.ADMIN}>Admin</Link>|{' '}
+          <Link to={routeConstants.THEME}>Theme Test</Link>
         </div>
       </footer>
       <div className="half-circle"></div>
