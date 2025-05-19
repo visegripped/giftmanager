@@ -1,0 +1,13 @@
+.grid {
+  display: grid;
+  grid-gap: 40px;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+/* .grid-columns {
+  grid-auto-flow: column;
+} */
+
+.element {
+  margin-bottom: 32px;
+}
