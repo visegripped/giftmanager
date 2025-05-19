@@ -55,7 +55,6 @@ function isValidGoogleAccessToken($token) {
 
 // Types has the list of supported tasks
 
-// disabled to make testing easier.
 if(!$access_token) {
     $apiResponse = array("error" => "Access token not specified on API request.");
 } else if(!isValidGoogleAccessToken($access_token)) {
@@ -93,6 +92,14 @@ else if ($task == 'getUsersList') {
 }  else if($task == 'confirmUserIsValid' && $email_address) {
     $apiResponse = confirmUserIsValid($email_address, $mysqli);
 }
+
+// admin
+else if($task == 'archivePurchasedItems' && $myuserid == 1) {
+    $apiResponse = archivePurchasedItems($myuserid, $mysqli);
+    }
+else if($task == 'archiveRemovedItems' && $myuserid == 1) {
+    $apiResponse = archiveRemovedItems($myuserid, $mysqli);
+    }
 else {
     $apiResponse = array("error" => "Invalid task ($task) or myuserid ($myuserid) or missing params: thieruserid: $theiruserid, itemid: $itemid, removed: $removed, name: $name, description: $description, link: $link, groupid: $groupid, email: $email_address, avatar: $avatar");
 }

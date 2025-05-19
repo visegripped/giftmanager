@@ -5,6 +5,7 @@ import './App.css';
 import routeConstants from './routes/routeContstants';
 import Error404 from './pages/Error404/Error404';
 import Theme from './pages/Theme/Theme';
+import Admin from './pages/Admin/Admin';
 import Me from './pages/Me/Me';
 import User from './pages/User/User';
 import { AuthContext, AuthContextInterface } from './context/AuthContext';
@@ -87,9 +88,9 @@ function App() {
           fallbackRender={fallbackRender}
           // @ts-ignore: todo - remove this and address TS issue.
           onError={logError}
-          // onReset={(details) => {
-          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-          // }}
+        // onReset={(details) => {
+        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+        // }}
         >
           <NotificationsProvider>
             <div className="notifications">
@@ -100,6 +101,7 @@ function App() {
                 <Route path={routeConstants.HOME} Component={Me} />
                 <Route path={routeConstants.ME} Component={Me} />
                 <Route path={routeConstants.THEME} Component={Theme} />
+                <Route path={routeConstants.ADMIN} Component={Admin} />
                 <Route path={routeConstants.USER} Component={User} />
                 <Route
                   path={`${routeConstants.USER}/:userid`}
@@ -134,6 +136,8 @@ function App() {
           >
             Use default theme
           </a>
+          | <Link to={routeConstants.ADMIN} className="logo">Admin</Link>
+          | <Link to={routeConstants.THEME} className="logo">Theme Test</Link>
         </div>
       </footer>
       <div className="half-circle"></div>

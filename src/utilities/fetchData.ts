@@ -52,20 +52,27 @@ export const fetchData = (config: fetchInterface) => {
   const makeAsyncRequest = async (theFormData: {}) => {
     let jsonPayload = { err: '' };
 
-    const apiResponse = await fetch(apiUrl, {
-      // @ts-ignore
-      body: theFormData,
-      method: 'POST',
-    });
+    try {
+      const apiResponse = await fetch(apiUrl, {
+        // @ts-ignore
+        body: theFormData,
+        method: 'POST',
+      });
+      if (apiResponse.status >= 200 && apiResponse.status < 300) {
+        jsonPayload = await apiResponse.json();
+      } else {
+        jsonPayload.err = `API responded with a ${apiResponse.status}`;
+        throw new Error(`API responded with a ${apiResponse.status}`);
+      }
+      if (jsonPayload?.err) {
+        jsonPayload.err = `API responded with a ${apiResponse.status}`;
+        throw new Error(jsonPayload.err);
+      }
+    } catch (error) {
+      jsonPayload.err = `API Request Failure: ${error}`;
+      throw new Error(`API Request Failure: ${error}`);
+    }
 
-    if (apiResponse.status >= 200 && apiResponse.status < 300) {
-      jsonPayload = await apiResponse.json();
-    } else {
-      throw new Error(`API responded with a ${apiResponse.status}`);
-    }
-    if (jsonPayload?.err) {
-      throw new Error(jsonPayload.err);
-    }
     return jsonPayload;
   };
 
