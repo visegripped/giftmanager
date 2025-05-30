@@ -90,10 +90,9 @@ export const UserChooser = () => {
     return (
       <>
         {usersList.map((user: UserType) => (
-          <li>
+          <li key={user.userid}>
             <Link
               to={`${routeConstants.USER}/${user.userid}`}
-              key={user.userid}
               onClick={() => {
                 setUserid(user.userid);
                 setOpen(false);
