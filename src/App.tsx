@@ -78,12 +78,10 @@ function App() {
     ) : (
       <div className="unauthenticated">
         <h2>You are not logged in.</h2>
-        <h3>
-          Please use the sign in button in the upper right corner.
-        </h3>
+        <h3>Please use the sign in button in the upper right corner.</h3>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <Router>
@@ -95,7 +93,9 @@ function App() {
           <h1 className="logo__word">GiftManager</h1>
         </Link>
 
-        <nav className="navbar">{isAuthenticated ? <UserChooser /> : <></>}</nav>
+        <nav className="navbar">
+          {isAuthenticated ? <UserChooser /> : <></>}
+        </nav>
 
         <div className="auth">
           <AuthButton />
@@ -107,9 +107,9 @@ function App() {
           fallbackRender={fallbackRender}
           // @ts-ignore: todo - remove this and address TS issue.
           onError={logError}
-        // onReset={(details) => {
-        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-        // }}
+          // onReset={(details) => {
+          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+          // }}
         >
           <NotificationsProvider>
             <div className="notifications">
