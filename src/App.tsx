@@ -27,9 +27,10 @@ type fallbackRenderPropsInterface = {
 function App() {
   const { accessToken } = useContext(AuthContext) as AuthContextInterface;
   const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
-  const [isAuthenticated, setIsAuthenticated] = useState(!!(accessToken && myProfile && myProfile.userid));
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!(accessToken && myProfile && myProfile.userid)
+  );
   let currentDate = new Date();
-
 
   const selectedThemeAtLoad = localStorage.getItem('theme') || 'theme__default';
   const [theme, setTheme] = useState(selectedThemeAtLoad);
@@ -42,7 +43,9 @@ function App() {
 
   useEffect(() => {
     console.log('myProfile changed:', myProfile);
-    console.log(`isAuthenticated will be set to: ${!!(myProfile && myProfile.userid)}`);
+    console.log(
+      `isAuthenticated will be set to: ${!!(myProfile && myProfile.userid)}`
+    );
     setIsAuthenticated(!!(myProfile && myProfile.userid));
   }, [myProfile]);
 
@@ -114,9 +117,9 @@ function App() {
           fallbackRender={fallbackRender}
           // @ts-ignore: todo - remove this and address TS issue.
           onError={logError}
-        // onReset={(details) => {
-        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-        // }}
+          // onReset={(details) => {
+          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+          // }}
         >
           <NotificationsProvider>
             <div className="notifications">
