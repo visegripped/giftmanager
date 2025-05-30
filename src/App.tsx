@@ -15,6 +15,10 @@ import { setThemeOnBody } from './utilities/setThemeOnBody';
 import NotificationList from './components/NotificationList/NotificationList';
 import AuthButton from './components/AuthButton/AuthButton';
 import UserChooser from './components/UserChooser/UserChooser';
+import {
+  ProfileContext,
+  ProfileContextInterface,
+} from './context/ProfileContext';
 
 type fallbackRenderPropsInterface = {
   error: Error;
@@ -22,7 +26,9 @@ type fallbackRenderPropsInterface = {
 
 function App() {
   const { accessToken } = useContext(AuthContext) as AuthContextInterface;
+  const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
   let currentDate = new Date();
+  const isAuthenticated = accessToken && myProfile && myProfile.emailAddress;
 
   const selectedThemeAtLoad = localStorage.getItem('theme') || 'theme__default';
   const [theme, setTheme] = useState(selectedThemeAtLoad);
@@ -65,6 +71,20 @@ function App() {
     );
   };
 
+  const LoadingStates = (props: { accessToken: string }) => {
+    const { accessToken } = props;
+    return accessToken ? (
+      <div>Loading your profile...</div>
+    ) : (
+      <div className="unauthenticated">
+        <h2>You are not logged in.</h2>
+        <h3>
+          Please use the sign in button in the upper right corner.
+        </h3>
+      </div>
+    )
+  }
+
   return (
     <Router>
       <header>
@@ -75,7 +95,7 @@ function App() {
           <h1 className="logo__word">GiftManager</h1>
         </Link>
 
-        <nav className="navbar">{accessToken ? <UserChooser /> : <></>}</nav>
+        <nav className="navbar">{isAuthenticated ? <UserChooser /> : <></>}</nav>
 
         <div className="auth">
           <AuthButton />
@@ -87,15 +107,15 @@ function App() {
           fallbackRender={fallbackRender}
           // @ts-ignore: todo - remove this and address TS issue.
           onError={logError}
-          // onReset={(details) => {
-          //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
-          // }}
+        // onReset={(details) => {
+        //   // Reset the state of your app so the error doesn't happen again - NEED TO EXPLORE THIS
+        // }}
         >
           <NotificationsProvider>
             <div className="notifications">
               <NotificationList />
             </div>
-            {accessToken ? (
+            {isAuthenticated ? (
               <Routes>
                 <Route path={routeConstants.HOME} Component={Me} />
                 <Route path={routeConstants.ME} Component={Me} />
@@ -108,12 +128,7 @@ function App() {
                 <Route Component={Error404} />
               </Routes>
             ) : (
-              <div className="unauthenticated">
-                <h2>You are not logged in.</h2>
-                <h3>
-                  Please use the sign in button in the upper right corner.
-                </h3>
-              </div>
+              <LoadingStates accessToken={accessToken} />
             )}
           </NotificationsProvider>
         </ErrorBoundary>
