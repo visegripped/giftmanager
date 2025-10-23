@@ -1,4 +1,4 @@
-// import React from 'react';
+import React from 'react';
 import './Button.css';
 import Icon, { SupportedIcons } from '../Icon/Icon';
 
@@ -14,7 +14,7 @@ export interface ButtonProps {
 /**
  * Primary UI component for user interaction
  */
-export const Button = (props: ButtonProps) => {
+export const Button = React.memo((props: ButtonProps) => {
   const { icon, title, size, label, type = 'button', onButtonClick } = props;
 
   return (
@@ -32,6 +32,8 @@ export const Button = (props: ButtonProps) => {
       {label ? <span>{label}</span> : ''}
     </button>
   );
-};
+});
+
+Button.displayName = 'Button';
 
 export default Button;

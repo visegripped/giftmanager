@@ -1,4 +1,10 @@
-import { useState, useEffect, useRef, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useCallback,
+} from 'react';
 import { Link, useMatch } from 'react-router-dom';
 import { responseInterface, UserType } from '../../types/types';
 import './UserChooser.css';
@@ -20,32 +26,15 @@ export const getUserNameFromUsersList = (
   usersList: UserType[],
   userid: number | string
 ) => {
-  // iterate thru userList
-  const usersListClone = [...usersList]; // careful not to manipulate the original.
-  let numberOfRemainingUsers = usersListClone.length;
-  let usernameInFocus = '';
-  if (numberOfRemainingUsers && Number(userid) >= 0) {
-    do {
-      let user = usersListClone.shift() ?? {
-        userid: '',
-        firstname: '',
-        lastname: '',
-      };
-      if (user.userid && Number(user.userid) === Number(userid)) {
-        usernameInFocus = `${user.firstname} ${user.lastname}`;
-        numberOfRemainingUsers = 0; // exit.
-      }
-      numberOfRemainingUsers--;
-    } while (1 <= numberOfRemainingUsers);
-  }
-  return usernameInFocus;
+  const user = usersList.find((user) => Number(user.userid) === Number(userid));
+  return user ? `${user.firstname} ${user.lastname}` : '';
 };
 
 export const UserChooser = () => {
   const [open, setOpen] = useState(false);
-  const handleToggle = () => {
+  const handleToggle = useCallback(() => {
     setOpen((prev) => !prev);
-  };
+  }, []);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const paramsFromURL = useMatch('/User/:userid') || { params: { userid: '' } };
   const useridFromURL = Number(paramsFromURL.params?.userid) || '';
@@ -55,7 +44,7 @@ export const UserChooser = () => {
   let [usersList, setUsersList] = useState([]);
   let [currentUserid, setUserid] = useState(useridFromURL);
 
-  const fetchUsersList = () => {
+  const fetchUsersList = useCallback(() => {
     const response = fetchData({
       task: 'getUsersList',
     });
@@ -83,9 +72,14 @@ export const UserChooser = () => {
         }
       });
     return response;
-  };
+  }, [addNotification]);
 
-  const UserList = (props: { usersList: UserType[] }) => {
+  const handleUserClick = useCallback((userid: number | string) => {
+    setUserid(userid);
+    setOpen(false);
+  }, []);
+
+  const UserList = React.memo((props: { usersList: UserType[] }) => {
     const { usersList } = props;
     return (
       <>
@@ -93,10 +87,7 @@ export const UserChooser = () => {
           <li key={user.userid}>
             <Link
               to={`${routeConstants.USER}/${user.userid}`}
-              onClick={() => {
-                setUserid(user.userid);
-                setOpen(false);
-              }}
+              onClick={() => handleUserClick(user.userid)}
               className={`userlist-user ${currentUserid == user.userid ? 'userlist-user-active' : ''}`}
             >
               {/* <span className='userlist-user-avatar-container'>{user.avatar ? <img src={user.avatar} height='40' width='40' alt={`${user.lastname} avatar`} /> : ''}</span> */}
@@ -108,14 +99,16 @@ export const UserChooser = () => {
         ))}
       </>
     );
-  };
+  });
+
+  UserList.displayName = 'UserList';
 
   useEffect(() => {
     //on load, only fetch the list once.
     if (!usersList.length) {
       fetchUsersList();
     }
-  }, []);
+  }, [usersList.length, fetchUsersList]);
 
   useEffect(() => {
     const handler = (event: MouseEvent | TouchEvent) => {

@@ -1,4 +1,10 @@
-import { useState, createContext, PropsWithChildren } from 'react';
+import {
+  useState,
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useMemo,
+} from 'react';
 import { UUID } from 'uuidjs';
 
 export type AddNotificationTypeProp = 'error' | 'success' | 'info' | 'warn';
@@ -24,34 +30,37 @@ export interface NotificationContextProps {
 const NotificationsContext = createContext({});
 
 const NotificationsProvider = (props: PropsWithChildren) => {
-  const [notifications, setNotifications] = useState({});
+  const [notifications, setNotifications] = useState<{ [k: string]: NotificationProps }>({});
 
-  const removeNotification = (uuid: string | number) => {
-    let updatedNotifications: { [k: string]: NotificationProps } = {
-      ...notifications,
-    };
-    delete updatedNotifications[uuid];
-    setNotifications(updatedNotifications);
-  };
+  const removeNotification = useCallback((uuid: string | number) => {
+    setNotifications((prevNotifications) => {
+      const updatedNotifications = { ...prevNotifications };
+      delete updatedNotifications[uuid];
+      return updatedNotifications;
+    });
+  }, []);
 
-  const addNotification = (notificationObj: NotificationProps) => {
-    let updatedNotifications: { [k: string]: NotificationProps } = {
-      ...notifications,
-    };
+  const addNotification = useCallback((notificationObj: NotificationProps) => {
     const uuid = UUID.generate();
     notificationObj.uuid = uuid; // add to the individual notification for easy lookup later.
-    updatedNotifications[uuid] = notificationObj;
-    setNotifications(updatedNotifications);
-  };
+    setNotifications((prevNotifications) => ({
+      ...prevNotifications,
+      [uuid]: notificationObj,
+    }));
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({
+      notifications,
+      setNotifications,
+      addNotification,
+      removeNotification,
+    }),
+    [notifications, addNotification, removeNotification]
+  );
+
   return (
-    <NotificationsContext.Provider
-      value={{
-        notifications,
-        setNotifications,
-        addNotification,
-        removeNotification,
-      }}
-    >
+    <NotificationsContext.Provider value={contextValue}>
       {props.children}
     </NotificationsContext.Provider>
   );

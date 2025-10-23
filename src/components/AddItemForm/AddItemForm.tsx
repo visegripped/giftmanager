@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import './AddItemForm.css';
 import Button from '../Button/Button';
 
@@ -14,7 +14,7 @@ export interface AddItemFormProps {
 /**
  * Primary UI component for user interaction
  */
-export const AddItemForm = (props: AddItemFormProps) => {
+export const AddItemForm = React.memo((props: AddItemFormProps) => {
   const { onAddItemFormSubmit = () => {}, legendText = 'Add item to list' } =
     props;
 
@@ -22,17 +22,40 @@ export const AddItemForm = (props: AddItemFormProps) => {
   const [addItemDescription, setAddItemDescription] = useState('');
   const [addItemLink, setAddItemLink] = useState('');
 
+  const handleSubmit = useCallback(
+    (formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
+      formSubmitEvent.preventDefault();
+      onAddItemFormSubmit(addItemName, addItemDescription, addItemLink);
+      setAddItemName('');
+      setAddItemDescription('');
+      setAddItemLink('');
+    },
+    [addItemName, addItemDescription, addItemLink, onAddItemFormSubmit]
+  );
+
+  const handleNameChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setAddItemName(event.target.value);
+    },
+    []
+  );
+
+  const handleDescriptionChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setAddItemDescription(event.target.value);
+    },
+    []
+  );
+
+  const handleLinkChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setAddItemLink(event.target.value);
+    },
+    []
+  );
+
   return (
-    <form
-      className="addItemForm"
-      onSubmit={(formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
-        formSubmitEvent.preventDefault();
-        onAddItemFormSubmit(addItemName, addItemDescription, addItemLink);
-        setAddItemName('');
-        setAddItemDescription('');
-        setAddItemLink('');
-      }}
-    >
+    <form className="addItemForm" onSubmit={handleSubmit}>
       <fieldset className="fieldset">
         <legend className="legend">{legendText}</legend>
         <label className="label">Name</label>
@@ -42,9 +65,7 @@ export const AddItemForm = (props: AddItemFormProps) => {
             name="name"
             required
             value={addItemName}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setAddItemName(event.target.value);
-            }}
+            onChange={handleNameChange}
           />
         </div>
 
@@ -54,9 +75,7 @@ export const AddItemForm = (props: AddItemFormProps) => {
             type="url"
             name="link"
             value={addItemLink}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setAddItemLink(event.target.value);
-            }}
+            onChange={handleLinkChange}
           />
         </div>
 
@@ -65,9 +84,7 @@ export const AddItemForm = (props: AddItemFormProps) => {
           <textarea
             name="description"
             value={addItemDescription}
-            onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-              setAddItemDescription(event.target.value);
-            }}
+            onChange={handleDescriptionChange}
           ></textarea>
         </div>
 
@@ -75,6 +92,8 @@ export const AddItemForm = (props: AddItemFormProps) => {
       </fieldset>
     </form>
   );
-};
+});
+
+AddItemForm.displayName = 'AddItemForm';
 
 export default AddItemForm;
