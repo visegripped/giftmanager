@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Notification } from './Notification';
-import { NotificationsContext, NotificationProps } from '../../context/NotificationsContext';
+import {
+  NotificationsContext,
+  NotificationProps,
+} from '../../context/NotificationsContext';
 
 // Mock the context
 const mockRemoveNotification = vi.fn();

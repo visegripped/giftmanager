@@ -30,7 +30,9 @@ export interface NotificationContextProps {
 const NotificationsContext = createContext({});
 
 const NotificationsProvider = (props: PropsWithChildren) => {
-  const [notifications, setNotifications] = useState<{ [k: string]: NotificationProps }>({});
+  const [notifications, setNotifications] = useState<{
+    [k: string]: NotificationProps;
+  }>({});
 
   const removeNotification = useCallback((uuid: string | number) => {
     setNotifications((prevNotifications) => {

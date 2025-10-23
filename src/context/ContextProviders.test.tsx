@@ -20,8 +20,9 @@ vi.mock('../../utilities/postReport', () => ({
 
 describe('NotificationsContext', () => {
   const TestComponent = () => {
-    const { notifications, addNotification, removeNotification } =
-      useContext(NotificationsContext) as any;
+    const { notifications, addNotification, removeNotification } = useContext(
+      NotificationsContext
+    ) as any;
 
     return (
       <div>
@@ -114,7 +115,8 @@ describe('NotificationsContext', () => {
       </NotificationsProvider>
     );
 
-    const initialCount = screen.getByTestId('notifications-count').textContent || '';
+    const initialCount =
+      screen.getByTestId('notifications-count').textContent || '';
 
     // Re-render with same props
     rerender(
@@ -194,8 +196,9 @@ describe('ProfileContext', () => {
 
 describe('AuthContext', () => {
   const TestComponent = () => {
-    const { accessToken, login, logout, setAccessToken } =
-      useContext(AuthContext) as any;
+    const { accessToken, login, logout, setAccessToken } = useContext(
+      AuthContext
+    ) as any;
 
     return (
       <div>
