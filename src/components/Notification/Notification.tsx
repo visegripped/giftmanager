@@ -44,7 +44,10 @@ export const Notification = React.memo((props: NotificationProps) => {
   }, [persist, clearDuration, uuid, removeNotification]);
 
   return (
-    <div className={`notification ${type}`} data-testid={`notification-${uuid}`}>
+    <div
+      className={`notification ${type}`}
+      data-testid={`notification-${uuid}`}
+    >
       <pre className="notification--pre">{message}</pre>
       <button
         className={`notification--button ${type}`}

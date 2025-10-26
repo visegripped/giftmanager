@@ -62,7 +62,9 @@ describe('AddItemForm Component', () => {
 
     const nameInput = screen.getByDisplayValue('') as HTMLInputElement;
     const linkInput = screen.getByDisplayValue('') as HTMLInputElement;
-    const descriptionInput = screen.getByDisplayValue('') as HTMLTextAreaElement;
+    const descriptionInput = screen.getByDisplayValue(
+      ''
+    ) as HTMLTextAreaElement;
     const submitButton = screen.getByRole('button', { name: /add/i });
 
     fireEvent.change(nameInput, { target: { value: 'Test Item' } });
