@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useMemo } from 'react';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { ErrorBoundary, useErrorBoundary } from 'react-error-boundary';
 import './App.css';
@@ -30,7 +30,9 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!(accessToken && myProfile && myProfile.userid)
   );
-  let currentDate = new Date();
+
+  // Memoize current year to avoid creating new Date on every render
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   const selectedThemeAtLoad = localStorage.getItem('theme') || 'theme__default';
   const [theme, setTheme] = useState(selectedThemeAtLoad);
@@ -145,10 +147,7 @@ function App() {
       </main>
 
       <footer>
-        <div>
-          &copy; Copyright 2010 - {currentDate.getFullYear()}. All rights
-          reserved.
-        </div>
+        <div>&copy; Copyright 2010 - {currentYear}. All rights reserved.</div>
         <div>
           <a
             href="#"

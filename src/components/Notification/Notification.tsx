@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import './Notification.css';
 import {
   NotificationsContext,
@@ -6,28 +6,42 @@ import {
   NotificationContextProps,
 } from '../../context/NotificationsContext';
 
-export const Notification = (props: NotificationProps) => {
+export const Notification = React.memo((props: NotificationProps) => {
   const { type, message, uuid, persist, clearDuration = 5000 } = props;
 
   const { removeNotification } = useContext(
     NotificationsContext
   ) as NotificationContextProps;
-  let wasManuallyCleared = false;
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasManuallyClearedRef = useRef(false);
 
   const handleClick = () => {
     console.log(' -> handleClick got triggered');
-    wasManuallyCleared = true;
+    wasManuallyClearedRef.current = true;
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     removeNotification(uuid);
   };
 
-  if (persist) {
-  } else {
-    setTimeout(() => {
-      if (!wasManuallyCleared) {
-        removeNotification(uuid);
+  useEffect(() => {
+    if (!persist) {
+      timeoutRef.current = setTimeout(() => {
+        if (!wasManuallyClearedRef.current) {
+          removeNotification(uuid);
+        }
+      }, clearDuration);
+    }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
-    }, clearDuration);
-  }
+    };
+  }, [persist, clearDuration, uuid, removeNotification]);
 
   return (
     <div className={`notification ${type}`}>
@@ -41,6 +55,8 @@ export const Notification = (props: NotificationProps) => {
       </button>
     </div>
   );
-};
+});
+
+Notification.displayName = 'Notification';
 
 export default Notification;

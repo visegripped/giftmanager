@@ -1,3 +1,4 @@
+import React from 'react';
 import './Icon.css';
 import IconDelete from '../../assets/icon-delete.svg';
 import IconEdit from '../../assets/icon-edit.svg';
@@ -11,7 +12,7 @@ export interface IconProps {
   title?: string;
 }
 
-export const Icon = (props: IconProps) => {
+export const Icon = React.memo((props: IconProps) => {
   const { icon, title } = props;
   const icons = {
     delete: <IconDelete />,
@@ -24,6 +25,8 @@ export const Icon = (props: IconProps) => {
       {icons[icon]}
     </span>
   );
-};
+});
+
+Icon.displayName = 'Icon';
 
 export default Icon;
