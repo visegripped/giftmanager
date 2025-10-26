@@ -8,10 +8,8 @@ describe('Icon Component', () => {
   it('renders with all supported icon types', () => {
     supportedIcons.forEach((iconType) => {
       const { unmount } = render(<Icon icon={iconType} />);
-      const iconElement = screen.getByRole('generic', { hidden: true });
+      const iconElement = screen.getByTestId(`icon-${iconType}`);
       expect(iconElement).toBeInTheDocument();
-      expect(iconElement).toHaveClass('icon');
-      expect(iconElement.querySelector('svg')).toBeInTheDocument();
       unmount();
     });
   });
@@ -24,48 +22,46 @@ describe('Icon Component', () => {
 
   it('applies correct CSS class', () => {
     render(<Icon icon="delete" />);
-    const iconElement = screen.getByRole('generic', { hidden: true });
+    const iconElement = screen.getByTestId('icon-delete');
     expect(iconElement).toHaveClass('icon');
   });
 
   it('renders SVG element for each icon type', () => {
     supportedIcons.forEach((iconType) => {
       const { unmount } = render(<Icon icon={iconType} />);
-      const svgElement = screen
-        .getByRole('generic', { hidden: true })
-        .querySelector('svg');
-      expect(svgElement).toBeInTheDocument();
+      const iconElement = screen.getByTestId(`icon-${iconType}`);
+      expect(iconElement.querySelector('svg')).toBeInTheDocument();
       unmount();
     });
   });
 
   it('renders delete icon correctly', () => {
     render(<Icon icon="delete" />);
-    const iconElement = screen.getByRole('generic', { hidden: true });
+    const iconElement = screen.getByTestId('icon-delete');
     expect(iconElement.querySelector('svg')).toBeInTheDocument();
   });
 
   it('renders edit icon correctly', () => {
     render(<Icon icon="edit" />);
-    const iconElement = screen.getByRole('generic', { hidden: true });
+    const iconElement = screen.getByTestId('icon-edit');
     expect(iconElement.querySelector('svg')).toBeInTheDocument();
   });
 
   it('renders plus icon correctly', () => {
     render(<Icon icon="plus" />);
-    const iconElement = screen.getByRole('generic', { hidden: true });
+    const iconElement = screen.getByTestId('icon-plus');
     expect(iconElement.querySelector('svg')).toBeInTheDocument();
   });
 
   it('renders close icon correctly', () => {
     render(<Icon icon="close" />);
-    const iconElement = screen.getByRole('generic', { hidden: true });
+    const iconElement = screen.getByTestId('icon-close');
     expect(iconElement.querySelector('svg')).toBeInTheDocument();
   });
 
   it('is memoized and only re-renders when props change', () => {
     const { rerender } = render(<Icon icon="plus" />);
-    const iconElement = screen.getByRole('generic', { hidden: true });
+    const iconElement = screen.getByTestId('icon-plus');
 
     // Re-render with same props
     rerender(<Icon icon="plus" />);
@@ -73,19 +69,19 @@ describe('Icon Component', () => {
 
     // Re-render with different props
     rerender(<Icon icon="delete" />);
-    expect(screen.getByRole('generic', { hidden: true })).toBeInTheDocument();
+    expect(screen.getByTestId('icon-delete')).toBeInTheDocument();
   });
 
   it('handles missing title gracefully', () => {
     render(<Icon icon="plus" />);
-    const iconElement = screen.getByRole('generic', { hidden: true });
+    const iconElement = screen.getByTestId('icon-plus');
     expect(iconElement).toBeInTheDocument();
     expect(iconElement).not.toHaveAttribute('title');
   });
 
   it('renders within span element', () => {
     render(<Icon icon="edit" />);
-    const spanElement = screen.getByRole('generic', { hidden: true });
+    const spanElement = screen.getByTestId('icon-edit');
     expect(spanElement.tagName).toBe('SPAN');
   });
 });

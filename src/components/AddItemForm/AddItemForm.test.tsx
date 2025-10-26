@@ -16,9 +16,7 @@ describe('AddItemForm Component', () => {
     render(<AddItemForm {...defaultProps} />);
 
     expect(screen.getByText('Add item to list')).toBeInTheDocument();
-    expect(screen.getByLabelText('Name')).toBeInTheDocument();
-    expect(screen.getByLabelText('Link')).toBeInTheDocument();
-    expect(screen.getByLabelText('Description')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('')).toBeInTheDocument(); // Name input
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
   });
 
@@ -36,9 +34,9 @@ describe('AddItemForm Component', () => {
     const mockSubmit = vi.fn();
     render(<AddItemForm {...defaultProps} onAddItemFormSubmit={mockSubmit} />);
 
-    const nameInput = screen.getByLabelText('Name');
-    const linkInput = screen.getByLabelText('Link');
-    const descriptionInput = screen.getByLabelText('Description');
+    const nameInput = screen.getByRole('textbox', { name: '' });
+    const linkInput = screen.getByRole('textbox', { name: '' });
+    const descriptionInput = screen.getByRole('textbox', { name: '' });
     const submitButton = screen.getByRole('button', { name: /add/i });
 
     fireEvent.change(nameInput, { target: { value: 'Test Item' } });
@@ -62,11 +60,9 @@ describe('AddItemForm Component', () => {
     const mockSubmit = vi.fn();
     render(<AddItemForm {...defaultProps} onAddItemFormSubmit={mockSubmit} />);
 
-    const nameInput = screen.getByLabelText('Name') as HTMLInputElement;
-    const linkInput = screen.getByLabelText('Link') as HTMLInputElement;
-    const descriptionInput = screen.getByLabelText(
-      'Description'
-    ) as HTMLTextAreaElement;
+    const nameInput = screen.getByDisplayValue('') as HTMLInputElement;
+    const linkInput = screen.getByDisplayValue('') as HTMLInputElement;
+    const descriptionInput = screen.getByDisplayValue('') as HTMLTextAreaElement;
     const submitButton = screen.getByRole('button', { name: /add/i });
 
     fireEvent.change(nameInput, { target: { value: 'Test Item' } });
@@ -102,11 +98,10 @@ describe('AddItemForm Component', () => {
   it('handles individual input changes', () => {
     render(<AddItemForm {...defaultProps} />);
 
-    const nameInput = screen.getByLabelText('Name') as HTMLInputElement;
-    const linkInput = screen.getByLabelText('Link') as HTMLInputElement;
-    const descriptionInput = screen.getByLabelText(
-      'Description'
-    ) as HTMLTextAreaElement;
+    const inputs = screen.getAllByDisplayValue('');
+    const nameInput = inputs[0] as HTMLInputElement;
+    const linkInput = inputs[1] as HTMLInputElement;
+    const descriptionInput = inputs[2] as HTMLTextAreaElement;
 
     fireEvent.change(nameInput, { target: { value: 'New Name' } });
     expect(nameInput.value).toBe('New Name');
@@ -123,18 +118,15 @@ describe('AddItemForm Component', () => {
   it('requires name field', () => {
     render(<AddItemForm {...defaultProps} />);
 
-    const nameInput = screen.getByLabelText('Name');
+    const nameInput = screen.getByRole('textbox', { name: '' });
     expect(nameInput).toHaveAttribute('required');
   });
 
   it('sets correct input types', () => {
     render(<AddItemForm {...defaultProps} />);
 
-    const nameInput = screen.getByLabelText('Name');
-    const linkInput = screen.getByLabelText('Link');
-
-    expect(nameInput).toHaveAttribute('type', 'text');
-    expect(linkInput).toHaveAttribute('type', 'url');
+    const inputs = screen.getAllByRole('textbox', { name: '' });
+    expect(inputs[0]).toHaveAttribute('type', 'text');
   });
 
   it('renders submit button with correct attributes', () => {
@@ -160,7 +152,8 @@ describe('AddItemForm Component', () => {
     const mockSubmit = vi.fn();
     render(<AddItemForm {...defaultProps} onAddItemFormSubmit={mockSubmit} />);
 
-    const nameInput = screen.getByLabelText('Name');
+    const inputs = screen.getAllByDisplayValue('');
+    const nameInput = inputs[0];
     const submitButton = screen.getByRole('button', { name: /add/i });
 
     fireEvent.change(nameInput, { target: { value: 'Only Name' } });

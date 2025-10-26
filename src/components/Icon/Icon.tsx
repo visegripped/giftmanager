@@ -21,7 +21,7 @@ export const Icon = React.memo((props: IconProps) => {
     close: <IconClose />,
   };
   return (
-    <span className={`icon`} title={title}>
+    <span className={`icon`} title={title} data-testid={`icon-${icon}`}>
       {icons[icon]}
     </span>
   );
