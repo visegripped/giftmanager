@@ -10,6 +10,7 @@ import { NotificationsProvider } from './context/NotificationsContext';
 vi.mock('@react-oauth/google', () => ({
   GoogleOAuthProvider: ({ children }: { children: React.ReactNode }) =>
     children,
+  useGoogleLogin: () => vi.fn(),
 }));
 
 vi.mock('./utilities/postReport', () => ({
