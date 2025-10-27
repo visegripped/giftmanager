@@ -4,7 +4,6 @@ import { UserProfileInterface } from '../types/types';
 export interface ProfileContextInterface {
   myProfile: UserProfileInterface;
   setMyProfile: (a: object) => {};
-  fetchGoogleProfile: () => {};
 }
 
 const ProfileContext = createContext({});
