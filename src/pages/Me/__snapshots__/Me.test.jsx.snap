@@ -64,6 +64,7 @@ exports[`The Me page > when no user context is provided > should match snapshot 
         >
           <span
             class="icon"
+            data-testid="icon-plus"
           >
             <svg
               fill="none"

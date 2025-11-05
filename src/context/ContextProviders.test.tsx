@@ -24,6 +24,9 @@ describe('NotificationsContext', () => {
       NotificationsContext
     ) as any;
 
+    const notificationKeys = Object.keys(notifications);
+    const firstNotificationKey = notificationKeys[0] || 'test-uuid';
+
     return (
       <div>
         <div data-testid="notifications-count">
@@ -36,7 +39,7 @@ describe('NotificationsContext', () => {
         >
           Add Notification
         </button>
-        <button onClick={() => removeNotification('test-uuid')}>
+        <button onClick={() => removeNotification(firstNotificationKey)}>
           Remove Notification
         </button>
       </div>

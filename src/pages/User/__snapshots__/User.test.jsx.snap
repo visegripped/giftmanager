@@ -64,6 +64,7 @@ exports[`The User page > when no user context is provided > should match snapsho
         >
           <span
             class="icon"
+            data-testid="icon-plus"
           >
             <svg
               fill="none"

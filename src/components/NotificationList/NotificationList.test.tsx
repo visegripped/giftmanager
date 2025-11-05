@@ -33,7 +33,7 @@ describe('NotificationList Component', () => {
   it('renders empty list when no notifications', () => {
     renderWithContext();
 
-    const container = screen.getByRole('region', { hidden: true });
+    const container = screen.getByTestId('notification-list-container');
     expect(container).toBeInTheDocument();
     expect(container).toHaveClass('notificationList-container');
     expect(container).toBeEmptyDOMElement();
@@ -183,7 +183,7 @@ describe('NotificationList Component', () => {
   it('renders container with correct CSS class', () => {
     renderWithContext();
 
-    const container = screen.getByRole('region', { hidden: true });
+    const container = screen.getByTestId('notification-list-container');
     expect(container).toHaveClass('notificationList-container');
   });
 

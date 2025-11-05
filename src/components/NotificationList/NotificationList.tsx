@@ -28,7 +28,12 @@ export const NotificationList = React.memo(() => {
   }, [notifications]);
 
   return (
-    <section className="notificationList-container">{notificationList}</section>
+    <section
+      className="notificationList-container"
+      data-testid="notification-list-container"
+    >
+      {notificationList}
+    </section>
   );
 });
 

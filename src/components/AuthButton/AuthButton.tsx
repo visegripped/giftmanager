@@ -60,6 +60,8 @@ export const AuthButton = () => {
   ) as ProfileContextInterface;
   const [emailAddress, setMyEmailAddress] = useState('');
   const [myAvatar, setMyAvatar] = useState('');
+  const [googleProfileData, setGoogleProfileData] =
+    useState<UserProfileInterface | null>(null);
 
   const fetchGoogleProfile = async (accessToken: string) => {
     // Fetch user profile information
@@ -90,6 +92,7 @@ export const AuthButton = () => {
         const userProfile = await response.json();
         console.log(' -> got a google profile: ', userProfile);
         const convertedProfile = convertGoogleProfile2Custom(userProfile);
+        setGoogleProfileData(convertedProfile);
         setMyEmailAddress(convertedProfile.emailAddress);
         if (convertedProfile.avatar) {
           setMyAvatar(convertedProfile.avatar);
@@ -148,7 +151,17 @@ export const AuthButton = () => {
             });
           } else if (validationResponse.success) {
             // @ts-ignore: todo - remove this and address TS issue.
-            setMyProfile(validationResponse.success[0]);
+            const dbUser = validationResponse.success[0];
+            // Map database fields to UserProfileInterface
+            const mappedProfile = {
+              emailAddress: dbUser.email,
+              userid: dbUser.userid,
+              givenName: dbUser.firstname,
+              familyName: dbUser.lastname,
+              avatar: dbUser.avatar || myAvatar,
+              google: googleProfileData?.google || myProfile.google || {},
+            } as UserProfileInterface;
+            setMyProfile(mappedProfile);
           } else {
             postReport({
               type: 'warn',

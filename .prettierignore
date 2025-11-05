@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+pnpm-lock.yaml
+.pnpm-store
+
+# Build outputs
+dist
+build
+.vite
+*.local
+
+# Storybook
+storybook-static
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+.DS_Store
+*.log
+*.lock
+
+# Generated files
+*.generated.*
