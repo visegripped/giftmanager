@@ -83,21 +83,6 @@ function AuthProvider(props: PropsWithChildren) {
     googleLogout();
   };
 
-  const tokenIsValid = async () => {
-    if (!accessToken) {
-      return false;
-    }
-    const currentTime = new Date();
-    if (currentTime >= accessTokenExpiration) {
-      return false;
-    }
-    if (!validateTokenViaAPI()) {
-      return false;
-    }
-
-    return true;
-  };
-
   const validateTokenViaAPI = useCallback(async () => {
     if (!accessToken) return false;
 
@@ -118,13 +103,31 @@ function AuthProvider(props: PropsWithChildren) {
       logout();
       return false;
     }
-  }, [accessToken, accessTokenExpiration]);
+  }, [accessToken, logout]);
+
+  const tokenIsValid = useCallback(async () => {
+    if (!accessToken) {
+      return false;
+    }
+    const currentTime = new Date();
+    if (currentTime >= accessTokenExpiration) {
+      return false;
+    }
+    if (!(await validateTokenViaAPI())) {
+      return false;
+    }
+
+    return true;
+  }, [accessToken, accessTokenExpiration, validateTokenViaAPI]);
 
   useEffect(() => {
-    if (!accessToken || !tokenIsValid()) {
-      logout();
-    }
-  }, [accessToken]);
+    const checkToken = async () => {
+      if (!accessToken || !(await tokenIsValid())) {
+        logout();
+      }
+    };
+    checkToken();
+  }, [accessToken, tokenIsValid, logout]);
 
   return (
     <AuthContext.Provider

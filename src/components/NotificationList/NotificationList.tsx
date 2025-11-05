@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import './NotificationList.css';
 import {
   NotificationsContext,
@@ -6,17 +6,16 @@ import {
 } from '../../context/NotificationsContext';
 import Notification from '../Notification/Notification';
 
-export const NotificationList = () => {
+export const NotificationList = React.memo(() => {
   const { notifications } = useContext(
     NotificationsContext
   ) as NotificationContextProps;
-  const notificationList: React.ReactElement[] = [];
-  const keys = Object.keys(notifications);
 
-  if (keys.length) {
-    keys.forEach((uuid) => {
+  const notificationList = useMemo(() => {
+    const keys = Object.keys(notifications);
+    return keys.map((uuid) => {
       const { message, type, persist } = notifications[uuid];
-      notificationList.push(
+      return (
         <Notification
           uuid={uuid}
           key={uuid}
@@ -26,10 +25,18 @@ export const NotificationList = () => {
         />
       );
     });
-  }
+  }, [notifications]);
+
   return (
-    <section className="notificationList-container">{notificationList}</section>
+    <section
+      className="notificationList-container"
+      data-testid="notification-list-container"
+    >
+      {notificationList}
+    </section>
   );
-};
+});
+
+NotificationList.displayName = 'NotificationList';
 
 export default NotificationList;
