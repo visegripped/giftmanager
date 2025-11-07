@@ -52,6 +52,9 @@ function App() {
     setIsAuthenticated(!!(myProfile && myProfile.userid));
   }, [myProfile]);
 
+  // Check if user is admin (userid === 1)
+  const isAdmin = String(myProfile.userid) === '1';
+
   const updateTheme = () => {
     const newTheme = 'theme__default';
     localStorage.setItem('theme', newTheme);
@@ -160,8 +163,13 @@ function App() {
           >
             Use default theme
           </a>
-          | <Link to={routeConstants.ADMIN}>Admin</Link>|{' '}
-          <Link to={routeConstants.THEME}>Theme Test</Link>
+          {isAdmin && (
+            <>
+              {' '}
+              | <Link to={routeConstants.ADMIN}>Admin</Link> |
+              <Link to={routeConstants.THEME}>Theme Test</Link>
+            </>
+          )}
         </div>
       </footer>
       <div className="half-circle"></div>

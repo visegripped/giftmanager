@@ -286,9 +286,9 @@ function updateAvatar($email_address, $avatar, $mysqli) {
 
 // admin -> This will need additional check to ensure that the user is an admin
 function archivePurchasedItems($userid, $mysqli) {
-    $query = "UPDATE items SET archive = 1 WHERE userid = ? AND status = 'purchased'";
+    // Archive purchased items for all users (not just admin userid)
+    $query = "UPDATE items SET archive = 1 WHERE status = 'purchased' AND archive = 0";
     $stmt = $mysqli->prepare($query);
-    $stmt->bind_param('s', $userid);
     if ($stmt) {
         $stmt->execute();
         if ($stmt->affected_rows > 0) {
@@ -304,9 +304,9 @@ function archivePurchasedItems($userid, $mysqli) {
 }
 // admin
 function archiveRemovedItems($userid, $mysqli) {
-    $query = "UPDATE items SET archive = 1 WHERE userid = ? AND removed = 1 AND archive = 0";
+    // Archive removed items for all users (not just admin userid)
+    $query = "UPDATE items SET archive = 1 WHERE removed = 1 AND archive = 0";
     $stmt = $mysqli->prepare($query);
-    $stmt->bind_param('s', $userid);
     if ($stmt) {
         $stmt->execute();
         if ($stmt->affected_rows > 0) {

@@ -21,6 +21,10 @@ const Admin = () => {
   ) as NotificationContextProps;
 
   const [myUserid] = useState(myProfile.userid || '');
+
+  // Check if user is admin (userid === 1)
+  const isAdmin = String(myProfile.userid) === '1';
+
   // TODO -> Refactor this so shared code is not duplicated
   const handleArchivePurchasedItemsClick = () => {
     const response = fetchData({
@@ -55,7 +59,7 @@ const Admin = () => {
   };
   const handleArchiveRemovedItemsClick = () => {
     const response = fetchData({
-      task: 'archivePurchasedItems',
+      task: 'archiveRemovedItems',
       myuserid: myUserid,
     });
     response &&
@@ -90,19 +94,25 @@ const Admin = () => {
       <div className="element">
         <h2>Administration</h2>
       </div>
-      <section>
-        <Button
-          onButtonClick={handleArchivePurchasedItemsClick}
-          title="Remove all items from all lists where items are tagged as purchased"
-          label="Archive purchased items"
-        />
-        <br />
-        <Button
-          onButtonClick={handleArchiveRemovedItemsClick}
-          title="Remove all items from all lists where items are tagged as purchased"
-          label="Archive removed items"
-        />
-      </section>
+      {isAdmin ? (
+        <section>
+          <Button
+            onButtonClick={handleArchivePurchasedItemsClick}
+            title="Remove all items from all lists where items are tagged as purchased"
+            label="Archive purchased items"
+          />
+          <br />
+          <Button
+            onButtonClick={handleArchiveRemovedItemsClick}
+            title="Archive all items from all lists where items are tagged as removed"
+            label="Archive removed items"
+          />
+        </section>
+      ) : (
+        <section>
+          <p>You do not have permission to access this page.</p>
+        </section>
+      )}
     </>
   );
 };
