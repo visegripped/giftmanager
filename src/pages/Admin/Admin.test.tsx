@@ -275,7 +275,9 @@ describe('Admin Component', () => {
   describe('button titles', () => {
     it('has correct title for archive purchased items button', () => {
       renderWithContext({ userid: 1 });
-      const button = screen.getByText('Archive purchased items');
+      const button = screen.getByRole('button', {
+        name: /archive purchased items/i,
+      });
       expect(button).toHaveAttribute(
         'title',
         'Remove all items from all lists where items are tagged as purchased'
@@ -284,7 +286,9 @@ describe('Admin Component', () => {
 
     it('has correct title for archive removed items button', () => {
       renderWithContext({ userid: 1 });
-      const button = screen.getByText('Archive removed items');
+      const button = screen.getByRole('button', {
+        name: /archive removed items/i,
+      });
       expect(button).toHaveAttribute(
         'title',
         'Archive all items from all lists where items are tagged as removed'
