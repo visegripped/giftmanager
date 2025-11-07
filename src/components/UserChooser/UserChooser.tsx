@@ -135,7 +135,7 @@ export const UserChooser = () => {
         className="inline-flex items-center justify-center rounded-md text-sm border border-[#e4e4e7] h-10 px-4 py-2"
         onClick={handleToggle}
       >
-        Choose User
+        Choose user
       </button>
       {open && (
         <div className="userchooser-container">

@@ -284,6 +284,41 @@ function updateAvatar($email_address, $avatar, $mysqli) {
     return $apiResponse;
 }
 
-
+// admin -> This will need additional check to ensure that the user is an admin
+function archivePurchasedItems($userid, $mysqli) {
+    // Archive purchased items for all users (not just admin userid)
+    $query = "UPDATE items SET archive = 1 WHERE status = 'purchased' AND archive = 0";
+    $stmt = $mysqli->prepare($query);
+    if ($stmt) {
+        $stmt->execute();
+        if ($stmt->affected_rows > 0) {
+            $apiResponse = array("success" => "Purchased items have been archived. " . $stmt->affected_rows . " items affected.");
+        } else {
+            $apiResponse = array("warn" => "There were no matching items.");
+        }
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
+// admin
+function archiveRemovedItems($userid, $mysqli) {
+    // Archive removed items for all users (not just admin userid)
+    $query = "UPDATE items SET archive = 1 WHERE removed = 1 AND archive = 0";
+    $stmt = $mysqli->prepare($query);
+    if ($stmt) {
+        $stmt->execute();
+        if ($stmt->affected_rows > 0) {
+            $apiResponse = array("success" => "Removed items have been archived " . $stmt->affected_rows . " items affected.");
+        } else {
+            $apiResponse = array("warn" => "There were no matching items.");
+        }
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
 
 ?>

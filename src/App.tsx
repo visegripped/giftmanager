@@ -5,6 +5,7 @@ import './App.css';
 import routeConstants from './routes/routeContstants';
 import Error404 from './pages/Error404/Error404';
 import Theme from './pages/Theme/Theme';
+import Admin from './pages/Admin/Admin';
 import Me from './pages/Me/Me';
 import User from './pages/User/User';
 import { AuthContext, AuthContextInterface } from './context/AuthContext';
@@ -50,6 +51,9 @@ function App() {
     );
     setIsAuthenticated(!!(myProfile && myProfile.userid));
   }, [myProfile]);
+
+  // Check if user is admin (userid === 1)
+  const isAdmin = String(myProfile.userid) === '1';
 
   const updateTheme = () => {
     const newTheme = 'theme__default';
@@ -132,6 +136,7 @@ function App() {
                 <Route path={routeConstants.HOME} Component={Me} />
                 <Route path={routeConstants.ME} Component={Me} />
                 <Route path={routeConstants.THEME} Component={Theme} />
+                <Route path={routeConstants.ADMIN} Component={Admin} />
                 <Route path={routeConstants.USER} Component={User} />
                 <Route
                   path={`${routeConstants.USER}/:userid`}
@@ -158,6 +163,13 @@ function App() {
           >
             Use default theme
           </a>
+          {isAdmin && (
+            <>
+              {' '}
+              | <Link to={routeConstants.ADMIN}>Admin</Link> |
+              <Link to={routeConstants.THEME}>Theme Test</Link>
+            </>
+          )}
         </div>
       </footer>
       <div className="half-circle"></div>
