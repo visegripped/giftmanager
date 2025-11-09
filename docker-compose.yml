@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    container_name: giftmanager-php
+    ports:
+      - '${PHP_PORT:-8081}:80'
+    volumes:
+      - ./php:/var/www/html
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+      - ./docker/php/apache-config.conf:/etc/apache2/sites-available/000-default.conf
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-giftmanager}
+      - DB_USER=${DB_USER:-visegripped}
+      - DB_PASSWORD=${DB_PASSWORD:-giftmanager_db_password}
+      - REPORT_DB_NAME=${REPORT_DB_NAME:-reports}
+      - REPORT_DB_USER=${REPORT_DB_USER:-visegripped}
+      - REPORT_DB_PASSWORD=${REPORT_DB_PASSWORD:-giftmanager_db_password}
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID:-}
+      - APP_ENV=development
+    networks:
+      - giftmanager-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: giftmanager-mysql
+    ports:
+      - '${MYSQL_PORT:-3307}:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root_password}
+      - MYSQL_DATABASE=giftmanager
+      - MYSQL_USER=visegripped
+      - MYSQL_PASSWORD=${DB_PASSWORD:-giftmanager_db_password}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    networks:
+      - giftmanager-network
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-u',
+          'root',
+          '-p${MYSQL_ROOT_PASSWORD:-root_password}',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  db-setup:
+    image: mysql:8.0
+    container_name: giftmanager-db-setup
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root_password}
+      - MYSQL_HOST=mysql
+    volumes:
+      - ./php:/data
+      - ./docker/mysql/import-data.sh:/import-data.sh:ro
+    entrypoint: ['/bin/bash', '/import-data.sh']
+    networks:
+      - giftmanager-network
+    restart: 'no'
+    profiles:
+      - setup
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: giftmanager-phpmyadmin
+    ports:
+      - '${PHPMYADMIN_PORT:-8082}:80'
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root_password}
+      - UPLOAD_LIMIT=300M
+    depends_on:
+      - mysql
+    networks:
+      - giftmanager-network
+    # phpMyAdmin will prompt for login - use 'visegripped' as username
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: giftmanager-frontend
+    ports:
+      - '${FRONTEND_PORT:-5174}:5173'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:${PHP_PORT:-8081}/api.php
+      - VITE_REPORTING_API_URL=http://localhost:${PHP_PORT:-8081}/reporting.php
+    depends_on:
+      - php
+    networks:
+      - giftmanager-network
+    command: pnpm dev --host
+
+volumes:
+  mysql_data:
+
+networks:
+  giftmanager-network:
+    driver: bridge

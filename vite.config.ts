@@ -31,6 +31,26 @@ export default defineConfig({
       include: '**/*.svg',
     }),
   ],
+  server: {
+    proxy: {
+      // Proxy API requests to PHP backend in Docker
+      // Port is configurable via PHP_PORT env var (default 8081)
+      '/api.php': {
+        target: process.env.PHP_PORT
+          ? `http://localhost:${process.env.PHP_PORT}`
+          : 'http://localhost:8081',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
+      '/reporting.php': {
+        target: process.env.PHP_PORT
+          ? `http://localhost:${process.env.PHP_PORT}`
+          : 'http://localhost:8081',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

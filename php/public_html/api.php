@@ -1,13 +1,29 @@
 <?php
+// Suppress error output to prevent breaking JSON responses
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
+// CORS headers - must be set before any output
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, X-Requested-With, Authorization");
+header("Access-Control-Max-Age: 86400");
 header('Content-type: application/json');
-header('Access-Control-Allow-Methods: POST');
-header("Access-Control-Allow-Headers: X-Requested-With");
-header("Access-Control-Allow-Origin: '*'");
+
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 include "../includes/api-credentials.php";
 include "../includes/api-functions.php";
 
 // Assuming $mysqli is your mysqli connection object
-$mysqli = new mysqli("localhost", $username, $password, $database);
+// Support Docker environment (use DB_HOST from env, fallback to localhost)
+$dbHost = getenv('DB_HOST') ?: 'localhost';
+$mysqli = new mysqli($dbHost, $username, $password, $database);
 $apiResponse = array("warn" => "successful post with no task passed.");
 
 // Check connection
@@ -41,12 +57,16 @@ function isValidGoogleAccessToken($token) {
     return false;
   }
 
+  // Get Google OAuth client ID from environment variable
+  // Fallback to hardcoded value for backward compatibility (should be removed in production)
+  $googleClientId = getenv('GOOGLE_OAUTH_CLIENT_ID') ?: "451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleusercontent.com";
+
   $url = "https://oauth2.googleapis.com/tokeninfo?access_token=" . $token;
 
   $response = file_get_contents($url);
   $result = json_decode($response, true);
 
-  if (isset($result['aud']) && $result['aud'] === "451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleusercontent.com") {
+  if (isset($result['aud']) && $result['aud'] === $googleClientId) {
     return true;
   }
   return false;

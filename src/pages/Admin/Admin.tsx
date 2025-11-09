@@ -3,6 +3,7 @@ import { responseInterface } from '../../types/types';
 import Button from '../../components/Button/Button';
 import fetchData from '../../utilities/fetchData';
 import postReport from '../../utilities/postReport';
+import ReportingQuery from '../../components/Reporting/ReportingQuery';
 import {
   ProfileContext,
   ProfileContextInterface,
@@ -95,19 +96,27 @@ const Admin = () => {
         <h2>Administration</h2>
       </div>
       {isAdmin ? (
-        <section>
-          <Button
-            onButtonClick={handleArchivePurchasedItemsClick}
-            title="Remove all items from all lists where items are tagged as purchased"
-            label="Archive purchased items"
-          />
-          <br />
-          <Button
-            onButtonClick={handleArchiveRemovedItemsClick}
-            title="Archive all items from all lists where items are tagged as removed"
-            label="Archive removed items"
-          />
-        </section>
+        <>
+          <section>
+            <h3>Database Management</h3>
+            <Button
+              onButtonClick={handleArchivePurchasedItemsClick}
+              title="Remove all items from all lists where items are tagged as purchased"
+              label="Archive purchased items"
+            />
+            <br />
+            <Button
+              onButtonClick={handleArchiveRemovedItemsClick}
+              title="Archive all items from all lists where items are tagged as removed"
+              label="Archive removed items"
+            />
+          </section>
+
+          <section className="admin__reporting-section">
+            <h3>Reporting & Analytics</h3>
+            <ReportingQuery showStats={true} />
+          </section>
+        </>
       ) : (
         <section>
           <p>You do not have permission to access this page.</p>

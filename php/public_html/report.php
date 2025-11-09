@@ -1,15 +1,30 @@
-<?
+<?php
+// Suppress error output to prevent breaking JSON responses
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
+// CORS headers - must be set before any output
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, X-Requested-With, Authorization");
+header("Access-Control-Max-Age: 86400");
 header('Content-type: application/json');
-header('Access-Control-Allow-Methods: POST');
-header("Access-Control-Allow-Headers: X-Requested-With");
-header("Access-Control-Allow-Origin: '*'");
+
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 include "../includes/report-credentials.php";
 
 $task = $_POST['task'] ?? "";
 
 // Assuming $mysqli is your mysqli connection object
-$mysqli = new mysqli("localhost", $username, $password, $database);
+// Support Docker environment (use DB_HOST from env, fallback to localhost)
+$dbHost = getenv('DB_HOST') ?: 'localhost';
+$mysqli = new mysqli($dbHost, $username, $password, $database);
 
 // Check connection
 if ($mysqli->connect_errno) {
