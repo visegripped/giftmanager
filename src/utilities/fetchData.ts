@@ -139,7 +139,6 @@ export const fetchData = (config: fetchInterface) => {
 
       throw new Error(`API Request Failure: ${errorMessage}`);
     }
-
     return jsonPayload;
   };
 
