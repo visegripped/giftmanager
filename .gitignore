@@ -26,5 +26,10 @@ dist-ssr
 *storybook.log
 
 /php/includes/*-credentials.php
+/php/vendor
+/php/composer.lock
+composer.lock
 
 .cursor/*
+
+AI-notes/*

@@ -1,0 +1,21 @@
+{
+  "name": "giftmanager/giftmanager",
+  "description": "GiftManager application",
+  "type": "project",
+  "require": {
+    "php": ">=7.4",
+    "webonyx/graphql-php": "^15.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
+  },
+  "autoload": {
+    "files": [
+      "includes/api-functions.php",
+      "includes/reporting-functions.php"
+    ]
+  },
+  "scripts": {
+    "test": "phpunit"
+  }
+}

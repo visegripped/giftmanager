@@ -1,6 +1,9 @@
 import { itemStatusInterface, ItemRemovedType } from '../types/types';
+import { startAPICall, endAPICall } from './performanceTracker';
 
-const apiUrl = 'https://gm.visegripped.com/api.php';
+// Support environment variable for API URL (for Docker/local development)
+const apiUrl =
+  import.meta.env.VITE_API_URL || 'https://gm.visegripped.com/api.php';
 
 type fetchInterface = {
   task: string;
@@ -52,27 +55,90 @@ export const fetchData = (config: fetchInterface) => {
   const makeAsyncRequest = async (theFormData: {}) => {
     let jsonPayload = { err: '' };
 
+    // Start tracking API call
+    const callId = startAPICall(apiUrl, 'POST');
+
+    // Extract request data for reporting
+    const requestData: Record<string, unknown> = {};
+    if (theFormData instanceof FormData) {
+      // Convert FormData to object for reporting (exclude sensitive data)
+      theFormData.forEach((value, key) => {
+        if (key !== 'access_token') {
+          requestData[key] = value;
+        }
+      });
+    }
+
     try {
       const apiResponse = await fetch(apiUrl, {
         // @ts-ignore
         body: theFormData,
         method: 'POST',
       });
+
+      let responseData: Record<string, unknown> | undefined;
+
       if (apiResponse.status >= 200 && apiResponse.status < 300) {
         jsonPayload = await apiResponse.json();
+        responseData = jsonPayload;
+
+        // End tracking with success
+        endAPICall(
+          callId,
+          apiResponse.status,
+          apiResponse.statusText,
+          undefined,
+          requestData,
+          responseData
+        );
       } else {
         jsonPayload.err = `API responded with a ${apiResponse.status}`;
+
+        // End tracking with error
+        endAPICall(
+          callId,
+          apiResponse.status,
+          apiResponse.statusText,
+          jsonPayload.err,
+          requestData,
+          undefined
+        );
+
         throw new Error(`API responded with a ${apiResponse.status}`);
       }
+
       if (jsonPayload?.err) {
         jsonPayload.err = `API responded with a ${apiResponse.status}`;
+
+        // End tracking with error
+        endAPICall(
+          callId,
+          apiResponse.status,
+          apiResponse.statusText,
+          jsonPayload.err,
+          requestData,
+          responseData
+        );
+
         throw new Error(jsonPayload.err);
       }
     } catch (error) {
-      jsonPayload.err = `API Request Failure: ${error}`;
-      throw new Error(`API Request Failure: ${error}`);
-    }
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      jsonPayload.err = `API Request Failure: ${errorMessage}`;
 
+      // End tracking with error
+      endAPICall(
+        callId,
+        undefined,
+        undefined,
+        errorMessage,
+        requestData,
+        undefined
+      );
+
+      throw new Error(`API Request Failure: ${errorMessage}`);
+    }
     return jsonPayload;
   };
 

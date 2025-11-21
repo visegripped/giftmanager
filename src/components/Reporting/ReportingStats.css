@@ -1,0 +1,105 @@
+.reporting-stats {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.reporting-stats__title {
+  margin: 0 0 20px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.reporting-stats--loading,
+.reporting-stats--error {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+}
+
+.reporting-stats--error {
+  color: #d32f2f;
+}
+
+.reporting-stats__summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.reporting-stats__summary-card {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.reporting-stats__summary-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-primary, #1976d2);
+  margin-bottom: 8px;
+}
+
+.reporting-stats__summary-label {
+  font-size: 0.875rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reporting-stats__breakdown h4 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.reporting-stats__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reporting-stats__table th {
+  text-align: left;
+  padding: 12px;
+  background: #f5f5f5;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+}
+
+.reporting-stats__table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.reporting-stats__type {
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.reporting-stats__row--error .reporting-stats__type {
+  color: #d32f2f;
+}
+
+.reporting-stats__row--warning .reporting-stats__type {
+  color: #f57c00;
+}
+
+.reporting-stats__row--performance .reporting-stats__type {
+  color: #1976d2;
+}
+
+.reporting-stats__row--interaction .reporting-stats__type {
+  color: #388e3c;
+}
+
+.reporting-stats__row--info .reporting-stats__type {
+  color: #0288d1;
+}
+
+.reporting-stats__row--debug .reporting-stats__type {
+  color: #7b1fa2;
+}

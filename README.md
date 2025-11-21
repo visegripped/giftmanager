@@ -1,30 +1,162 @@
-# React + TypeScript + Vite
+# GiftManager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern gift list management application with reporting and analytics.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- User authentication via Google OAuth
+- Personal and shared gift lists
+- Admin dashboard with database management
+- Comprehensive reporting and analytics system
+- Performance monitoring
+- Error tracking and debugging
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Frontend**: React 18 + TypeScript + Vite
+- **Backend**: PHP 7.4.33 + MySQL 8.0
+- **Reporting**: GraphQL API with ag-grid interface
+- **Deployment**: Docker containers for local development
 
-- Configure the top-level `parserOptions` property like this:
+## Quick Start
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json', './tsconfig.app.json'],
-    tsconfigRootDir: __dirname,
-  },
-};
+### Local Development with Docker
+
+1. **Prerequisites**:
+
+   - Docker Desktop installed
+   - Git
+
+2. **Clone and setup**:
+
+   ```bash
+   git clone <repository-url>
+   cd giftmanager
+   cp env-template.txt .env.local
+   # Edit .env.local with your settings
+   ```
+
+3. **Start services**:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Import database** (first time only):
+
+   ```bash
+   docker-compose --profile setup up db-setup
+   ```
+
+5. **Access application**:
+   - Frontend: http://localhost:5174
+   - phpMyAdmin: http://localhost:8082
+   - API: http://localhost:8081/api.php
+   - Reporting: http://localhost:8081/reporting.php
+
+See [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md) for detailed instructions.
+
+### Traditional Development (without Docker)
+
+1. **Install dependencies**:
+
+   ```bash
+   pnpm install
+   ```
+
+2. **Configure environment**:
+
+   - Set up MySQL databases
+   - Configure `php/includes/api-credentials.php`
+   - Configure `php/includes/report-credentials.php`
+   - Set environment variables for API URLs
+
+3. **Run development server**:
+   ```bash
+   pnpm dev
+   ```
+
+## Scripts
+
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm test` - Run tests
+- `pnpm test:once` - Run tests once
+- `pnpm lint` - Lint code
+- `pnpm prettier` - Format code
+- `pnpm storybook` - Start Storybook
+
+## Documentation
+
+- [Docker Setup](docs/DOCKER_SETUP.md) - Local development with Docker
+- [Reporting System](docs/REPORTING_SYSTEM.md) - Error tracking and analytics
+- [Reporting Interface](docs/REPORTING_INTERFACE.md) - Admin reporting UI
+- [GraphQL API](docs/GRAPHQL_API.md) - GraphQL API reference
+- [Security](README-SECURITY.md) - Credential management and security
+
+## Database Structure
+
+### Main Database (giftmanager)
+
+- `items` - Gift list items
+- `users` - User accounts
+
+### Reports Database (reports)
+
+- `application_reports` - System reports and analytics
+
+See database schema in `docker/mysql/init.sql`.
+
+## Reporting & Analytics
+
+The application includes a comprehensive reporting system that tracks:
+
+- Errors and warnings
+- Performance metrics (API calls, page load)
+- User interactions (clicks, navigation)
+- Debug information
+
+Reports are:
+
+- Automatically collected by the frontend
+- Stored in a dedicated database
+- Queryable via GraphQL API
+- Viewable in the Admin interface
+
+Session tracking ensures all events in a browser session are linked via a Session Transaction ID (STID).
+
+## Admin Features
+
+Accessible to admin users (userid = 1):
+
+- Archive purchased/removed items
+- View and query application reports
+- Export reports to CSV
+- View performance statistics
+- Debug user sessions
+
+## Architecture
+
+```
+Frontend (React)
+  ↓
+  ├→ API (api.php) → MySQL (giftmanager DB)
+  └→ Reporting (reporting.php) → MySQL (reports DB)
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Contributing
+
+1. Follow existing patterns and naming conventions
+2. Add tests for new features
+3. Update documentation
+4. Create Storybook stories for new components
+
+## Security
+
+⚠️ **Important**: This repository uses environment variables for all sensitive data. See [README-SECURITY.md](README-SECURITY.md) and [SECURITY_CHANGES.md](SECURITY_CHANGES.md) for details.
+
+Credential files in `php/includes/*-credentials.php` are git-ignored. Example files are provided as templates.
+
+## License
+
+Copyright 2010-2025. All rights reserved.
