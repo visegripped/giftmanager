@@ -32,61 +32,70 @@ const Admin = () => {
       task: 'archivePurchasedItems',
       myuserid: myUserid,
     });
+
     response &&
       response.then((data: responseInterface) => {
-        if (data.error) {
+        const errorMessage = data.error ?? data.err;
+        if (errorMessage) {
+          const errorKey = data.error ? 'error' : 'err';
           postReport({
             type: 'error',
             report: 'Failure executing fetchData for archivePurchasedItems',
             body: {
-              error: data.error,
+              [errorKey]: errorMessage,
               file: 'Admin',
               // task: 'archivePurchasedItems', <- this may be a better way to do this
               origin: 'apiResponse',
             },
           });
           addNotification({
-            message: `Something went wrong: ${data.error}`,
+            message: `Something went wrong: ${errorMessage}`,
             type: 'error',
             persist: true,
           });
-        } else {
-          addNotification({
-            message: (data.success as string) || (data.warn as string),
-            type: 'success',
-          });
+          return;
         }
+
+        addNotification({
+          message: (data.success as string) || (data.warn as string),
+          type: 'success',
+        });
       });
   };
+
   const handleArchiveRemovedItemsClick = () => {
     const response = fetchData({
       task: 'archiveRemovedItems',
       myuserid: myUserid,
     });
+
     response &&
       response.then((data: responseInterface) => {
-        if (data.error) {
+        const errorMessage = data.error ?? data.err;
+        if (errorMessage) {
+          const errorKey = data.error ? 'error' : 'err';
           postReport({
             type: 'error',
             report: 'Failure executing fetchData for archiveRemovedItems',
             body: {
-              error: data.error,
+              [errorKey]: errorMessage,
               file: 'Admin',
               // task: 'archiveRemovedItems', <- this may be a better way to do this
               origin: 'apiResponse',
             },
           });
           addNotification({
-            message: `Something went wrong: ${data.error}`,
+            message: `Something went wrong: ${errorMessage}`,
             type: 'error',
             persist: true,
           });
-        } else {
-          addNotification({
-            message: (data.success as string) || (data.warn as string),
-            type: 'success',
-          });
+          return;
         }
+
+        addNotification({
+          message: (data.success as string) || (data.warn as string),
+          type: 'success',
+        });
       });
   };
 
