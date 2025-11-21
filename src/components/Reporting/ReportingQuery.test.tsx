@@ -77,7 +77,7 @@ describe('ReportingQuery', () => {
       },
     });
 
-    const { container } = render(<ReportingQuery />);
+    render(<ReportingQuery />);
 
     // Trigger a search by changing filter
     const userIdInput = screen.getByLabelText('User ID') as HTMLInputElement;

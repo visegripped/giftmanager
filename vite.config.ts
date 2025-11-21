@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 /// <reference types="node" />
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import path from 'path';

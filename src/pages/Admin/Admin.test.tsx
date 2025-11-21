@@ -53,7 +53,7 @@ describe('Admin Component', () => {
 
   describe('when user is admin (userid === 1)', () => {
     it('renders admin interface with buttons', () => {
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
 
       expect(screen.getByText('Administration')).toBeInTheDocument();
       expect(screen.getByText('Archive purchased items')).toBeInTheDocument();
@@ -71,10 +71,11 @@ describe('Admin Component', () => {
     it('calls fetchData with correct task when archive purchased items button is clicked', async () => {
       const mockResponse = Promise.resolve({
         success: 'Purchased items have been archived. 5 items affected.',
+        err: '',
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -82,7 +83,7 @@ describe('Admin Component', () => {
       await waitFor(() => {
         expect(mockFetchData).toHaveBeenCalledWith({
           task: 'archivePurchasedItems',
-          myuserid: 1,
+          myuserid: '1',
         });
       });
     });
@@ -90,10 +91,11 @@ describe('Admin Component', () => {
     it('calls fetchData with correct task when archive removed items button is clicked', async () => {
       const mockResponse = Promise.resolve({
         success: 'Removed items have been archived 3 items affected.',
+        err: '',
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
 
       const button = screen.getByText('Archive removed items');
       fireEvent.click(button);
@@ -101,7 +103,7 @@ describe('Admin Component', () => {
       await waitFor(() => {
         expect(mockFetchData).toHaveBeenCalledWith({
           task: 'archiveRemovedItems',
-          myuserid: 1,
+          myuserid: '1',
         });
       });
     });
@@ -109,10 +111,11 @@ describe('Admin Component', () => {
     it('shows success notification when archive purchased items succeeds', async () => {
       const mockResponse = Promise.resolve({
         success: 'Purchased items have been archived. 5 items affected.',
+        err: '',
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -128,10 +131,11 @@ describe('Admin Component', () => {
     it('shows success notification when archive removed items succeeds', async () => {
       const mockResponse = Promise.resolve({
         success: 'Removed items have been archived 3 items affected.',
+        err: '',
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
 
       const button = screen.getByText('Archive removed items');
       fireEvent.click(button);
@@ -147,10 +151,11 @@ describe('Admin Component', () => {
     it('shows warn notification when archive purchased items returns warn', async () => {
       const mockResponse = Promise.resolve({
         warn: 'There were no matching items.',
+        err: '',
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -165,12 +170,12 @@ describe('Admin Component', () => {
 
     it('shows error notification and reports error when archive purchased items fails', async () => {
       const mockResponse = Promise.resolve({
-        error: 'Failed to prepare the statement',
+        err: 'Failed to prepare the statement',
       });
       mockFetchData.mockReturnValue(mockResponse);
       mockPostReport.mockResolvedValue(undefined);
 
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -180,7 +185,7 @@ describe('Admin Component', () => {
           type: 'error',
           report: 'Failure executing fetchData for archivePurchasedItems',
           body: {
-            error: 'Failed to prepare the statement',
+            err: 'Failed to prepare the statement',
             file: 'Admin',
             origin: 'apiResponse',
           },
@@ -195,12 +200,12 @@ describe('Admin Component', () => {
 
     it('shows error notification and reports error when archive removed items fails', async () => {
       const mockResponse = Promise.resolve({
-        error: 'Database connection failed',
+        err: 'Database connection failed',
       });
       mockFetchData.mockReturnValue(mockResponse);
       mockPostReport.mockResolvedValue(undefined);
 
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
 
       const button = screen.getByText('Archive removed items');
       fireEvent.click(button);
@@ -210,7 +215,7 @@ describe('Admin Component', () => {
           type: 'error',
           report: 'Failure executing fetchData for archiveRemovedItems',
           body: {
-            error: 'Database connection failed',
+            err: 'Database connection failed',
             file: 'Admin',
             origin: 'apiResponse',
           },
@@ -226,7 +231,7 @@ describe('Admin Component', () => {
     it('does not call notification when fetchData returns undefined', async () => {
       mockFetchData.mockReturnValue(undefined);
 
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -239,7 +244,7 @@ describe('Admin Component', () => {
 
   describe('when user is not admin', () => {
     it('shows permission denied message', () => {
-      renderWithContext({ userid: 2 });
+      renderWithContext({ userid: '2' });
 
       expect(screen.getByText('Administration')).toBeInTheDocument();
       expect(
@@ -274,7 +279,7 @@ describe('Admin Component', () => {
 
   describe('button titles', () => {
     it('has correct title for archive purchased items button', () => {
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
       const button = screen.getByRole('button', {
         name: /archive purchased items/i,
       });
@@ -285,7 +290,7 @@ describe('Admin Component', () => {
     });
 
     it('has correct title for archive removed items button', () => {
-      renderWithContext({ userid: 1 });
+      renderWithContext({ userid: '1' });
       const button = screen.getByRole('button', {
         name: /archive removed items/i,
       });

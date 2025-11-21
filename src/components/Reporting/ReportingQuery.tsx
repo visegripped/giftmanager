@@ -30,7 +30,7 @@ export function ReportingQuery({ showStats = true }: ReportingQueryProps) {
       }
 
       if (result.data?.getReports) {
-        setReports(result.data.getReports.reports as ReportData[]);
+        setReports(result.data.getReports.reports as unknown as ReportData[]);
       }
     } catch (err) {
       setError('Failed to load reports');

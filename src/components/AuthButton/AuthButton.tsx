@@ -150,18 +150,36 @@ export const AuthButton = () => {
               persist: true,
             });
           } else if (validationResponse.success) {
-            // @ts-ignore: todo - remove this and address TS issue.
-            const dbUser = validationResponse.success[0];
-            // Map database fields to UserProfileInterface
-            const mappedProfile = {
-              emailAddress: dbUser.email,
-              userid: dbUser.userid,
-              givenName: dbUser.firstname,
-              familyName: dbUser.lastname,
-              avatar: dbUser.avatar || myAvatar,
-              google: googleProfileData?.google || myProfile.google || {},
-            } as UserProfileInterface;
-            setMyProfile(mappedProfile);
+            // Handle success response - could be array or string
+            if (typeof validationResponse.success === 'string') {
+              // If it's just a success message string, something went wrong
+              postReport({
+                type: 'warn',
+                report: 'Unexpected success response type',
+                body: {
+                  file: 'AuthButton',
+                  origin: 'apiResponse',
+                  error: `Received string instead of user data: ${validationResponse.success}`,
+                },
+              });
+            } else if (
+              Array.isArray(validationResponse.success) &&
+              validationResponse.success.length > 0
+            ) {
+              // Success with user data - use type assertion to work around TypeScript limitation
+              const userArray = validationResponse.success as any[];
+              const dbUser = userArray[0];
+              // Map database fields to UserProfileInterface
+              const mappedProfile = {
+                emailAddress: dbUser.email,
+                userid: String(dbUser.userid),
+                givenName: dbUser.firstname,
+                familyName: dbUser.lastname,
+                avatar: dbUser.avatar || myAvatar,
+                google: googleProfileData?.google || myProfile.google || {},
+              } as UserProfileInterface;
+              setMyProfile(mappedProfile);
+            }
           } else {
             postReport({
               type: 'warn',

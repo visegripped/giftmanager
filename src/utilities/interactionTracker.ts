@@ -55,7 +55,7 @@ function getComponentName(element: HTMLElement): string | undefined {
 /**
  * Extract action name from element
  */
-function getActionName(element: HTMLElement): string | undefined {
+export function getActionName(element: HTMLElement): string | undefined {
   // Check data attributes
   const dataAction = element.getAttribute('data-report-action');
   if (dataAction) {

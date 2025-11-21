@@ -65,10 +65,13 @@ export function ReportingGrid({
         cellStyle: (params) => {
           const type = params.value;
           if (type === 'error') return { color: '#d32f2f', fontWeight: 'bold' };
-          if (type === 'warning') return { color: '#f57c00' };
-          if (type === 'performance') return { color: '#1976d2' };
-          if (type === 'interaction') return { color: '#388e3c' };
-          return {};
+          if (type === 'warning')
+            return { color: '#f57c00', fontWeight: 'normal' };
+          if (type === 'performance')
+            return { color: '#1976d2', fontWeight: 'normal' };
+          if (type === 'interaction')
+            return { color: '#388e3c', fontWeight: 'normal' };
+          return { color: 'inherit', fontWeight: 'normal' };
         },
       },
       {

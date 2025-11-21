@@ -52,7 +52,7 @@ const createContextProviders = (
 
 // Admin user stories
 export const AdminUser: Story = {
-  render: () => createContextProviders({ userid: 1 }),
+  render: () => createContextProviders({ userid: '1' }),
 };
 
 export const AdminUserStringId: Story = {
@@ -61,7 +61,7 @@ export const AdminUserStringId: Story = {
 
 // Non-admin user stories
 export const NonAdminUser: Story = {
-  render: () => createContextProviders({ userid: 2 }),
+  render: () => createContextProviders({ userid: '2' }),
 };
 
 export const NoUser: Story = {

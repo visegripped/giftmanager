@@ -6,7 +6,7 @@
 import { reportCreate, ReportInput } from './reportCreate';
 import { getSTID } from '../hooks/useSessionTracking';
 
-interface PerformanceMetric {
+export interface PerformanceMetric {
   name: string;
   value: number;
   unit: string;
