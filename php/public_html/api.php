@@ -149,7 +149,7 @@ else if ($task == 'getTheirItemList' && $theiruserid) {
     $apiResponse = getTheirItemList($theiruserid, $mysqli);
 }
 else if ($task == 'updateStatusForTheirItem' && $theiruserid && $status && $myuserid && $itemid) {
-    $apiResponse = updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli);
+    $apiResponse = updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli, $date_received);
 }
 //general
  else if ($task == 'getUserProfileByUserId' && $userid) {

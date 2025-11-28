@@ -187,10 +187,27 @@ function getTheirItemList($userid, $mysqli) {
     return $apiResponse;
 }
 
-function updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli) {
-    $query = "UPDATE items SET status = ?, status_userid = ? WHERE itemid = ? AND userid = ?";
-    $stmt = $mysqli->prepare($query);
-    $stmt->bind_param('ssis', $status, $myuserid, $itemid, $theiruserid);
+function updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli, $date_received = null) {
+    // If status is purchased, date_received is required
+    if ($status === 'purchased' && empty($date_received)) {
+        return array("error" => "date_received is required when status is 'purchased'");
+    }
+
+    // Build query based on whether date_received is provided
+    if ($status === 'purchased' && !empty($date_received)) {
+        $query = "UPDATE items SET status = ?, status_userid = ?, date_received = ? WHERE itemid = ? AND userid = ?";
+        $stmt = $mysqli->prepare($query);
+        if ($stmt) {
+            $stmt->bind_param('sssis', $status, $myuserid, $date_received, $itemid, $theiruserid);
+        }
+    } else {
+        $query = "UPDATE items SET status = ?, status_userid = ? WHERE itemid = ? AND userid = ?";
+        $stmt = $mysqli->prepare($query);
+        if ($stmt) {
+            $stmt->bind_param('ssis', $status, $myuserid, $itemid, $theiruserid);
+        }
+    }
+
     if ($stmt) {
         $stmt->execute();
         if ($stmt->affected_rows > 0) {
@@ -207,7 +224,7 @@ function updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $my
 
 // generic
 function getUserProfileByUserId($userid, $mysqli) {
-    $query = "SELECT * FROM `users` WHERE userid = ? ";
+    $query = "SELECT userid, firstname, lastname, groupid, created, email, avatar, birthday_month, birthday_day FROM `users` WHERE userid = ? ";
     $stmt = $mysqli->prepare($query);
 
     if ($stmt) {
