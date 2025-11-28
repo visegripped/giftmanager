@@ -42,6 +42,11 @@ export type ReportType =
   | 'info'
   | 'debug';
 
+type GraphQLReportType = Uppercase<ReportType>;
+
+const toGraphQLReportType = (reportType: ReportType): GraphQLReportType =>
+  reportType.toUpperCase() as GraphQLReportType;
+
 export interface ReportInput {
   stid: string;
   userid?: number | string;
@@ -132,6 +137,7 @@ export const reportCreate = async (
   const variables = {
     input: {
       ...fullReportInput,
+      report_type: toGraphQLReportType(fullReportInput.report_type),
       // Convert objects to JSON strings for GraphQL
       performance_metrics: fullReportInput.performance_metrics
         ? JSON.stringify(fullReportInput.performance_metrics)
