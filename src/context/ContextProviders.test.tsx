@@ -199,16 +199,33 @@ describe('ProfileContext', () => {
 
 describe('AuthContext', () => {
   const TestComponent = () => {
-    const { accessToken, login, logout, setAccessToken } = useContext(
-      AuthContext
-    ) as any;
+    const {
+      accessToken,
+      login,
+      logout,
+      setAccessToken,
+      authProvider,
+      facebookLogin,
+    } = useContext(AuthContext) as any;
 
     return (
       <div>
         <div data-testid="access-token">{accessToken || 'no-token'}</div>
+        <div data-testid="auth-provider">{authProvider || 'no-provider'}</div>
         <button onClick={login}>Login</button>
         <button onClick={logout}>Logout</button>
         <button onClick={() => setAccessToken('test-token')}>Set Token</button>
+        <button
+          onClick={() =>
+            facebookLogin({
+              accessToken: 'facebook-token',
+              userID: '123',
+              expiresIn: 3600,
+            })
+          }
+        >
+          Facebook Login
+        </button>
       </div>
     );
   };
@@ -342,5 +359,125 @@ describe('AuthContext', () => {
     );
 
     expect(screen.getByTestId('access-token')).toHaveTextContent(initialToken);
+  });
+
+  it('provides initial empty auth provider', () => {
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    expect(screen.getByTestId('auth-provider')).toHaveTextContent(
+      'no-provider'
+    );
+  });
+
+  it('loads auth provider from localStorage on mount', () => {
+    localStorage.setItem('auth_provider', 'facebook');
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    // The provider should be loaded immediately from localStorage
+    expect(screen.getByTestId('auth-provider')).toHaveTextContent('facebook');
+  });
+
+  it('handles Facebook login correctly', () => {
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    const facebookButton = screen.getByText('Facebook Login');
+    act(() => {
+      facebookButton.click();
+    });
+
+    expect(screen.getByTestId('access-token')).toHaveTextContent(
+      'facebook-token'
+    );
+    expect(screen.getByTestId('auth-provider')).toHaveTextContent('facebook');
+    expect(localStorage.getItem('access_token')).toBe('facebook-token');
+    expect(localStorage.getItem('auth_provider')).toBe('facebook');
+  });
+
+  it('clears auth provider on logout', () => {
+    localStorage.setItem('access_token', 'initial-token');
+    localStorage.setItem('auth_provider', 'google');
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    expect(screen.getByTestId('auth-provider')).toHaveTextContent('google');
+
+    const logoutButton = screen.getByText('Logout');
+    act(() => {
+      logoutButton.click();
+    });
+
+    expect(screen.getByTestId('auth-provider')).toHaveTextContent(
+      'no-provider'
+    );
+    expect(localStorage.getItem('auth_provider')).toBeNull();
+  });
+
+  it('validates Facebook token correctly', async () => {
+    // Mock fetch for Facebook token validation
+    (globalThis as any).fetch = vi.fn().mockResolvedValue({
+      json: () => Promise.resolve({ id: '123456' }),
+    });
+
+    localStorage.setItem('access_token', 'facebook-token');
+    localStorage.setItem('auth_provider', 'facebook');
+    localStorage.setItem(
+      'access_token_expiration',
+      new Date(Date.now() + 3600000).toString()
+    );
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    // Should not logout with valid Facebook token
+    await waitFor(() => {
+      expect(screen.getByTestId('access-token')).toHaveTextContent(
+        'facebook-token'
+      );
+    });
+  });
+
+  it('handles invalid Facebook token correctly', async () => {
+    // Mock fetch for Facebook token validation with error
+    (globalThis as any).fetch = vi.fn().mockResolvedValue({
+      json: () => Promise.resolve({ error: 'Invalid token' }),
+    });
+
+    localStorage.setItem('access_token', 'invalid-facebook-token');
+    localStorage.setItem('auth_provider', 'facebook');
+    localStorage.setItem(
+      'access_token_expiration',
+      new Date(Date.now() + 3600000).toString()
+    );
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    // Should logout with invalid Facebook token
+    await waitFor(() => {
+      expect(screen.getByTestId('access-token')).toHaveTextContent('no-token');
+    });
   });
 });

@@ -35,6 +35,7 @@ if ($mysqli->connect_errno) {
 // Get POST variables
 $access_token = $_POST['access_token'] ?? "";
 $task = $_POST['task'] ?? "";
+$auth_provider = $_POST['auth_provider'] ?? ""; // 'google' or 'facebook'
 $myuserid = $_POST['myuserid'] ?? "";
 $theiruserid = $_POST['theiruserid'] ?? "";
 $userid = $_POST['userid'] ?? ""; // drop this in favor of my/their.
@@ -72,13 +73,62 @@ function isValidGoogleAccessToken($token) {
   return false;
 }
 
+function isValidFacebookAccessToken($token) {
+  if (!$token) {
+    return false;
+  }
+
+  // Get Facebook App ID from environment variable
+  $fbAppId = getenv('FB_APP_ID') ?: "";
+
+  // Validate token by checking user info
+  $url = "https://graph.facebook.com/me?access_token=" . $token;
+
+  $response = @file_get_contents($url);
+  if ($response === false) {
+    return false;
+  }
+
+  $result = json_decode($response, true);
+
+  // If there's an error, token is invalid
+  if (isset($result['error'])) {
+    return false;
+  }
+
+  // If we get user data, token is valid
+  if (isset($result['id'])) {
+    return true;
+  }
+
+  return false;
+}
+
+function isValidAccessToken($token, $provider) {
+  if (!$token || !$provider) {
+    return false;
+  }
+
+  if ($provider === 'google') {
+    return isValidGoogleAccessToken($token);
+  } else if ($provider === 'facebook') {
+    return isValidFacebookAccessToken($token);
+  }
+
+  return false;
+}
+
 
 // Types has the list of supported tasks
 
 if(!$access_token) {
     $apiResponse = array("error" => "Access token not specified on API request.");
-} else if(!isValidGoogleAccessToken($access_token)) {
-    $apiResponse = array("error" => "Invalid/expired token.  Please sign (or re-sign) in.");
+} else {
+    // Default to 'google' for backward compatibility if provider not specified
+    $provider = $auth_provider ?: 'google';
+    if(!isValidAccessToken($access_token, $provider)) {
+        $apiResponse = array("error" => "Invalid/expired token.  Please sign (or re-sign) in.");
+    }
 }   
 
 // my tasks

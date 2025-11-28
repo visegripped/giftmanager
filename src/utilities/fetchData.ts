@@ -145,6 +145,8 @@ export const fetchData = (config: fetchInterface) => {
   if (accessToken) {
     let formData = new FormData();
     formData.append('access_token', accessToken);
+    const authProvider = localStorage.getItem('auth_provider') || 'google';
+    formData.append('auth_provider', authProvider);
     for (let key of configWhiteList) {
       // @ts-ignore: todo - remove this and address TS issue.
       formData.append(key, config[key]);

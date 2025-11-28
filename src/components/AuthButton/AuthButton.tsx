@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import FacebookLogin from 'react-facebook-login';
 import { AuthContext, AuthContextInterface } from '../../context/AuthContext';
 import {
   ProfileContext,
@@ -11,6 +12,7 @@ import {
   UserProfileInterface,
   GoogleProfileEmailInterface,
   GoogleProfilePhotoInterface,
+  FacebookProfileInterface,
 } from '../../types/types';
 import fetchData from '../../utilities/fetchData';
 import postReport from '../../utilities/postReport';
@@ -46,11 +48,46 @@ const convertGoogleProfile2Custom = (googleProfile: GoogleProfileInterface) => {
   return userProfile;
 };
 
+const convertFacebookProfile2Custom = (
+  facebookProfile: FacebookProfileInterface
+) => {
+  let userProfile = { facebook: facebookProfile } as UserProfileInterface;
+  const { email, name, picture, first_name, last_name } = facebookProfile;
+
+  if (email) {
+    userProfile.emailAddress = email;
+  }
+
+  if (picture?.data?.url) {
+    userProfile.avatar = picture.data.url;
+  }
+
+  if (first_name) {
+    userProfile.givenName = first_name;
+  } else if (name) {
+    // Fallback: split name if first_name not available
+    const nameParts = name.split(' ');
+    userProfile.givenName = nameParts[0] || '';
+  }
+
+  if (last_name) {
+    userProfile.familyName = last_name;
+  } else if (name) {
+    // Fallback: split name if last_name not available
+    const nameParts = name.split(' ');
+    userProfile.familyName = nameParts.slice(1).join(' ') || '';
+  }
+
+  return userProfile;
+};
+
 export const AuthButton = () => {
   const {
     logout,
     login,
     accessToken = '',
+    authProvider,
+    facebookLogin,
   } = useContext(AuthContext) as AuthContextInterface;
   const { addNotification } = useContext(
     NotificationsContext
@@ -62,6 +99,9 @@ export const AuthButton = () => {
   const [myAvatar, setMyAvatar] = useState('');
   const [googleProfileData, setGoogleProfileData] =
     useState<UserProfileInterface | null>(null);
+  const [facebookProfileData, setFacebookProfileData] =
+    useState<UserProfileInterface | null>(null);
+  const fbAppId = import.meta.env.VITE_FB_APP_ID;
 
   const fetchGoogleProfile = async (accessToken: string) => {
     // Fetch user profile information
@@ -124,6 +164,62 @@ export const AuthButton = () => {
     }
   };
 
+  const fetchFacebookProfile = async (accessToken: string) => {
+    // Fetch user profile information from Facebook Graph API
+    if (accessToken && !myProfile.emailAddress) {
+      try {
+        // https://developers.facebook.com/docs/graph-api/reference/user
+        const response = await fetch(
+          `https://graph.facebook.com/me?fields=id,name,email,picture.width(200).height(200),first_name,last_name&access_token=${accessToken}`
+        );
+
+        if (!response.ok) {
+          postReport({
+            type: 'error',
+            report: 'Error fetching Facebook profile',
+            body: {
+              file: 'AuthButton',
+              origin: 'apiResponse',
+              error: `HTTP error! status: ${response.status}`,
+            },
+          });
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const userProfile = await response.json();
+        console.log(' -> got a facebook profile: ', userProfile);
+        const convertedProfile = convertFacebookProfile2Custom(userProfile);
+        setFacebookProfileData(convertedProfile);
+        setMyEmailAddress(convertedProfile.emailAddress);
+        if (convertedProfile.avatar) {
+          setMyAvatar(convertedProfile.avatar);
+        }
+        return convertedProfile;
+      } catch (error: unknown) {
+        postReport({
+          type: 'error',
+          report: 'Error fetching Facebook profile',
+          body: {
+            file: 'AuthButton',
+            origin: 'apiResponse',
+            error: JSON.stringify(error),
+          },
+        });
+      }
+      return;
+    } else {
+      postReport({
+        type: 'error',
+        report: 'Error fetching Facebook profile',
+        body: {
+          file: 'AuthButton',
+          origin: 'apiResponse',
+          error:
+            'Access token was not passed to fetchFacebookProfile.  No request attempt has been made to retrieve the user profile',
+        },
+      });
+    }
+  };
+
   useEffect(() => {
     console.log(`BEGIN useEffect for emailAddress change. ${emailAddress}`);
     if (emailAddress) {
@@ -176,7 +272,8 @@ export const AuthButton = () => {
                 givenName: dbUser.firstname,
                 familyName: dbUser.lastname,
                 avatar: dbUser.avatar || myAvatar,
-                google: googleProfileData?.google || myProfile.google || {},
+                google: googleProfileData?.google || myProfile.google,
+                facebook: facebookProfileData?.facebook || myProfile.facebook,
               } as UserProfileInterface;
               setMyProfile(mappedProfile);
             }
@@ -228,7 +325,7 @@ export const AuthButton = () => {
   }, [myAvatar, myProfile.avatar]);
   /*
   When a user logs in, access token gets set.
-  Then a profile is retrieved from google which includes an email address.
+  Then a profile is retrieved from google/facebook which includes an email address.
   The email is used to determine if a valid account exists.
   if yes, the myProfile is updated and the user can proceed.
   if no, the user is logged out and a message is thrown.
@@ -236,13 +333,28 @@ export const AuthButton = () => {
   useEffect(() => {
     // only need to get the profile once.
     if (accessToken && Object.keys(myProfile).length === 0) {
-      fetchGoogleProfile(accessToken);
+      if (authProvider === 'google') {
+        fetchGoogleProfile(accessToken);
+      } else if (authProvider === 'facebook') {
+        fetchFacebookProfile(accessToken);
+      }
     }
-  }, [accessToken]);
+  }, [accessToken, authProvider]);
 
   const authButtonLogout = () => {
     logout();
     setMyProfile({});
+  };
+
+  const handleFacebookResponse = (response: any) => {
+    if (response.accessToken) {
+      facebookLogin(response);
+    } else {
+      addNotification({
+        message: 'Facebook login was cancelled or failed.',
+        type: 'warn',
+      });
+    }
   };
 
   return (
@@ -250,7 +362,20 @@ export const AuthButton = () => {
       {accessToken ? (
         <button onClick={() => authButtonLogout()}>Sign out</button>
       ) : (
-        <button onClick={() => login()}>Sign in with Google 🚀 </button>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button onClick={() => login()}>Sign in with Google 🚀</button>
+          {fbAppId && (
+            <FacebookLogin
+              appId={fbAppId}
+              autoLoad={false}
+              fields="name,email,picture"
+              callback={handleFacebookResponse}
+              icon="fa-facebook"
+              textButton="Sign in with Facebook"
+              cssClass="facebook-login-button"
+            />
+          )}
+        </div>
       )}
     </>
   );

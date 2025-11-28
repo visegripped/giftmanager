@@ -17,6 +17,8 @@ export interface AuthContextInterface {
   logout: () => {};
   accessToken: string;
   setAccessToken: (accessToken: string) => {};
+  authProvider: 'google' | 'facebook' | '';
+  facebookLogin: (response: FacebookAuthResponseInterface) => void;
 }
 
 const AuthContext = createContext({});
@@ -31,6 +33,15 @@ export interface GoogleAuthResponseInterface {
   scope: string;
 }
 
+export interface FacebookAuthResponseInterface {
+  accessToken: string;
+  userID: string;
+  expiresIn?: number;
+  signedRequest?: string;
+  graphDomain?: string;
+  data_access_expiration_time?: number;
+}
+
 function AuthProvider(props: PropsWithChildren) {
   // console.log(' -> props from authProvider', props);
   const [accessToken, setAccessToken] = useState(
@@ -39,24 +50,35 @@ function AuthProvider(props: PropsWithChildren) {
   const [accessTokenExpiration, setAccessTokenExpiration] = useState<
     Date | string
   >(localStorage.getItem('access_token_expiration') || '');
+  const [authProvider, setAuthProvider] = useState<'google' | 'facebook' | ''>(
+    (localStorage.getItem('auth_provider') as 'google' | 'facebook' | '') || ''
+  );
 
   const { addNotification } = useContext(
     NotificationsContext
   ) as NotificationContextProps;
 
-  const handleGoogleTokenExpiration = () => {
+  const handleTokenExpiration = (expiresIn?: number) => {
     let currentTime = new Date().getTime();
-    const expirationTime = new Date(currentTime + 2 * 60 * 60 * 1000); // 2 hours for token life
+    // Facebook tokens typically expire in 1-2 hours, Google in 2 hours
+    const expirationTime = expiresIn
+      ? new Date(currentTime + expiresIn * 1000)
+      : new Date(currentTime + 2 * 60 * 60 * 1000); // Default 2 hours
     setAccessTokenExpiration(expirationTime);
     localStorage.setItem('access_token_expiration', expirationTime.toString());
   };
 
-  const onLoginSuccess = (authResponse: GoogleAuthResponseInterface) => {
+  const onLoginSuccess = (
+    authResponse: GoogleAuthResponseInterface,
+    provider: 'google' | 'facebook' = 'google'
+  ) => {
     const { access_token, refresh_token } = authResponse;
     setAccessToken(access_token);
+    setAuthProvider(provider);
     localStorage.setItem('access_token', access_token);
     localStorage.setItem('refresh_token', refresh_token || '');
-    handleGoogleTokenExpiration();
+    localStorage.setItem('auth_provider', provider);
+    handleTokenExpiration(authResponse.expires_in);
   };
 
   const onLoginFailure = (authResponse: GoogleAuthResponseInterface) => {
@@ -69,41 +91,92 @@ function AuthProvider(props: PropsWithChildren) {
   };
 
   const login = useGoogleLogin({
-    onSuccess: onLoginSuccess,
+    onSuccess: (response) => onLoginSuccess(response, 'google'),
     // @ts-ignore: todo - remove this and address TS issue.
     onError: onLoginFailure,
     client_id: googleClientId,
     scope: 'openid profile email',
   });
 
+  const facebookLogin = (response: FacebookAuthResponseInterface) => {
+    if (response.accessToken) {
+      const googleFormatResponse: GoogleAuthResponseInterface = {
+        access_token: response.accessToken,
+        token_type: 'Bearer',
+        expires_in: response.expiresIn,
+        scope: 'email',
+      };
+      onLoginSuccess(googleFormatResponse, 'facebook');
+    } else {
+      addNotification({
+        message: 'Facebook login failed. Please try again.',
+        type: 'error',
+      });
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('tokenId');
+    localStorage.removeItem('auth_provider');
     setAccessToken('');
-    googleLogout();
+    setAuthProvider('');
+
+    // Logout from the appropriate provider
+    if (authProvider === 'google') {
+      googleLogout();
+    } else if (authProvider === 'facebook') {
+      // Facebook logout - clear Facebook session
+      // Note: react-facebook-login doesn't have a built-in logout function
+      // We'll rely on clearing localStorage and the token
+      try {
+        // Attempt to logout via Facebook API if available
+        if (window.FB) {
+          window.FB.logout(() => {});
+        }
+      } catch (error) {
+        // Silently fail if FB is not available
+      }
+    }
   };
 
   const validateTokenViaAPI = useCallback(async () => {
-    if (!accessToken) return false;
+    if (!accessToken || !authProvider) return false;
 
     try {
-      const response = await fetch(
-        'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' +
-          accessToken
-      );
-      const data = await response.json();
+      if (authProvider === 'google') {
+        const response = await fetch(
+          'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' +
+            accessToken
+        );
+        const data = await response.json();
 
-      if (data.error_description) {
-        logout();
-        return false;
+        if (data.error_description) {
+          logout();
+          return false;
+        }
+
+        return true;
+      } else if (authProvider === 'facebook') {
+        // Validate Facebook token
+        const response = await fetch(
+          `https://graph.facebook.com/me?access_token=${accessToken}`
+        );
+        const data = await response.json();
+
+        if (data.error) {
+          logout();
+          return false;
+        }
+
+        return true;
       }
-
-      return true;
+      return false;
     } catch (error) {
       logout();
       return false;
     }
-  }, [accessToken, logout]);
+  }, [accessToken, authProvider, logout]);
 
   const tokenIsValid = useCallback(async () => {
     if (!accessToken) {
@@ -131,7 +204,14 @@ function AuthProvider(props: PropsWithChildren) {
 
   return (
     <AuthContext.Provider
-      value={{ login, logout, accessToken, setAccessToken }}
+      value={{
+        login,
+        logout,
+        accessToken,
+        setAccessToken,
+        authProvider,
+        facebookLogin,
+      }}
     >
       {props.children}
     </AuthContext.Provider>
