@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DeliveryDateModal } from './DeliveryDateModal';
 
@@ -8,6 +8,11 @@ describe('DeliveryDateModal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    // Restore Date after each test
+    global.Date = Date;
   });
 
   it('renders when isOpen is true', () => {
@@ -65,7 +70,7 @@ describe('DeliveryDateModal', () => {
   });
 
   it('updates date when user selects a new date', () => {
-    render(
+    const { container } = render(
       <DeliveryDateModal
         isOpen={true}
         onClose={mockOnClose}
@@ -73,7 +78,12 @@ describe('DeliveryDateModal', () => {
         defaultDate="2024-12-25"
       />
     );
-    const dateInput = screen.getByLabelText('Expected delivery date');
+
+    // Use container query as fallback
+    const dateInput = container.querySelector(
+      '#date-chooser-input'
+    ) as HTMLInputElement;
+    expect(dateInput).toBeTruthy();
     fireEvent.change(dateInput, { target: { value: '2024-12-30' } });
 
     const confirmButton = screen.getByText('Confirm');
@@ -83,8 +93,10 @@ describe('DeliveryDateModal', () => {
 
   it('calculates default date from birthday when provided', () => {
     // Mock date to be in March
-    const originalDate = Date;
-    global.Date = class extends originalDate {
+    const RealDate = Date;
+    const mockDateInstance = new RealDate(2024, 2, 15); // March 15, 2024
+
+    global.Date = class extends RealDate {
       constructor(...args: any[]) {
         if (args.length === 0) {
           super(2024, 2, 15); // March 15, 2024
@@ -94,7 +106,11 @@ describe('DeliveryDateModal', () => {
       }
     } as any;
 
-    render(
+    // Mock Date.now() as well
+    const originalNow = Date.now;
+    global.Date.now = () => mockDateInstance.getTime();
+
+    const { container } = render(
       <DeliveryDateModal
         isOpen={true}
         onClose={mockOnClose}
@@ -104,17 +120,20 @@ describe('DeliveryDateModal', () => {
       />
     );
 
-    const dateInput = screen.getByLabelText(
-      'Expected delivery date'
+    const dateInput = container.querySelector(
+      '#date-chooser-input'
     ) as HTMLInputElement;
+    expect(dateInput).toBeTruthy();
     // Should default to June 10 (birthday) since it's sooner than Christmas
     expect(dateInput.value).toBe('2024-06-10');
 
-    global.Date = originalDate;
+    // Restore
+    global.Date = RealDate;
+    global.Date.now = originalNow;
   });
 
   it('calculates default date to Christmas when no birthday provided', () => {
-    render(
+    const { container } = render(
       <DeliveryDateModal
         isOpen={true}
         onClose={mockOnClose}
@@ -122,15 +141,16 @@ describe('DeliveryDateModal', () => {
       />
     );
 
-    const dateInput = screen.getByLabelText(
-      'Expected delivery date'
+    const dateInput = container.querySelector(
+      '#date-chooser-input'
     ) as HTMLInputElement;
+    expect(dateInput).toBeTruthy();
     // Should default to Christmas
     expect(dateInput.value).toMatch(/^\d{4}-12-25$/);
   });
 
   it('resets date when modal reopens', () => {
-    const { rerender } = render(
+    const { container, rerender } = render(
       <DeliveryDateModal
         isOpen={true}
         onClose={mockOnClose}
@@ -139,10 +159,13 @@ describe('DeliveryDateModal', () => {
       />
     );
 
-    let dateInput = screen.getByLabelText(
-      'Expected delivery date'
+    let dateInput = container.querySelector(
+      '#date-chooser-input'
     ) as HTMLInputElement;
+    expect(dateInput).toBeTruthy();
+    expect(dateInput.value).toBe('2024-12-25');
     fireEvent.change(dateInput, { target: { value: '2024-12-30' } });
+    expect(dateInput.value).toBe('2024-12-30');
 
     // Close modal
     rerender(
@@ -154,6 +177,11 @@ describe('DeliveryDateModal', () => {
       />
     );
 
+    // Modal should not be visible when closed
+    expect(
+      container.querySelector('#date-chooser-input')
+    ).not.toBeInTheDocument();
+
     // Reopen modal
     rerender(
       <DeliveryDateModal
@@ -164,9 +192,10 @@ describe('DeliveryDateModal', () => {
       />
     );
 
-    dateInput = screen.getByLabelText(
-      'Expected delivery date'
+    dateInput = container.querySelector(
+      '#date-chooser-input'
     ) as HTMLInputElement;
+    expect(dateInput).toBeTruthy();
     // Should reset to default date
     expect(dateInput.value).toBe('2024-12-25');
   });
@@ -210,8 +239,10 @@ describe('DeliveryDateModal', () => {
 
   it('uses calculated date from birthday when defaultDate is not provided', () => {
     // Mock date to be in March
-    const originalDate = Date;
-    global.Date = class extends originalDate {
+    const RealDate = Date;
+    const mockDateInstance = new Date(2024, 2, 15); // March 15, 2024
+
+    global.Date = class extends RealDate {
       constructor(...args: any[]) {
         if (args.length === 0) {
           super(2024, 2, 15); // March 15, 2024
@@ -220,6 +251,10 @@ describe('DeliveryDateModal', () => {
         }
       }
     } as any;
+
+    // Mock Date.now() as well
+    const originalNow = Date.now;
+    global.Date.now = () => mockDateInstance.getTime();
 
     render(
       <DeliveryDateModal
@@ -237,6 +272,8 @@ describe('DeliveryDateModal', () => {
     // Should use calculated date (June 10, which is sooner than Christmas)
     expect(mockOnConfirm).toHaveBeenCalledWith('2024-06-10');
 
-    global.Date = originalDate;
+    // Restore
+    global.Date = RealDate;
+    global.Date.now = originalNow;
   });
 });

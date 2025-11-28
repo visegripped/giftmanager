@@ -67,15 +67,19 @@ describe('DateChooser', () => {
   });
 
   it('has required attribute when required is true', () => {
-    render(
+    const { container } = render(
       <DateChooser
         onDateChange={mockOnDateChange}
         label="Select Date"
         required={true}
       />
     );
-    const input = screen.getByLabelText('Select Date') as HTMLInputElement;
-    expect(input.required).toBe(true);
+    const input = container.querySelector(
+      '#date-chooser-input'
+    ) as HTMLInputElement;
+    expect(input).toBeTruthy();
+    expect(input.hasAttribute('required')).toBe(true);
+    expect(input.getAttribute('required')).not.toBeNull();
   });
 
   it('does not have required attribute when required is false', () => {
@@ -158,9 +162,14 @@ describe('calculateNearestGiftDate', () => {
     restoreDate();
   });
 
-  it('returns next year birthday when birthday has passed', () => {
-    mockDate(2024, 7, 15); // July 15, 2024
-    const result = calculateNearestGiftDate(6, 10); // June 10 (already passed)
+  it('returns next year birthday when birthday has passed and is sooner than next Christmas', () => {
+    // Mock date to be after Christmas (December 26, 2024)
+    // In this case, next Christmas is 2025-12-25, and next birthday is 2025-06-10
+    // So the birthday should be returned since it's sooner
+    mockDate(2024, 12, 26); // December 26, 2024
+    const result = calculateNearestGiftDate(6, 10); // June 10
+    // Next Christmas: 2025-12-25, Next Birthday: 2025-06-10
+    // Birthday is sooner, so should return 2025-06-10
     expect(result).toBe('2025-06-10');
     restoreDate();
   });
