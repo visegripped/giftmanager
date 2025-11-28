@@ -65,7 +65,8 @@ export interface UserProfileInterface {
   givenName: string;
   familyName: string;
   avatar: string;
-  google: GoogleProfileInterface;
+  google?: GoogleProfileInterface;
+  facebook?: FacebookProfileInterface;
 }
 
 export interface GoogleProfileEmailInterface {
@@ -94,4 +95,23 @@ export interface GoogleProfileInterface {
   emailAddresses: GoogleProfileEmailInterface[];
   names: GoogleProfileNameInterface[];
   photos: GoogleProfilePhotoInterface[];
+}
+
+export interface FacebookProfilePictureData {
+  url: string;
+  width?: number;
+  height?: number;
+}
+
+export interface FacebookProfilePicture {
+  data: FacebookProfilePictureData;
+}
+
+export interface FacebookProfileInterface {
+  id: string;
+  name: string;
+  email: string;
+  picture?: FacebookProfilePicture;
+  first_name?: string;
+  last_name?: string;
 }
