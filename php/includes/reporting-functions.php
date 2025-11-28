@@ -71,23 +71,36 @@ function createReport($reportData, $mysqli) {
         ? json_encode($reportData['metadata']) 
         : null;
 
+    // Prepare bind parameters (mysqli requires variables passed by reference)
+    $stid = $reportData['stid'];
+    $userid = isset($reportData['userid']) ? (int)$reportData['userid'] : null;
+    $reportType = $reportData['report_type'];
+    $component = $reportData['component'] ?? null;
+    $message = $reportData['message'] ?? null;
+    $userAgent = $reportData['user_agent'] ?? null;
+    $viewportWidth = isset($reportData['viewport_width']) ? (int)$reportData['viewport_width'] : null;
+    $viewportHeight = isset($reportData['viewport_height']) ? (int)$reportData['viewport_height'] : null;
+    $pageUrl = $reportData['page_url'] ?? null;
+    $referrer = $reportData['referrer'] ?? null;
+    $stackTrace = $reportData['stack_trace'] ?? null;
+
     // Bind parameters
     $stmt->bind_param(
         'sisssssiissssss',
-        $reportData['stid'],
-        $reportData['userid'] ?? null,
-        $reportData['report_type'],
-        $reportData['component'] ?? null,
-        $reportData['message'] ?? null,
+        $stid,
+        $userid,
+        $reportType,
+        $component,
+        $message,
         $performance_metrics,
-        $reportData['user_agent'] ?? null,
-        $reportData['viewport_width'] ?? null,
-        $reportData['viewport_height'] ?? null,
-        $reportData['page_url'] ?? null,
-        $reportData['referrer'] ?? null,
+        $userAgent,
+        $viewportWidth,
+        $viewportHeight,
+        $pageUrl,
+        $referrer,
         $request_data,
         $response_data,
-        $reportData['stack_trace'] ?? null,
+        $stackTrace,
         $metadata
     );
 
