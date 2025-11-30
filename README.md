@@ -4,7 +4,7 @@ A modern gift list management application with reporting and analytics.
 
 ## Features
 
-- User authentication via Google OAuth
+- User authentication via Google OAuth and Facebook OAuth (requires HTTPS)
 - Personal and shared gift lists
 - Admin dashboard with database management
 - Comprehensive reporting and analytics system
@@ -36,20 +36,30 @@ A modern gift list management application with reporting and analytics.
    # Edit .env.local with your settings
    ```
 
-3. **Start services**:
+3. **Generate SSL certificates** (required for Facebook OAuth):
+
+   ```bash
+   ./docker/generate-ssl-cert.sh
+   ```
+
+   This creates self-signed certificates for HTTPS. Your browser will show a security warning - this is normal for local development. Click "Advanced" → "Proceed to localhost" to continue.
+
+   > **Note**: Facebook OAuth requires HTTPS. Without certificates, the app will run on HTTP but Facebook login won't work.
+
+4. **Start services**:
 
    ```bash
    docker-compose up -d
    ```
 
-4. **Import database** (first time only):
+5. **Import database** (first time only):
 
    ```bash
    docker-compose --profile setup up db-setup
    ```
 
-5. **Access application**:
-   - Frontend: http://localhost:5174
+6. **Access application**:
+   - Frontend: https://localhost:5174 (or http://localhost:5174 if SSL not configured)
    - phpMyAdmin: http://localhost:8082
    - API: http://localhost:8081/api.php
    - Reporting: http://localhost:8081/reporting.php

@@ -8,12 +8,16 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
+# Copy entrypoint script
+COPY docker/frontend-entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Install dependencies
 RUN pnpm install
 
 # Expose Vite dev server port
 EXPOSE 5173
 
-# Start dev server (will be overridden by docker-compose command)
-CMD ["pnpm", "dev", "--host"]
+# Use entrypoint script
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 

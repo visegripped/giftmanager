@@ -1,0 +1,4 @@
+# This directory stores SSL certificates for local HTTPS development
+# Certificates are generated locally using docker/generate-ssl-cert.sh
+# and are not committed to the repository
+

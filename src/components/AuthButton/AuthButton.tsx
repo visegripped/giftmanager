@@ -168,55 +168,174 @@ export const AuthButton = () => {
     // Fetch user profile information from Facebook Graph API
     if (accessToken && !myProfile.emailAddress) {
       try {
-        // https://developers.facebook.com/docs/graph-api/reference/user
-        const response = await fetch(
-          `https://graph.facebook.com/me?fields=id,name,email,picture.width(200).height(200),first_name,last_name&access_token=${accessToken}`
+        console.log(
+          'Fetching Facebook profile with token:',
+          accessToken.substring(0, 10) + '...'
         );
 
-        if (!response.ok) {
-          postReport({
-            type: 'error',
-            report: 'Error fetching Facebook profile',
-            body: {
-              file: 'AuthButton',
-              origin: 'apiResponse',
-              error: `HTTP error! status: ${response.status}`,
-            },
+        // Use Facebook SDK API method instead of direct fetch to avoid appsecret_proof requirement
+        // The SDK handles authentication properly for client-side requests
+        if (window.FB && window.FB.api) {
+          return new Promise<void>((resolve, reject) => {
+            window.FB!.api(
+              '/me',
+              {
+                fields:
+                  'id,name,email,picture.width(200).height(200),first_name,last_name',
+              },
+              (response: any) => {
+                if (response.error) {
+                  console.error('Facebook API error:', response.error);
+                  postReport({
+                    type: 'error',
+                    report: 'Error fetching Facebook profile',
+                    body: {
+                      file: 'AuthButton',
+                      origin: 'apiResponse',
+                      error: JSON.stringify(response.error),
+                    },
+                  });
+                  addNotification({
+                    message: `Failed to load Facebook profile: ${response.error.message}`,
+                    type: 'error',
+                  });
+                  reject(response.error);
+                  return;
+                }
+
+                console.log(' -> got a facebook profile via SDK: ', response);
+
+                // Check if email is present (required for validation)
+                if (!response.email) {
+                  console.error('Facebook profile missing email:', response);
+                  addNotification({
+                    message:
+                      'Facebook profile is missing email address. Please ensure your Facebook account has an email.',
+                    type: 'error',
+                  });
+                  reject(new Error('Missing email'));
+                  return;
+                }
+
+                const convertedProfile =
+                  convertFacebookProfile2Custom(response);
+                console.log(' -> converted profile: ', convertedProfile);
+
+                if (!convertedProfile.emailAddress) {
+                  console.error(
+                    'Converted profile missing emailAddress:',
+                    convertedProfile
+                  );
+                  addNotification({
+                    message: 'Failed to extract email from Facebook profile.',
+                    type: 'error',
+                  });
+                  reject(new Error('Failed to extract email'));
+                  return;
+                }
+
+                setFacebookProfileData(convertedProfile);
+                setMyEmailAddress(convertedProfile.emailAddress);
+                if (convertedProfile.avatar) {
+                  setMyAvatar(convertedProfile.avatar);
+                }
+                resolve();
+              }
+            );
           });
-          throw new Error(`HTTP error! status: ${response.status}`);
+        } else {
+          // Fallback to direct fetch if SDK not available (but this may require appsecret_proof)
+          console.warn(
+            'Facebook SDK not available, falling back to direct fetch'
+          );
+          const response = await fetch(
+            `https://graph.facebook.com/me?fields=id,name,email,picture.width(200).height(200),first_name,last_name&access_token=${accessToken}`
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(
+              'Facebook profile fetch failed:',
+              response.status,
+              errorText
+            );
+            postReport({
+              type: 'error',
+              report: 'Error fetching Facebook profile',
+              body: {
+                file: 'AuthButton',
+                origin: 'apiResponse',
+                error: `HTTP error! status: ${response.status}, body: ${errorText}`,
+              },
+            });
+            addNotification({
+              message: `Failed to load Facebook profile. Please try logging in again.`,
+              type: 'error',
+            });
+            return;
+          }
+          const userProfile = await response.json();
+          console.log(' -> got a facebook profile: ', userProfile);
+
+          // Check if email is present (required for validation)
+          if (!userProfile.email) {
+            console.error('Facebook profile missing email:', userProfile);
+            addNotification({
+              message:
+                'Facebook profile is missing email address. Please ensure your Facebook account has an email.',
+              type: 'error',
+            });
+            return;
+          }
+
+          const convertedProfile = convertFacebookProfile2Custom(userProfile);
+          console.log(' -> converted profile: ', convertedProfile);
+
+          if (!convertedProfile.emailAddress) {
+            console.error(
+              'Converted profile missing emailAddress:',
+              convertedProfile
+            );
+            addNotification({
+              message: 'Failed to extract email from Facebook profile.',
+              type: 'error',
+            });
+            return;
+          }
+
+          setFacebookProfileData(convertedProfile);
+          setMyEmailAddress(convertedProfile.emailAddress);
+          if (convertedProfile.avatar) {
+            setMyAvatar(convertedProfile.avatar);
+          }
+          return convertedProfile;
         }
-        const userProfile = await response.json();
-        console.log(' -> got a facebook profile: ', userProfile);
-        const convertedProfile = convertFacebookProfile2Custom(userProfile);
-        setFacebookProfileData(convertedProfile);
-        setMyEmailAddress(convertedProfile.emailAddress);
-        if (convertedProfile.avatar) {
-          setMyAvatar(convertedProfile.avatar);
-        }
-        return convertedProfile;
       } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        console.error('Error fetching Facebook profile:', error);
         postReport({
           type: 'error',
           report: 'Error fetching Facebook profile',
           body: {
             file: 'AuthButton',
             origin: 'apiResponse',
-            error: JSON.stringify(error),
+            error: errorMessage,
           },
+        });
+        addNotification({
+          message: `Failed to load Facebook profile: ${errorMessage}`,
+          type: 'error',
         });
       }
       return;
     } else {
-      postReport({
-        type: 'error',
-        report: 'Error fetching Facebook profile',
-        body: {
-          file: 'AuthButton',
-          origin: 'apiResponse',
-          error:
-            'Access token was not passed to fetchFacebookProfile.  No request attempt has been made to retrieve the user profile',
-        },
-      });
+      if (!accessToken) {
+        console.error('fetchFacebookProfile called without accessToken');
+      }
+      if (myProfile.emailAddress) {
+        console.log('fetchFacebookProfile skipped - profile already has email');
+      }
     }
   };
 
@@ -332,14 +451,23 @@ export const AuthButton = () => {
   */
   useEffect(() => {
     // only need to get the profile once.
-    if (accessToken && Object.keys(myProfile).length === 0) {
+    if (accessToken && Object.keys(myProfile).length === 0 && authProvider) {
+      console.log('Triggering profile fetch for:', authProvider);
       if (authProvider === 'google') {
         fetchGoogleProfile(accessToken);
       } else if (authProvider === 'facebook') {
         fetchFacebookProfile(accessToken);
       }
+    } else {
+      if (!accessToken) {
+        console.log('Profile fetch skipped: no accessToken');
+      } else if (Object.keys(myProfile).length > 0) {
+        console.log('Profile fetch skipped: profile already exists');
+      } else if (!authProvider) {
+        console.log('Profile fetch skipped: no authProvider');
+      }
     }
-  }, [accessToken, authProvider]);
+  }, [accessToken, authProvider, myProfile]);
 
   const authButtonLogout = () => {
     logout();
@@ -347,9 +475,20 @@ export const AuthButton = () => {
   };
 
   const handleFacebookResponse = (response: any) => {
+    // Check if response has status indicating failure/cancellation
+    if (response.status === 'not_authorized' || response.status === 'unknown') {
+      addNotification({
+        message: 'Facebook login was cancelled or not authorized.',
+        type: 'warn',
+      });
+      return;
+    }
+
+    // Check if we have a valid access token
     if (response.accessToken) {
       facebookLogin(response);
     } else {
+      // If no accessToken, it's likely a cancelled login
       addNotification({
         message: 'Facebook login was cancelled or failed.',
         type: 'warn',

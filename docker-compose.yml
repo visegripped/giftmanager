@@ -104,8 +104,8 @@ services:
       - .:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=http://localhost:${PHP_PORT:-8081}/api.php
-      - VITE_REPORTING_API_URL=http://localhost:${PHP_PORT:-8081}/reporting.php
+      - VITE_API_URL=//localhost:${PHP_PORT:-8081}/api.php
+      - VITE_REPORTING_API_URL=//localhost:${PHP_PORT:-8081}/reporting.php
     depends_on:
       - php
     networks:

@@ -3,7 +3,9 @@
  * Simple GraphQL client for querying the reporting API
  */
 
-const reportingUrl = import.meta.env.VITE_REPORTING_API_URL as string;
+import { getReportingUrl } from './urlHelper';
+
+const reportingUrl = getReportingUrl();
 
 export interface GraphQLResponse<T = unknown> {
   data?: T;

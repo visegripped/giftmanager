@@ -1,6 +1,7 @@
 import { responseInterface as ApiResponse } from '../types/types';
+import { getReportingUrl } from './urlHelper';
 
-const reportingUrl = import.meta.env.VITE_REPORTING_API_URL as string;
+const reportingUrl = getReportingUrl();
 
 // SANITY -> DO NOT THROW ERRORS FROM THIS FILE.
 // There is a method listening for uncaught errors that uses this.
