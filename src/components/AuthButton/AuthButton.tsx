@@ -16,6 +16,7 @@ import {
 } from '../../types/types';
 import fetchData from '../../utilities/fetchData';
 import postReport from '../../utilities/postReport';
+import { reportCreate } from '../../utilities/reportCreate';
 import {
   NotificationsContext,
   NotificationContextProps,
@@ -311,6 +312,30 @@ export const AuthButton = () => {
         (validationResponse: responseInterface) => {
           if (validationResponse?.warn) {
             logout();
+
+            // Log unauthorized login attempt to reporting API
+            const stid = sessionStorage.getItem('giftmanager_stid') || '';
+            if (stid) {
+              reportCreate({
+                stid,
+                report_type: 'warning',
+                component: 'AuthButton',
+                message: 'Unauthorized user attempted to log in',
+                metadata: {
+                  email: emailAddress,
+                  warning: validationResponse.warn,
+                  origin: 'apiResponse',
+                  file: 'AuthButton',
+                },
+              }).catch((reportError) => {
+                console.error(
+                  'Failed to report unauthorized login attempt:',
+                  reportError
+                );
+              });
+            }
+
+            // Also use postReport for backward compatibility
             postReport({
               type: 'warn',
               report: 'Unauthorized user attempted to log in',
@@ -318,12 +343,17 @@ export const AuthButton = () => {
                 file: 'AuthButton',
                 origin: 'apiResponse',
                 email: emailAddress,
+                warn: validationResponse.warn,
               },
             });
+
+            // Show user-friendly error message with specific warning
+            const warnMessage =
+              validationResponse.warn ||
+              'Email address not recognized as a valid user';
             addNotification({
-              message: `The email address ${emailAddress} is not recognized as a valid user.
-              If you think you have received this message in error, reach out to the site administrator.
-              If you don't know who the site administrator is, you probably don't belong here.`,
+              message: `Login failed: ${warnMessage}
+              If you think you have received this message in error, reach out to the site administrator.`,
               type: 'warn',
               persist: true,
             });
@@ -360,19 +390,47 @@ export const AuthButton = () => {
               setMyProfile(mappedProfile);
             }
           } else {
+            // Handle error response - includes specific error message from API
+            const errorMessage =
+              validationResponse?.error ||
+              validationResponse?.err ||
+              'Unknown error';
+
+            // Log login failure to reporting API
+            const stid = sessionStorage.getItem('giftmanager_stid') || '';
+            if (stid) {
+              reportCreate({
+                stid,
+                report_type: 'error',
+                component: 'AuthButton',
+                message: 'Login validation failed',
+                metadata: {
+                  email: emailAddress,
+                  error: errorMessage,
+                  origin: 'apiResponse',
+                  file: 'AuthButton',
+                },
+              }).catch((reportError) => {
+                console.error('Failed to report login failure:', reportError);
+              });
+            }
+
+            // Also use postReport for backward compatibility
             postReport({
-              type: 'warn',
+              type: 'error',
               report: 'Error while attempting to validate user',
               body: {
                 file: 'AuthButton',
                 origin: 'apiResponse',
                 email: emailAddress,
+                error: errorMessage,
               },
             });
+
+            // Show user-friendly error message with specific API error
             addNotification({
-              message: `Something went wrong while trying to validate your account.
-              If you think you have received this message in error, reach out to the site administrator.
-              If you don't know who the site administrator is, you probably don't belong here.`,
+              message: `Login failed: ${errorMessage}
+              If you think you have received this message in error, reach out to the site administrator.`,
               type: 'error',
               persist: true,
             });

@@ -327,6 +327,9 @@ describe('AuthContext', () => {
     });
 
     localStorage.setItem('access_token', 'expired-token');
+    localStorage.setItem('auth_provider', 'google');
+    // Set login_timestamp to be old so validation will run
+    localStorage.setItem('login_timestamp', (Date.now() - 20000).toString());
     localStorage.setItem(
       'access_token_expiration',
       new Date(Date.now() - 3600000).toString()
@@ -338,10 +341,15 @@ describe('AuthContext', () => {
       </AuthProvider>
     );
 
-    // Should logout with expired token
-    await waitFor(() => {
-      expect(screen.getByTestId('access-token')).toHaveTextContent('no-token');
-    });
+    // Should logout with expired token (expiration check happens first)
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('access-token')).toHaveTextContent(
+          'no-token'
+        );
+      },
+      { timeout: 3000 }
+    );
   });
 
   it('memoizes functions to prevent unnecessary re-renders', () => {
@@ -477,13 +485,18 @@ describe('AuthContext', () => {
   });
 
   it('handles invalid Facebook token correctly', async () => {
-    // Mock fetch for Facebook token validation with error
+    // Mock fetch for Facebook token validation with error response
     (globalThis as any).fetch = vi.fn().mockResolvedValue({
-      json: () => Promise.resolve({ error: 'Invalid token' }),
+      ok: false,
+      status: 400,
+      json: () =>
+        Promise.resolve({ error: { message: 'Invalid token', code: 100 } }),
     });
 
     localStorage.setItem('access_token', 'invalid-facebook-token');
     localStorage.setItem('auth_provider', 'facebook');
+    // Set login_timestamp to be old so validation will run
+    localStorage.setItem('login_timestamp', (Date.now() - 20000).toString());
     localStorage.setItem(
       'access_token_expiration',
       new Date(Date.now() + 3600000).toString()
@@ -495,9 +508,14 @@ describe('AuthContext', () => {
       </AuthProvider>
     );
 
-    // Should logout with invalid Facebook token
-    await waitFor(() => {
-      expect(screen.getByTestId('access-token')).toHaveTextContent('no-token');
-    });
+    // Should logout with invalid Facebook token (after validation delay)
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('access-token')).toHaveTextContent(
+          'no-token'
+        );
+      },
+      { timeout: 5000 }
+    );
   });
 });
