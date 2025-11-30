@@ -40,3 +40,4 @@ composer.lock
 .cursor/*
 
 AI-notes/*
+docker/ssl/*

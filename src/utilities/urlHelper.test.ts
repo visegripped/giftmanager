@@ -18,13 +18,13 @@ describe('urlHelper', () => {
     };
 
     // Mock window object
-    global.window = mockWindow as Window;
+    global.window = mockWindow as Window & typeof globalThis;
   });
 
   afterEach(() => {
     // Restore original window
     if (originalWindow) {
-      global.window = originalWindow;
+      global.window = originalWindow as Window & typeof globalThis;
     } else {
       delete (global as any).window;
     }

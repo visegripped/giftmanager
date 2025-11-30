@@ -36,7 +36,7 @@ export function normalizeUrl(url: string): string {
     return url;
   }
 
-  const [, hostname, port, path = ''] = match;
+  const [, hostname, , path = ''] = match;
 
   // If it's localhost, return just the path (Vite will proxy it)
   // This works because Vite's proxy is configured for /api.php and /reporting.php

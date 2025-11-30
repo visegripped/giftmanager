@@ -116,7 +116,7 @@ describe('calculateNearestGiftDate', () => {
         if (args.length === 0) {
           super(year, month - 1, day); // month is 0-indexed in Date constructor
         } else {
-          super(...args);
+          super(...(args as Parameters<DateConstructor>));
         }
       }
     } as any;
