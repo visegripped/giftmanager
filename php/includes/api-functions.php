@@ -2,6 +2,28 @@
 <?php
 // my
 function addItemToMyList($userid, $name, $description, $link, $groupid, $mysqli) {
+    // Check for duplicate items (if ai-functions.php is available)
+    if (function_exists('checkForDuplicateItem')) {
+        $duplicate = checkForDuplicateItem($name, $description, $userid, $mysqli);
+        if ($duplicate) {
+            return array(
+                "error" => "A similar item already exists in your list",
+                "duplicate" => array(
+                    "itemid" => $duplicate['itemid'],
+                    "name" => $duplicate['name']
+                )
+            );
+        }
+    }
+
+    // Enhance description if needed (if ai-functions.php is available)
+    $enhancedDescription = $description;
+    if (function_exists('enhanceItemDescription')) {
+        if (empty($description) || strlen($description) < 20) {
+            $enhancedDescription = enhanceItemDescription($name, $description, $link);
+        }
+    }
+
     // Correct SQL query
     $addedByUserId = $userid;
 
@@ -9,11 +31,14 @@ function addItemToMyList($userid, $name, $description, $link, $groupid, $mysqli)
 
     if ($stmt) {
         // Bind the parameters correctly
-        $stmt->bind_param('ssssss', $userid, $name, $description, $link, $userid, $groupid);
+        $stmt->bind_param('ssssss', $userid, $name, $enhancedDescription, $link, $userid, $groupid);
         
         // Execute the statement
         if ($stmt->execute()) {
-            $apiResponse = array("success" => "Item added to user $userid");
+            $apiResponse = array(
+                "success" => "Item added to user $userid",
+                "description_enhanced" => ($enhancedDescription !== $description)
+            );
         } else {
             $apiResponse = array("error" => "Failed to add item: " . $stmt->error);
         }
@@ -127,15 +152,40 @@ function updateRemovedStatusForMyItem($userid, $removed, $itemid, $mysqli) {
 
 // their
 function addItemToTheirList($myuserid, $theiruserid, $name, $description, $link, $groupid, $mysqli) {
+    // Check for duplicate items (if ai-functions.php is available)
+    if (function_exists('checkForDuplicateItem')) {
+        $duplicate = checkForDuplicateItem($name, $description, $theiruserid, $mysqli);
+        if ($duplicate) {
+            return array(
+                "error" => "A similar item already exists in their list",
+                "duplicate" => array(
+                    "itemid" => $duplicate['itemid'],
+                    "name" => $duplicate['name']
+                )
+            );
+        }
+    }
+
+    // Enhance description if needed (if ai-functions.php is available)
+    $enhancedDescription = $description;
+    if (function_exists('enhanceItemDescription')) {
+        if (empty($description) || strlen($description) < 20) {
+            $enhancedDescription = enhanceItemDescription($name, $description, $link);
+        }
+    }
+
     $apiResponse = '';
     $stmt = $mysqli->prepare("INSERT INTO items (userid, name, description, link, added_by_userid, status_userid, groupid, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'purchased')");
     if ($stmt) {
         // Bind the parameters correctly
-        $stmt->bind_param('sssssss', $theiruserid, $name, $description, $link, $myuserid,  $myuserid, $groupid);
+        $stmt->bind_param('sssssss', $theiruserid, $name, $enhancedDescription, $link, $myuserid,  $myuserid, $groupid);
         
         // Execute the statement
         if ($stmt->execute()) {
-            $apiResponse = array("success" => "Item added for user $theiruserid");
+            $apiResponse = array(
+                "success" => "Item added for user $theiruserid",
+                "description_enhanced" => ($enhancedDescription !== $description)
+            );
         } else {
             $apiResponse = array("error" => "Failed to add item: " . $stmt->error);
         }

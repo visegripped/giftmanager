@@ -19,6 +19,7 @@ import {
 } from '../../types/types';
 import AddItemForm from '../../components/AddItemForm/AddItemForm';
 import DeliveryDateModal from '../../components/DeliveryDateModal/DeliveryDateModal';
+import GiftRecommendations from '../../components/GiftRecommendations/GiftRecommendations';
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
@@ -372,22 +373,40 @@ const PageContent = () => {
     response &&
       response.then((data: responseInterface) => {
         if (data.error) {
-          postReport({
-            type: 'error',
-            report: 'Unable to add item to users list',
-            body: {
-              error: data.error,
-              file: 'User',
-              origin: 'apiResponse',
-            },
-          });
-          addNotification({
-            message: `Something has gone wrong with adding an item to this users list.
+          // Check if it's a duplicate error
+          const duplicateInfo = (data as any).duplicate;
+          if (duplicateInfo) {
+            addNotification({
+              message: `A similar item "${duplicateInfo.name}" already exists in their list. Please check if this is a duplicate.`,
+              type: 'warn',
+              persist: true,
+            });
+          } else {
+            postReport({
+              type: 'error',
+              report: 'Unable to add item to users list',
+              body: {
+                error: data.error,
+                file: 'User',
+                origin: 'apiResponse',
+              },
+            });
+            addNotification({
+              message: `Something has gone wrong with adding an item to this users list.
             Try refreshing the page.
             If the error persists, reach out to the site administrator`,
-            type: 'error',
-          });
+              type: 'error',
+            });
+          }
         } else {
+          // Check if description was enhanced
+          if ((data as any).description_enhanced) {
+            addNotification({
+              message:
+                'Item added! The description was automatically enhanced by AI.',
+              type: 'success',
+            });
+          }
           fetchTheirItemList(theirUserid);
         }
       });
@@ -425,6 +444,12 @@ const PageContent = () => {
               legendText={`Add to  ${theirUserProfile?.firstname}'s list`}
               onAddItemFormSubmit={onSubmit}
             />
+            {theirUserid && (
+              <GiftRecommendations
+                theiruserid={theirUserid}
+                onAddRecommendation={onSubmit}
+              />
+            )}
             <>
               {theirItemList?.length && myUserid ? (
                 <Table

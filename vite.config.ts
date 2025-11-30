@@ -57,6 +57,7 @@ export default defineConfig({
     setupFiles: ['src/__tests__/setup.ts'],
   },
   optimizeDeps: {
+    include: ['react-facebook-login'],
     force: true,
     esbuildOptions: {
       loader: {
