@@ -23,6 +23,7 @@ type fetchInterface = {
   added_by_userid?: string;
   groupid?: string;
   archive?: string;
+  limit?: string | number;
 };
 
 export const formatDate = (date: Date) => {
@@ -50,6 +51,7 @@ export const fetchData = (config: fetchInterface) => {
     'added_by_userid',
     'groupid',
     'archive',
+    'limit',
   ];
   const accessToken = localStorage.getItem('access_token');
   const makeAsyncRequest = async (theFormData: {}) => {

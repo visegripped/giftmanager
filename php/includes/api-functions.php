@@ -2,6 +2,28 @@
 <?php
 // my
 function addItemToMyList($userid, $name, $description, $link, $groupid, $mysqli) {
+    // Check for duplicate items (if ai-functions.php is available)
+    if (function_exists('checkForDuplicateItem')) {
+        $duplicate = checkForDuplicateItem($name, $description, $userid, $mysqli);
+        if ($duplicate) {
+            return array(
+                "error" => "A similar item already exists in your list",
+                "duplicate" => array(
+                    "itemid" => $duplicate['itemid'],
+                    "name" => $duplicate['name']
+                )
+            );
+        }
+    }
+
+    // Enhance description if needed (if ai-functions.php is available)
+    $enhancedDescription = $description;
+    if (function_exists('enhanceItemDescription')) {
+        if (empty($description) || strlen($description) < 20) {
+            $enhancedDescription = enhanceItemDescription($name, $description, $link);
+        }
+    }
+
     // Correct SQL query
     $addedByUserId = $userid;
 
@@ -9,11 +31,14 @@ function addItemToMyList($userid, $name, $description, $link, $groupid, $mysqli)
 
     if ($stmt) {
         // Bind the parameters correctly
-        $stmt->bind_param('ssssss', $userid, $name, $description, $link, $userid, $groupid);
+        $stmt->bind_param('ssssss', $userid, $name, $enhancedDescription, $link, $userid, $groupid);
         
         // Execute the statement
         if ($stmt->execute()) {
-            $apiResponse = array("success" => "Item added to user $userid");
+            $apiResponse = array(
+                "success" => "Item added to user $userid",
+                "description_enhanced" => ($enhancedDescription !== $description)
+            );
         } else {
             $apiResponse = array("error" => "Failed to add item: " . $stmt->error);
         }
@@ -127,15 +152,40 @@ function updateRemovedStatusForMyItem($userid, $removed, $itemid, $mysqli) {
 
 // their
 function addItemToTheirList($myuserid, $theiruserid, $name, $description, $link, $groupid, $mysqli) {
+    // Check for duplicate items (if ai-functions.php is available)
+    if (function_exists('checkForDuplicateItem')) {
+        $duplicate = checkForDuplicateItem($name, $description, $theiruserid, $mysqli);
+        if ($duplicate) {
+            return array(
+                "error" => "A similar item already exists in their list",
+                "duplicate" => array(
+                    "itemid" => $duplicate['itemid'],
+                    "name" => $duplicate['name']
+                )
+            );
+        }
+    }
+
+    // Enhance description if needed (if ai-functions.php is available)
+    $enhancedDescription = $description;
+    if (function_exists('enhanceItemDescription')) {
+        if (empty($description) || strlen($description) < 20) {
+            $enhancedDescription = enhanceItemDescription($name, $description, $link);
+        }
+    }
+
     $apiResponse = '';
     $stmt = $mysqli->prepare("INSERT INTO items (userid, name, description, link, added_by_userid, status_userid, groupid, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'purchased')");
     if ($stmt) {
         // Bind the parameters correctly
-        $stmt->bind_param('sssssss', $theiruserid, $name, $description, $link, $myuserid,  $myuserid, $groupid);
+        $stmt->bind_param('sssssss', $theiruserid, $name, $enhancedDescription, $link, $myuserid,  $myuserid, $groupid);
         
         // Execute the statement
         if ($stmt->execute()) {
-            $apiResponse = array("success" => "Item added for user $theiruserid");
+            $apiResponse = array(
+                "success" => "Item added for user $theiruserid",
+                "description_enhanced" => ($enhancedDescription !== $description)
+            );
         } else {
             $apiResponse = array("error" => "Failed to add item: " . $stmt->error);
         }
@@ -187,10 +237,27 @@ function getTheirItemList($userid, $mysqli) {
     return $apiResponse;
 }
 
-function updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli) {
-    $query = "UPDATE items SET status = ?, status_userid = ? WHERE itemid = ? AND userid = ?";
-    $stmt = $mysqli->prepare($query);
-    $stmt->bind_param('ssis', $status, $myuserid, $itemid, $theiruserid);
+function updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli, $date_received = null) {
+    // If status is purchased, date_received is required
+    if ($status === 'purchased' && empty($date_received)) {
+        return array("error" => "date_received is required when status is 'purchased'");
+    }
+
+    // Build query based on whether date_received is provided
+    if ($status === 'purchased' && !empty($date_received)) {
+        $query = "UPDATE items SET status = ?, status_userid = ?, date_received = ? WHERE itemid = ? AND userid = ?";
+        $stmt = $mysqli->prepare($query);
+        if ($stmt) {
+            $stmt->bind_param('sssis', $status, $myuserid, $date_received, $itemid, $theiruserid);
+        }
+    } else {
+        $query = "UPDATE items SET status = ?, status_userid = ? WHERE itemid = ? AND userid = ?";
+        $stmt = $mysqli->prepare($query);
+        if ($stmt) {
+            $stmt->bind_param('ssis', $status, $myuserid, $itemid, $theiruserid);
+        }
+    }
+
     if ($stmt) {
         $stmt->execute();
         if ($stmt->affected_rows > 0) {
@@ -207,7 +274,7 @@ function updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $my
 
 // generic
 function getUserProfileByUserId($userid, $mysqli) {
-    $query = "SELECT * FROM `users` WHERE userid = ? ";
+    $query = "SELECT userid, firstname, lastname, groupid, created, email, avatar, birthday_month, birthday_day FROM `users` WHERE userid = ? ";
     $stmt = $mysqli->prepare($query);
 
     if ($stmt) {

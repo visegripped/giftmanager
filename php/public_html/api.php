@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 include "../includes/api-credentials.php";
 include "../includes/api-functions.php";
+include "../includes/ai-functions.php";
 
 // Assuming $mysqli is your mysqli connection object
 // Support Docker environment (use DB_HOST from env, fallback to localhost)
@@ -149,7 +150,7 @@ else if ($task == 'getTheirItemList' && $theiruserid) {
     $apiResponse = getTheirItemList($theiruserid, $mysqli);
 }
 else if ($task == 'updateStatusForTheirItem' && $theiruserid && $status && $myuserid && $itemid) {
-    $apiResponse = updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli);
+    $apiResponse = updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli, $date_received);
 }
 //general
  else if ($task == 'getUserProfileByUserId' && $userid) {
@@ -161,6 +162,15 @@ else if ($task == 'getUsersList') {
     $apiResponse = updateAvatar($email_address, $avatar, $mysqli);
 }  else if($task == 'confirmUserIsValid' && $email_address) {
     $apiResponse = confirmUserIsValid($email_address, $mysqli);
+}
+// AI tasks
+else if($task == 'getGiftRecommendations' && $theiruserid) {
+    $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 10;
+    // Include AI functions if not already included
+    if (!function_exists('getGiftRecommendations')) {
+        include "../includes/ai-functions.php";
+    }
+    $apiResponse = getGiftRecommendations($theiruserid, $mysqli, $limit);
 }
 
 // admin

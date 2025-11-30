@@ -186,22 +186,40 @@ const Me = () => {
     response &&
       response.then((data: responseInterface) => {
         if (data.error) {
-          postReport({
-            type: 'error',
-            report: 'Unable to add item to item list',
-            body: {
-              error: data.error,
-              file: 'Me',
-              origin: 'apiResponse',
-            },
-          });
-          addNotification({
-            message: `Something has gone wrong with adding the item to your list.
+          // Check if it's a duplicate error
+          const duplicateInfo = (data as any).duplicate;
+          if (duplicateInfo) {
+            addNotification({
+              message: `A similar item "${duplicateInfo.name}" already exists in your list. Please check if this is a duplicate.`,
+              type: 'warn',
+              persist: true,
+            });
+          } else {
+            postReport({
+              type: 'error',
+              report: 'Unable to add item to item list',
+              body: {
+                error: data.error,
+                file: 'Me',
+                origin: 'apiResponse',
+              },
+            });
+            addNotification({
+              message: `Something has gone wrong with adding the item to your list.
             Try refreshing the page.
             If the error persists, reach out to the site administrator`,
-            type: 'error',
-          });
+              type: 'error',
+            });
+          }
         } else {
+          // Check if description was enhanced
+          if ((data as any).description_enhanced) {
+            addNotification({
+              message:
+                'Item added! The description was automatically enhanced by AI.',
+              type: 'success',
+            });
+          }
           setAddItemName('');
           setAddItemDescription('');
           setAddItemLink('');

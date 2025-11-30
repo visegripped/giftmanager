@@ -25,6 +25,8 @@ export type UserType = {
   created: number | string;
   email: string;
   avatar: string;
+  birthday_month?: number | null;
+  birthday_day?: number | null;
 };
 
 export type tasksInterface = {

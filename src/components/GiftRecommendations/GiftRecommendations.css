@@ -1,0 +1,90 @@
+.gift-recommendations {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.gift-recommendations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.gift-recommendations-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.error {
+  padding: 15px;
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  color: #c33;
+  margin-bottom: 15px;
+}
+
+.recommendations-list {
+  display: grid;
+  gap: 15px;
+}
+
+.recommendation-item {
+  padding: 15px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.recommendation-header h4 {
+  margin: 0;
+  color: #333;
+  flex: 1;
+}
+
+.recommendation-category {
+  font-size: 0.85em;
+  padding: 4px 8px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.recommendation-description {
+  color: #666;
+  line-height: 1.6;
+  margin: 10px 0;
+}
+
+.recommendation-reason {
+  color: #888;
+  font-size: 0.9em;
+  font-style: italic;
+  margin: 8px 0;
+  padding-left: 10px;
+  border-left: 3px solid #e0e0e0;
+}
+
+.no-recommendations {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}
