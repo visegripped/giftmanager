@@ -1,9 +1,10 @@
 import { itemStatusInterface, ItemRemovedType } from '../types/types';
 import { startAPICall, endAPICall } from './performanceTracker';
+import { getApiUrl } from './urlHelper';
 
 // Support environment variable for API URL (for Docker/local development)
-const apiUrl =
-  import.meta.env.VITE_API_URL || 'https://gm.visegripped.com/api.php';
+// URL is protocol-relative and will use current page's protocol (HTTP/HTTPS)
+const apiUrl = getApiUrl();
 
 type fetchInterface = {
   task: string;
