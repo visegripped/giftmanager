@@ -78,11 +78,22 @@ function isValidFacebookAccessToken($token) {
     return false;
   }
 
-  // Get Facebook App ID from environment variable
+  // Get Facebook App ID and Secret from environment variables
   $fbAppId = getenv('FB_APP_ID') ?: "";
+  $fbAppSecret = getenv('FB_APP_SECRET') ?: getenv('FB_APP_SECRET') ?: "";
+
+  // Generate appsecret_proof if app secret is available
+  $appsecret_proof = '';
+  if ($fbAppSecret) {
+    $appsecret_proof = hash_hmac('sha256', $token, $fbAppSecret);
+  }
 
   // Validate token by checking user info
-  $url = "https://graph.facebook.com/me?access_token=" . $token;
+  $params = array('access_token' => $token, 'fields' => 'id');
+  if ($appsecret_proof) {
+    $params['appsecret_proof'] = $appsecret_proof;
+  }
+  $url = "https://graph.facebook.com/me?" . http_build_query($params);
 
   $response = @file_get_contents($url);
   if ($response === false) {
@@ -121,7 +132,17 @@ function isValidAccessToken($token, $provider) {
 
 // Types has the list of supported tasks
 
-if(!$access_token) {
+// Handle getFacebookProfile task first (skip token validation for this task)
+if($task == 'getFacebookProfile') {
+    if (!$access_token) {
+        $apiResponse = array("error" => "Access token not specified for getFacebookProfile task.");
+    } else if (function_exists('getFacebookProfile')) {
+        // Fetch Facebook profile via server-side proxy (adds appsecret_proof)
+        $apiResponse = getFacebookProfile($access_token);
+    } else {
+        $apiResponse = array("error" => "getFacebookProfile function not found. Please check api-functions.php includes.");
+    }
+} else if(!$access_token) {
     $apiResponse = array("error" => "Access token not specified on API request.");
 } else {
     // Default to 'google' for backward compatibility if provider not specified
@@ -129,49 +150,50 @@ if(!$access_token) {
     if(!isValidAccessToken($access_token, $provider)) {
         $apiResponse = array("error" => "Invalid/expired token.  Please sign (or re-sign) in.");
     }
-}   
-
-// my tasks
- else if($task == 'addItemToMyList' && $myuserid && $name && $groupid) {
-    $apiResponse = addItemToMyList($myuserid, $name, $description, $link, $groupid, $mysqli);
-} else if ($task == 'getMyItemList' && $myuserid) {
-    $apiResponse = getMyItemList($myuserid, $mysqli);
-}  else if($task == 'updateItemOnMyList' && $myuserid && $myuserid && $itemid && ($description || $link)) {
-    $apiResponse = updateItemOnMyList($myuserid, $itemid, $description, $link, $mysqli);
-} else if($task == 'updateRemovedStatusForMyItem' && $myuserid &&  $removed >= 0 &&  $itemid) {
-    $apiResponse = updateRemovedStatusForMyItem($myuserid, $removed, $itemid, $mysqli);
-} 
-// their tasks
-else if ($task == 'addItemToTheirList' && $theiruserid && $myuserid && $name) {
-    $apiResponse = addItemToTheirList($myuserid, $theiruserid, $name, $description, $link, $groupid, $mysqli);
-}
-else if ($task == 'getTheirItemList' && $theiruserid) {
-    $apiResponse = getTheirItemList($theiruserid, $mysqli);
-}
-else if ($task == 'updateStatusForTheirItem' && $theiruserid && $status && $myuserid && $itemid) {
-    $apiResponse = updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli, $date_received);
-}
-//general
- else if ($task == 'getUserProfileByUserId' && $userid) {
-    $apiResponse = getUserProfileByUserId($userid, $mysqli);
-}
-else if ($task == 'getUsersList') {
-    $apiResponse = getUsers($mysqli);
-} else if($task == 'updateAvatar' && $email_address && $avatar) {
-    $apiResponse = updateAvatar($email_address, $avatar, $mysqli);
-}  else if($task == 'confirmUserIsValid' && $email_address) {
-    $apiResponse = confirmUserIsValid($email_address, $mysqli);
 }
 
-// admin
-else if($task == 'archivePurchasedItems' && $myuserid == 1) {
-    $apiResponse = archivePurchasedItems($myuserid, $mysqli);
+// my tasks - only process if task is not getFacebookProfile and no error has been set
+if($task != 'getFacebookProfile' && (!isset($apiResponse) || !isset($apiResponse["error"]))) {
+    if($task == 'addItemToMyList' && $myuserid && $name && $groupid) {
+        $apiResponse = addItemToMyList($myuserid, $name, $description, $link, $groupid, $mysqli);
+    } else if ($task == 'getMyItemList' && $myuserid) {
+        $apiResponse = getMyItemList($myuserid, $mysqli);
+    } else if($task == 'updateItemOnMyList' && $myuserid && $myuserid && $itemid && ($description || $link)) {
+        $apiResponse = updateItemOnMyList($myuserid, $itemid, $description, $link, $mysqli);
+    } else if($task == 'updateRemovedStatusForMyItem' && $myuserid &&  $removed >= 0 &&  $itemid) {
+        $apiResponse = updateRemovedStatusForMyItem($myuserid, $removed, $itemid, $mysqli);
+    } 
+    // their tasks
+    else if ($task == 'addItemToTheirList' && $theiruserid && $myuserid && $name) {
+        $apiResponse = addItemToTheirList($myuserid, $theiruserid, $name, $description, $link, $groupid, $mysqli);
     }
-else if($task == 'archiveRemovedItems' && $myuserid == 1) {
-    $apiResponse = archiveRemovedItems($myuserid, $mysqli);
+    else if ($task == 'getTheirItemList' && $theiruserid) {
+        $apiResponse = getTheirItemList($theiruserid, $mysqli);
     }
-else {
-    $apiResponse = array("error" => "Invalid task ($task) or myuserid ($myuserid) or missing params: thieruserid: $theiruserid, itemid: $itemid, removed: $removed, name: $name, description: $description, link: $link, groupid: $groupid, email: $email_address, avatar: $avatar");
+    else if ($task == 'updateStatusForTheirItem' && $theiruserid && $status && $myuserid && $itemid) {
+        $apiResponse = updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli, $date_received);
+    }
+    //general
+    else if ($task == 'getUserProfileByUserId' && $userid) {
+        $apiResponse = getUserProfileByUserId($userid, $mysqli);
+    }
+    else if ($task == 'getUsersList') {
+        $apiResponse = getUsers($mysqli);
+    } else if($task == 'updateAvatar' && $email_address && $avatar) {
+        $apiResponse = updateAvatar($email_address, $avatar, $mysqli);
+    }  else if($task == 'confirmUserIsValid' && $email_address) {
+        $apiResponse = confirmUserIsValid($email_address, $mysqli);
+    }
+    // admin
+    else if($task == 'archivePurchasedItems' && $myuserid == 1) {
+        $apiResponse = archivePurchasedItems($myuserid, $mysqli);
+    }
+    else if($task == 'archiveRemovedItems' && $myuserid == 1) {
+        $apiResponse = archiveRemovedItems($myuserid, $mysqli);
+    }
+    else if(!isset($apiResponse)) {
+        $apiResponse = array("error" => "Invalid task ($task) or myuserid ($myuserid) or missing params: thieruserid: $theiruserid, itemid: $itemid, removed: $removed, name: $name, description: $description, link: $link, groupid: $groupid, email: $email_address, avatar: $avatar");
+    }
 }
 
 // Close the connection

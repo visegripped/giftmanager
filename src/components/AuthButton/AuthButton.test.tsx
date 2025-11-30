@@ -2,10 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 
 // Use vi.hoisted() to ensure mocks are available when vi.mock factory runs
-const { mockGoogleLogout, mockGoogleLogin } = vi.hoisted(() => {
+const { mockGoogleLogout, mockGoogleLogin, mockFetchData } = vi.hoisted(() => {
   return {
     mockGoogleLogout: vi.fn(),
     mockGoogleLogin: vi.fn(),
+    mockFetchData: vi.fn(() => Promise.resolve({ success: true })),
   };
 });
 
@@ -61,7 +62,7 @@ vi.mock('../../utilities/validateUser', () => ({
 }));
 
 vi.mock('../../utilities/fetchData', () => ({
-  default: vi.fn(() => Promise.resolve({ success: true })),
+  default: mockFetchData,
 }));
 
 vi.mock('../../utilities/postReport', () => ({
@@ -91,6 +92,8 @@ describe('AuthButton Component', () => {
     vi.clearAllMocks();
     localStorage.clear();
     (global.fetch as any).mockClear();
+    mockFetchData.mockClear();
+    mockFetchData.mockResolvedValue({ success: true });
   });
 
   afterEach(() => {
@@ -307,33 +310,30 @@ describe('AuthButton Component', () => {
       localStorage.setItem('access_token', 'mock-facebook-token');
       localStorage.setItem('auth_provider', 'facebook');
 
-      // Mock Facebook profile API response
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: '123456',
-          name: 'Test User',
-          email: 'test@example.com',
-          first_name: 'Test',
-          last_name: 'User',
-          picture: {
-            data: {
-              url: 'https://example.com/avatar.jpg',
+      // Mock fetchData to return Facebook profile (server-side approach)
+      mockFetchData.mockResolvedValueOnce({
+        success: [
+          {
+            id: '123456',
+            name: 'Test User',
+            email: 'test@example.com',
+            first_name: 'Test',
+            last_name: 'User',
+            picture: {
+              data: {
+                url: 'https://example.com/avatar.jpg',
+              },
             },
           },
-        }),
+        ],
       });
 
       renderAuthButton();
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalled();
-        const calls = (global.fetch as any).mock.calls;
-        const facebookCall = calls.find((call: any[]) =>
-          call[0]?.includes('graph.facebook.com')
-        );
-        expect(facebookCall).toBeDefined();
-        expect(facebookCall[0]).toContain('graph.facebook.com');
+        expect(mockFetchData).toHaveBeenCalledWith({
+          task: 'getFacebookProfile',
+        });
       });
     });
   });

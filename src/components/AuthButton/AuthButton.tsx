@@ -16,6 +16,7 @@ import {
 } from '../../types/types';
 import fetchData from '../../utilities/fetchData';
 import postReport from '../../utilities/postReport';
+import { reportCreate } from '../../utilities/reportCreate';
 import {
   NotificationsContext,
   NotificationContextProps,
@@ -105,6 +106,21 @@ export const AuthButton = () => {
     useState<UserProfileInterface | null>(null);
   const fbAppId = import.meta.env.VITE_FB_APP_ID;
 
+  // Debug: Log Facebook App ID status
+  useEffect(() => {
+    if (fbAppId) {
+      console.log('Facebook App ID loaded:', fbAppId.substring(0, 10) + '...');
+    } else {
+      console.warn(
+        'Facebook App ID not found. VITE_FB_APP_ID environment variable is not set.'
+      );
+      console.log(
+        'Available env vars:',
+        Object.keys(import.meta.env).filter((key) => key.startsWith('VITE_'))
+      );
+    }
+  }, [fbAppId]);
+
   const fetchGoogleProfile = async (accessToken: string) => {
     // Fetch user profile information
     if (accessToken && !myProfile.emailAddress) {
@@ -167,58 +183,123 @@ export const AuthButton = () => {
   };
 
   const fetchFacebookProfile = async (accessToken: string) => {
-    // Fetch user profile information from Facebook Graph API
+    // Fetch user profile information via server-side only
+    // All Facebook API calls happen on the server with appsecret_proof
     if (accessToken && !myProfile.emailAddress) {
       try {
-        // https://developers.facebook.com/docs/graph-api/reference/user
-        const response = await fetch(
-          `https://graph.facebook.com/me?fields=id,name,email,picture.width(200).height(200),first_name,last_name&access_token=${accessToken}`
+        console.log(
+          'Fetching Facebook profile via server:',
+          accessToken.substring(0, 10) + '...'
         );
 
-        if (!response.ok) {
-          postReport({
-            type: 'error',
-            report: 'Error fetching Facebook profile',
-            body: {
-              file: 'AuthButton',
-              origin: 'apiResponse',
-              error: `HTTP error! status: ${response.status}`,
-            },
+        // Temporarily set access_token in localStorage for fetchData to use
+        const originalToken = localStorage.getItem('access_token');
+        localStorage.setItem('access_token', accessToken);
+
+        try {
+          // Use our API endpoint to fetch Facebook profile (server handles appsecret_proof)
+          const response = await fetchData({
+            task: 'getFacebookProfile',
           });
-          throw new Error(`HTTP error! status: ${response.status}`);
+
+          if (response.error) {
+            console.error('Facebook profile error:', response.error);
+            postReport({
+              type: 'error',
+              report: 'Error fetching Facebook profile',
+              body: {
+                file: 'AuthButton',
+                origin: 'apiResponse',
+                error: JSON.stringify(response.error),
+              },
+            });
+            addNotification({
+              message: `Failed to load Facebook profile: ${response.error}`,
+              type: 'error',
+            });
+            return;
+          }
+
+          if (
+            response.success &&
+            Array.isArray(response.success) &&
+            response.success.length > 0
+          ) {
+            const userProfile = response.success[0];
+            console.log(
+              ' -> got a facebook profile from server: ',
+              userProfile
+            );
+
+            // Check if email is present (required for validation)
+            if (!userProfile.email) {
+              console.error('Facebook profile missing email:', userProfile);
+              addNotification({
+                message:
+                  'Facebook profile is missing email address. Please ensure your Facebook account has an email.',
+                type: 'error',
+              });
+              return;
+            }
+
+            const convertedProfile = convertFacebookProfile2Custom(userProfile);
+            console.log(' -> converted profile: ', convertedProfile);
+
+            if (!convertedProfile.emailAddress) {
+              console.error(
+                'Converted profile missing emailAddress:',
+                convertedProfile
+              );
+              addNotification({
+                message: 'Failed to extract email from Facebook profile.',
+                type: 'error',
+              });
+              return;
+            }
+
+            setFacebookProfileData(convertedProfile);
+            setMyEmailAddress(convertedProfile.emailAddress);
+            if (convertedProfile.avatar) {
+              setMyAvatar(convertedProfile.avatar);
+            }
+            return convertedProfile;
+          } else {
+            throw new Error('Unexpected response format from server');
+          }
+        } finally {
+          // Restore original access token
+          if (originalToken) {
+            localStorage.setItem('access_token', originalToken);
+          } else {
+            localStorage.setItem('access_token', accessToken);
+          }
         }
-        const userProfile = await response.json();
-        console.log(' -> got a facebook profile: ', userProfile);
-        const convertedProfile = convertFacebookProfile2Custom(userProfile);
-        setFacebookProfileData(convertedProfile);
-        setMyEmailAddress(convertedProfile.emailAddress);
-        if (convertedProfile.avatar) {
-          setMyAvatar(convertedProfile.avatar);
-        }
-        return convertedProfile;
       } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        console.error('Error fetching Facebook profile:', error);
         postReport({
           type: 'error',
           report: 'Error fetching Facebook profile',
           body: {
             file: 'AuthButton',
             origin: 'apiResponse',
-            error: JSON.stringify(error),
+            error: errorMessage,
           },
+        });
+        addNotification({
+          message: `Failed to load Facebook profile: ${errorMessage}`,
+          type: 'error',
         });
       }
       return;
     } else {
-      postReport({
-        type: 'error',
-        report: 'Error fetching Facebook profile',
-        body: {
-          file: 'AuthButton',
-          origin: 'apiResponse',
-          error:
-            'Access token was not passed to fetchFacebookProfile.  No request attempt has been made to retrieve the user profile',
-        },
-      });
+      if (!accessToken) {
+        console.error('fetchFacebookProfile called without accessToken');
+      }
+      if (myProfile.emailAddress) {
+        console.log('fetchFacebookProfile skipped - profile already has email');
+      }
     }
   };
 
@@ -231,6 +312,30 @@ export const AuthButton = () => {
         (validationResponse: responseInterface) => {
           if (validationResponse?.warn) {
             logout();
+
+            // Log unauthorized login attempt to reporting API
+            const stid = sessionStorage.getItem('giftmanager_stid') || '';
+            if (stid) {
+              reportCreate({
+                stid,
+                report_type: 'warning',
+                component: 'AuthButton',
+                message: 'Unauthorized user attempted to log in',
+                metadata: {
+                  email: emailAddress,
+                  warning: validationResponse.warn,
+                  origin: 'apiResponse',
+                  file: 'AuthButton',
+                },
+              }).catch((reportError) => {
+                console.error(
+                  'Failed to report unauthorized login attempt:',
+                  reportError
+                );
+              });
+            }
+
+            // Also use postReport for backward compatibility
             postReport({
               type: 'warn',
               report: 'Unauthorized user attempted to log in',
@@ -238,12 +343,17 @@ export const AuthButton = () => {
                 file: 'AuthButton',
                 origin: 'apiResponse',
                 email: emailAddress,
+                warn: validationResponse.warn,
               },
             });
+
+            // Show user-friendly error message with specific warning
+            const warnMessage =
+              validationResponse.warn ||
+              'Email address not recognized as a valid user';
             addNotification({
-              message: `The email address ${emailAddress} is not recognized as a valid user.
-              If you think you have received this message in error, reach out to the site administrator.
-              If you don't know who the site administrator is, you probably don't belong here.`,
+              message: `Login failed: ${warnMessage}
+              If you think you have received this message in error, reach out to the site administrator.`,
               type: 'warn',
               persist: true,
             });
@@ -280,19 +390,47 @@ export const AuthButton = () => {
               setMyProfile(mappedProfile);
             }
           } else {
+            // Handle error response - includes specific error message from API
+            const errorMessage =
+              validationResponse?.error ||
+              validationResponse?.err ||
+              'Unknown error';
+
+            // Log login failure to reporting API
+            const stid = sessionStorage.getItem('giftmanager_stid') || '';
+            if (stid) {
+              reportCreate({
+                stid,
+                report_type: 'error',
+                component: 'AuthButton',
+                message: 'Login validation failed',
+                metadata: {
+                  email: emailAddress,
+                  error: errorMessage,
+                  origin: 'apiResponse',
+                  file: 'AuthButton',
+                },
+              }).catch((reportError) => {
+                console.error('Failed to report login failure:', reportError);
+              });
+            }
+
+            // Also use postReport for backward compatibility
             postReport({
-              type: 'warn',
+              type: 'error',
               report: 'Error while attempting to validate user',
               body: {
                 file: 'AuthButton',
                 origin: 'apiResponse',
                 email: emailAddress,
+                error: errorMessage,
               },
             });
+
+            // Show user-friendly error message with specific API error
             addNotification({
-              message: `Something went wrong while trying to validate your account.
-              If you think you have received this message in error, reach out to the site administrator.
-              If you don't know who the site administrator is, you probably don't belong here.`,
+              message: `Login failed: ${errorMessage}
+              If you think you have received this message in error, reach out to the site administrator.`,
               type: 'error',
               persist: true,
             });
@@ -334,14 +472,23 @@ export const AuthButton = () => {
   */
   useEffect(() => {
     // only need to get the profile once.
-    if (accessToken && Object.keys(myProfile).length === 0) {
+    if (accessToken && Object.keys(myProfile).length === 0 && authProvider) {
+      console.log('Triggering profile fetch for:', authProvider);
       if (authProvider === 'google') {
         fetchGoogleProfile(accessToken);
       } else if (authProvider === 'facebook') {
         fetchFacebookProfile(accessToken);
       }
+    } else {
+      if (!accessToken) {
+        console.log('Profile fetch skipped: no accessToken');
+      } else if (Object.keys(myProfile).length > 0) {
+        console.log('Profile fetch skipped: profile already exists');
+      } else if (!authProvider) {
+        console.log('Profile fetch skipped: no authProvider');
+      }
     }
-  }, [accessToken, authProvider]);
+  }, [accessToken, authProvider, myProfile]);
 
   const authButtonLogout = () => {
     logout();
@@ -349,9 +496,20 @@ export const AuthButton = () => {
   };
 
   const handleFacebookResponse = (response: any) => {
+    // Check if response has status indicating failure/cancellation
+    if (response.status === 'not_authorized' || response.status === 'unknown') {
+      addNotification({
+        message: 'Facebook login was cancelled or not authorized.',
+        type: 'warn',
+      });
+      return;
+    }
+
+    // Check if we have a valid access token
     if (response.accessToken) {
       facebookLogin(response);
     } else {
+      // If no accessToken, it's likely a cancelled login
       addNotification({
         message: 'Facebook login was cancelled or failed.',
         type: 'warn',

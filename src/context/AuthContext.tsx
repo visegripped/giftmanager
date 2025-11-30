@@ -78,6 +78,8 @@ function AuthProvider(props: PropsWithChildren) {
     localStorage.setItem('access_token', access_token);
     localStorage.setItem('refresh_token', refresh_token || '');
     localStorage.setItem('auth_provider', provider);
+    // Set login timestamp to prevent immediate validation
+    localStorage.setItem('login_timestamp', Date.now().toString());
     handleTokenExpiration(authResponse.expires_in);
   };
 
@@ -116,26 +118,39 @@ function AuthProvider(props: PropsWithChildren) {
   };
 
   const logout = () => {
+    const currentProvider = authProvider;
+    const hadToken = !!accessToken;
+
     localStorage.removeItem('access_token');
     localStorage.removeItem('tokenId');
     localStorage.removeItem('auth_provider');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('access_token_expiration');
+    localStorage.removeItem('login_timestamp');
     setAccessToken('');
     setAuthProvider('');
 
     // Logout from the appropriate provider
-    if (authProvider === 'google') {
+    if (currentProvider === 'google') {
       googleLogout();
-    } else if (authProvider === 'facebook') {
+    } else if (currentProvider === 'facebook' && hadToken) {
       // Facebook logout - clear Facebook session
       // Note: react-facebook-login doesn't have a built-in logout function
-      // We'll rely on clearing localStorage and the token
+      // Only attempt logout if we actually had a token (user was logged in)
       try {
-        // Attempt to logout via Facebook API if available
-        if (window.FB) {
-          window.FB.logout(() => {});
+        // Check if Facebook SDK is loaded and user has an active session
+        if (
+          window.FB &&
+          window.FB.getAuthResponse &&
+          window.FB.getAuthResponse()
+        ) {
+          window.FB.logout(() => {
+            // Callback after logout - nothing to do
+          });
         }
       } catch (error) {
-        // Silently fail if FB is not available
+        // Silently fail if FB is not available or logout fails
+        console.debug('Facebook logout failed:', error);
       }
     }
   };
@@ -152,55 +167,141 @@ function AuthProvider(props: PropsWithChildren) {
         const data = await response.json();
 
         if (data.error_description) {
-          logout();
+          console.debug(
+            'Google token validation error:',
+            data.error_description
+          );
           return false;
         }
 
         return true;
       } else if (authProvider === 'facebook') {
-        // Validate Facebook token
-        const response = await fetch(
-          `https://graph.facebook.com/me?access_token=${accessToken}`
-        );
-        const data = await response.json();
+        // Validate Facebook token using client-side fetch
+        // Client-side calls don't require appsecret_proof
+        try {
+          const graphUrl = new URL('https://graph.facebook.com/v18.0/me');
+          graphUrl.searchParams.set('access_token', accessToken);
+          graphUrl.searchParams.set('fields', 'id');
 
-        if (data.error) {
-          logout();
+          const response = await fetch(graphUrl.toString(), {
+            method: 'GET',
+            credentials: 'omit', // Don't send cookies, just the access token
+          });
+
+          if (!response.ok) {
+            console.debug(
+              'Facebook token validation failed: HTTP',
+              response.status
+            );
+            return false;
+          }
+
+          const data = await response.json();
+
+          if (data.error) {
+            console.debug('Facebook token validation error:', data.error);
+            return false;
+          }
+
+          // Token is valid if we get user data back
+          return !!data.id;
+        } catch (error) {
+          console.debug('Facebook token validation network error:', error);
           return false;
         }
-
-        return true;
       }
       return false;
     } catch (error) {
-      logout();
+      // Network or other errors - return false but don't logout directly
+      console.debug('Token validation error:', error);
       return false;
     }
-  }, [accessToken, authProvider, logout]);
+  }, [accessToken, authProvider]);
 
   const tokenIsValid = useCallback(async () => {
     if (!accessToken) {
       return false;
     }
-    const currentTime = new Date();
-    if (currentTime >= accessTokenExpiration) {
-      return false;
-    }
-    if (!(await validateTokenViaAPI())) {
-      return false;
+
+    // Check expiration if it's set
+    if (accessTokenExpiration) {
+      const expirationDate =
+        typeof accessTokenExpiration === 'string'
+          ? new Date(accessTokenExpiration)
+          : accessTokenExpiration;
+      const currentTime = new Date();
+
+      // Only check expiration if it's a valid date
+      if (expirationDate instanceof Date && !isNaN(expirationDate.getTime())) {
+        if (currentTime >= expirationDate) {
+          return false;
+        }
+      }
     }
 
+    // Skip API validation if token was just set (give it time to propagate)
+    // We'll rely on expiration check for now, and API validation happens later
     return true;
-  }, [accessToken, accessTokenExpiration, validateTokenViaAPI]);
+  }, [accessToken, accessTokenExpiration]);
 
   useEffect(() => {
+    // Only validate token if we have both accessToken and authProvider
+    // This prevents validation from running during login flow
+    if (!accessToken || !authProvider) {
+      return;
+    }
+
+    // Skip validation for a longer period after login to prevent premature logout
+    // This gives the token time to be properly stored and the app to initialize
+    const loginTimestamp = localStorage.getItem('login_timestamp');
+    const now = Date.now();
+
+    // If login was less than 10 seconds ago, skip validation (likely a fresh login)
+    // This gives Facebook tokens time to fully initialize and be validated by the app
+    if (loginTimestamp && now - parseInt(loginTimestamp) < 10000) {
+      console.debug('Skipping token validation - login was recent');
+      return;
+    }
+
     const checkToken = async () => {
-      if (!accessToken || !(await tokenIsValid())) {
+      // First check basic validity (expiration) - this is synchronous
+      const basicValid = await tokenIsValid();
+      if (!basicValid) {
+        console.debug('Token basic validation failed (expiration)');
         logout();
+        return;
+      }
+
+      // Then validate via API (but don't logout immediately on failure)
+      // Only logout if it's clearly invalid (not a temporary network issue)
+      try {
+        const isValid = await validateTokenViaAPI();
+        if (!isValid) {
+          // Token is invalid, logout
+          console.debug('Token API validation failed');
+          logout();
+        } else {
+          console.debug('Token validation successful');
+        }
+      } catch (error) {
+        // Network error - don't logout, token might still be valid
+        console.debug(
+          'Token validation network error, keeping session:',
+          error
+        );
       }
     };
-    checkToken();
-  }, [accessToken, tokenIsValid, logout]);
+
+    // Add a delay before first validation to avoid race conditions
+    // Increase delay if login was recent
+    const delay =
+      loginTimestamp && now - parseInt(loginTimestamp) < 15000 ? 5000 : 2000;
+    const timeoutId = setTimeout(() => {
+      checkToken();
+    }, delay);
+
+    return () => clearTimeout(timeoutId);
+  }, [accessToken, authProvider, tokenIsValid, validateTokenViaAPI, logout]);
 
   return (
     <AuthContext.Provider

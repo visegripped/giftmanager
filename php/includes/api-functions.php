@@ -301,6 +301,81 @@ function updateAvatar($email_address, $avatar, $mysqli) {
     return $apiResponse;
 }
 
+function getFacebookProfile($access_token) {
+    // Get Facebook App Secret from environment variable
+    $fbAppSecret = getenv('FB_APP_SECRET') ?: getenv('FB_SECRET') ?: "";
+    
+    if (!$fbAppSecret) {
+        error_log("Facebook App Secret not configured. Please set FB_APP_SECRET environment variable.");
+        return array("error" => "Facebook App Secret not configured. Please set FB_APP_SECRET environment variable.");
+    }
+    
+    if (!$access_token) {
+        return array("error" => "Access token is required.");
+    }
+    
+    try {
+        // Generate appsecret_proof using HMAC-SHA256
+        $appsecret_proof = hash_hmac('sha256', $access_token, $fbAppSecret);
+        
+        if (!$appsecret_proof) {
+            error_log("Failed to generate appsecret_proof for Facebook API call");
+            return array("error" => "Failed to generate security proof for Facebook API call.");
+        }
+        
+        // Build Facebook Graph API URL with appsecret_proof
+        $graphUrl = "https://graph.facebook.com/v18.0/me?" . http_build_query(array(
+            'access_token' => $access_token,
+            'appsecret_proof' => $appsecret_proof,
+            'fields' => 'id,name,email,picture.width(200).height(200),first_name,last_name'
+        ));
+        
+        // Make request to Facebook Graph API with error handling
+        $context = stream_context_create(array(
+            'http' => array(
+                'timeout' => 10,
+                'ignore_errors' => true
+            )
+        ));
+        
+        $response = @file_get_contents($graphUrl, false, $context);
+        
+        if ($response === false) {
+            $error = error_get_last();
+            error_log("Failed to fetch Facebook profile: " . ($error ? $error['message'] : 'Unknown error'));
+            return array("error" => "Failed to fetch Facebook profile: Unable to connect to Facebook Graph API. Check error logs for details.");
+        }
+        
+        $result = json_decode($response, true);
+        
+        // Check for JSON decode errors
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log("JSON decode error when fetching Facebook profile: " . json_last_error_msg());
+            return array("error" => "Failed to parse Facebook API response.");
+        }
+        
+        // Check for errors in response
+        if (isset($result['error'])) {
+            $errorMsg = isset($result['error']['message']) ? $result['error']['message'] : 'Unknown error';
+            $errorCode = isset($result['error']['code']) ? $result['error']['code'] : 'Unknown';
+            error_log("Facebook API error: Code $errorCode - $errorMsg");
+            return array("error" => "Facebook API error: $errorMsg");
+        }
+        
+        // Return success with profile data
+        if (isset($result['id'])) {
+            return array("success" => array($result));
+        }
+        
+        error_log("Unexpected response from Facebook Graph API: " . substr($response, 0, 500));
+        return array("error" => "Unexpected response from Facebook Graph API. Check error logs for details.");
+        
+    } catch (Exception $e) {
+        error_log("Exception in getFacebookProfile: " . $e->getMessage());
+        return array("error" => "An error occurred while fetching Facebook profile: " . $e->getMessage());
+    }
+}
+
 // admin -> This will need additional check to ensure that the user is an admin
 function archivePurchasedItems($userid, $mysqli) {
     // Archive purchased items for all users (not just admin userid)
