@@ -105,6 +105,21 @@ export const AuthButton = () => {
     useState<UserProfileInterface | null>(null);
   const fbAppId = import.meta.env.VITE_FB_APP_ID;
 
+  // Debug: Log Facebook App ID status
+  useEffect(() => {
+    if (fbAppId) {
+      console.log('Facebook App ID loaded:', fbAppId.substring(0, 10) + '...');
+    } else {
+      console.warn(
+        'Facebook App ID not found. VITE_FB_APP_ID environment variable is not set.'
+      );
+      console.log(
+        'Available env vars:',
+        Object.keys(import.meta.env).filter((key) => key.startsWith('VITE_'))
+      );
+    }
+  }, [fbAppId]);
+
   const fetchGoogleProfile = async (accessToken: string) => {
     // Fetch user profile information
     if (accessToken && !myProfile.emailAddress) {
@@ -167,150 +182,96 @@ export const AuthButton = () => {
   };
 
   const fetchFacebookProfile = async (accessToken: string) => {
-    // Fetch user profile information from Facebook Graph API
+    // Fetch user profile information via server-side only
+    // All Facebook API calls happen on the server with appsecret_proof
     if (accessToken && !myProfile.emailAddress) {
       try {
         console.log(
-          'Fetching Facebook profile with token:',
+          'Fetching Facebook profile via server:',
           accessToken.substring(0, 10) + '...'
         );
 
-        // Use Facebook SDK API method instead of direct fetch to avoid appsecret_proof requirement
-        // The SDK handles authentication properly for client-side requests
-        if (window.FB && window.FB.api) {
-          return new Promise<void>((resolve, reject) => {
-            window.FB!.api(
-              '/me',
-              {
-                fields:
-                  'id,name,email,picture.width(200).height(200),first_name,last_name',
-              },
-              (response: any) => {
-                if (response.error) {
-                  console.error('Facebook API error:', response.error);
-                  postReport({
-                    type: 'error',
-                    report: 'Error fetching Facebook profile',
-                    body: {
-                      file: 'AuthButton',
-                      origin: 'apiResponse',
-                      error: JSON.stringify(response.error),
-                    },
-                  });
-                  addNotification({
-                    message: `Failed to load Facebook profile: ${response.error.message}`,
-                    type: 'error',
-                  });
-                  reject(response.error);
-                  return;
-                }
+        // Temporarily set access_token in localStorage for fetchData to use
+        const originalToken = localStorage.getItem('access_token');
+        localStorage.setItem('access_token', accessToken);
 
-                console.log(' -> got a facebook profile via SDK: ', response);
-
-                // Check if email is present (required for validation)
-                if (!response.email) {
-                  console.error('Facebook profile missing email:', response);
-                  addNotification({
-                    message:
-                      'Facebook profile is missing email address. Please ensure your Facebook account has an email.',
-                    type: 'error',
-                  });
-                  reject(new Error('Missing email'));
-                  return;
-                }
-
-                const convertedProfile =
-                  convertFacebookProfile2Custom(response);
-                console.log(' -> converted profile: ', convertedProfile);
-
-                if (!convertedProfile.emailAddress) {
-                  console.error(
-                    'Converted profile missing emailAddress:',
-                    convertedProfile
-                  );
-                  addNotification({
-                    message: 'Failed to extract email from Facebook profile.',
-                    type: 'error',
-                  });
-                  reject(new Error('Failed to extract email'));
-                  return;
-                }
-
-                setFacebookProfileData(convertedProfile);
-                setMyEmailAddress(convertedProfile.emailAddress);
-                if (convertedProfile.avatar) {
-                  setMyAvatar(convertedProfile.avatar);
-                }
-                resolve();
-              }
-            );
+        try {
+          // Use our API endpoint to fetch Facebook profile (server handles appsecret_proof)
+          const response = await fetchData({
+            task: 'getFacebookProfile',
           });
-        } else {
-          // Fallback to direct fetch if SDK not available (but this may require appsecret_proof)
-          console.warn(
-            'Facebook SDK not available, falling back to direct fetch'
-          );
-          const response = await fetch(
-            `https://graph.facebook.com/me?fields=id,name,email,picture.width(200).height(200),first_name,last_name&access_token=${accessToken}`
-          );
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error(
-              'Facebook profile fetch failed:',
-              response.status,
-              errorText
-            );
+          if (response.error) {
+            console.error('Facebook profile error:', response.error);
             postReport({
               type: 'error',
               report: 'Error fetching Facebook profile',
               body: {
                 file: 'AuthButton',
                 origin: 'apiResponse',
-                error: `HTTP error! status: ${response.status}, body: ${errorText}`,
+                error: JSON.stringify(response.error),
               },
             });
             addNotification({
-              message: `Failed to load Facebook profile. Please try logging in again.`,
-              type: 'error',
-            });
-            return;
-          }
-          const userProfile = await response.json();
-          console.log(' -> got a facebook profile: ', userProfile);
-
-          // Check if email is present (required for validation)
-          if (!userProfile.email) {
-            console.error('Facebook profile missing email:', userProfile);
-            addNotification({
-              message:
-                'Facebook profile is missing email address. Please ensure your Facebook account has an email.',
+              message: `Failed to load Facebook profile: ${response.error}`,
               type: 'error',
             });
             return;
           }
 
-          const convertedProfile = convertFacebookProfile2Custom(userProfile);
-          console.log(' -> converted profile: ', convertedProfile);
-
-          if (!convertedProfile.emailAddress) {
-            console.error(
-              'Converted profile missing emailAddress:',
-              convertedProfile
+          if (
+            response.success &&
+            Array.isArray(response.success) &&
+            response.success.length > 0
+          ) {
+            const userProfile = response.success[0];
+            console.log(
+              ' -> got a facebook profile from server: ',
+              userProfile
             );
-            addNotification({
-              message: 'Failed to extract email from Facebook profile.',
-              type: 'error',
-            });
-            return;
-          }
 
-          setFacebookProfileData(convertedProfile);
-          setMyEmailAddress(convertedProfile.emailAddress);
-          if (convertedProfile.avatar) {
-            setMyAvatar(convertedProfile.avatar);
+            // Check if email is present (required for validation)
+            if (!userProfile.email) {
+              console.error('Facebook profile missing email:', userProfile);
+              addNotification({
+                message:
+                  'Facebook profile is missing email address. Please ensure your Facebook account has an email.',
+                type: 'error',
+              });
+              return;
+            }
+
+            const convertedProfile = convertFacebookProfile2Custom(userProfile);
+            console.log(' -> converted profile: ', convertedProfile);
+
+            if (!convertedProfile.emailAddress) {
+              console.error(
+                'Converted profile missing emailAddress:',
+                convertedProfile
+              );
+              addNotification({
+                message: 'Failed to extract email from Facebook profile.',
+                type: 'error',
+              });
+              return;
+            }
+
+            setFacebookProfileData(convertedProfile);
+            setMyEmailAddress(convertedProfile.emailAddress);
+            if (convertedProfile.avatar) {
+              setMyAvatar(convertedProfile.avatar);
+            }
+            return convertedProfile;
+          } else {
+            throw new Error('Unexpected response format from server');
           }
-          return convertedProfile;
+        } finally {
+          // Restore original access token
+          if (originalToken) {
+            localStorage.setItem('access_token', originalToken);
+          } else {
+            localStorage.setItem('access_token', accessToken);
+          }
         }
       } catch (error: unknown) {
         const errorMessage =

@@ -31,6 +31,9 @@ GOOGLE_OAUTH_CLIENT_ID=your_google_client_id_here
 # Facebook OAuth (requires HTTPS - see README for SSL certificate setup)
 VITE_FB_APP_ID=your_facebook_app_id_here
 FB_APP_ID=your_facebook_app_id_here
+FB_APP_SECRET=your_facebook_app_secret_here
+# Note: FB_APP_SECRET is used server-side only for appsecret_proof generation
+# Do NOT expose this in client-side code
 
 # Application Environment
 APP_ENV=development

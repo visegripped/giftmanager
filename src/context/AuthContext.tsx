@@ -176,11 +176,17 @@ function AuthProvider(props: PropsWithChildren) {
 
         return true;
       } else if (authProvider === 'facebook') {
-        // Validate Facebook token
+        // Validate Facebook token using client-side fetch
+        // Client-side calls don't require appsecret_proof
         try {
-          const response = await fetch(
-            `https://graph.facebook.com/me?access_token=${accessToken}&fields=id`
-          );
+          const graphUrl = new URL('https://graph.facebook.com/v18.0/me');
+          graphUrl.searchParams.set('access_token', accessToken);
+          graphUrl.searchParams.set('fields', 'id');
+
+          const response = await fetch(graphUrl.toString(), {
+            method: 'GET',
+            credentials: 'omit', // Don't send cookies, just the access token
+          });
 
           if (!response.ok) {
             console.debug(
