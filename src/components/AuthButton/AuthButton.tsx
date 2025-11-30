@@ -26,7 +26,9 @@ const convertGoogleProfile2Custom = (googleProfile: GoogleProfileInterface) => {
   let userProfile = { google: googleProfile } as UserProfileInterface;
   const { resourceName, emailAddresses, names, photos } = googleProfile;
 
-  userProfile.google.resourceName = resourceName;
+  if (userProfile.google) {
+    userProfile.google.resourceName = resourceName;
+  }
   emailAddresses.forEach((emailData: GoogleProfileEmailInterface) => {
     if (emailData?.metadata?.primary) {
       userProfile.emailAddress = emailData.value;
