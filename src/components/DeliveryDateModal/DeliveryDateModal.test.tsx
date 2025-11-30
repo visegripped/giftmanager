@@ -101,7 +101,7 @@ describe('DeliveryDateModal', () => {
         if (args.length === 0) {
           super(2024, 2, 15); // March 15, 2024
         } else {
-          super(...args);
+          super(...(args as Parameters<DateConstructor>));
         }
       }
     } as any;
@@ -247,7 +247,7 @@ describe('DeliveryDateModal', () => {
         if (args.length === 0) {
           super(2024, 2, 15); // March 15, 2024
         } else {
-          super(...args);
+          super(...(args as Parameters<DateConstructor>));
         }
       }
     } as any;

@@ -28,7 +28,7 @@ import { NotificationsProvider } from '../../context/NotificationsContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 vi.mock('react-facebook-login', () => ({
-  default: ({ appId, callback, textButton }: any) => (
+  default: ({ callback, textButton }: any) => (
     <button
       data-testid="facebook-login-button"
       onClick={() =>

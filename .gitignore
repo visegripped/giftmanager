@@ -31,7 +31,8 @@ deploy.js
 /php/vendor
 /php/composer.lock
 composer.lock
-
+.pnpm-store/*
 .cursor/*
 
 AI-notes/*
+docker/ssl/*
