@@ -6,6 +6,9 @@ import svgr from 'vite-plugin-svgr';
 import path from 'path';
 import fs from 'fs';
 
+const buildVersion =
+  process.env.BUILD_VERSION || process.env.npm_package_version || 'dev';
+
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
@@ -32,6 +35,26 @@ export default defineConfig({
       include: '**/*.svg',
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // Use the build version in filenames instead of content hashes
+        entryFileNames: `assets/[name]-${buildVersion}.js`,
+        chunkFileNames: `assets/[name]-${buildVersion}.js`,
+        assetFileNames: (chunkInfo) => {
+          const ext = path.extname(chunkInfo.name || '').slice(1);
+          const base = path.basename(
+            chunkInfo.name || '',
+            path.extname(chunkInfo.name || '')
+          );
+          if (!ext) {
+            return `assets/[name]-${buildVersion}`;
+          }
+          return `assets/${base}-${buildVersion}.${ext}`;
+        },
+      },
+    },
+  },
   server: (() => {
     // Enable HTTPS if SSL certificates exist (for Facebook OAuth which requires HTTPS)
     const certPath = path.resolve(__dirname, 'docker/ssl/localhost.crt');

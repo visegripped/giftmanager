@@ -30,8 +30,6 @@ docker/ssl/*.key
 *.env*
 *storybook.log
 
-deploy.js
-
 /php/includes/*-credentials.php
 /php/vendor
 /php/composer.lock

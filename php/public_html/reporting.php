@@ -22,10 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Load dependencies
 // Vendor path: from public_html/ -> parent (html, which is /var/www/html in container) -> vendor/
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../includes/reporting-credentials.php';
-require_once __DIR__ . '/../includes/reporting-functions.php';
-require_once __DIR__ . '/../includes/graphql-schema.php';
-require_once __DIR__ . '/../includes/graphql-resolvers.php';
+
+// Versioned includes
+require_once __DIR__ . '/../includes/current_version.php';
+require_once gm_get_include_path('reporting-credentials.php');
+require_once gm_get_include_path('reporting-functions.php');
+require_once gm_get_include_path('graphql-schema.php');
+require_once gm_get_include_path('graphql-resolvers.php');
 
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;

@@ -17,8 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-include "../includes/api-credentials.php";
-include "../includes/api-functions.php";
+// Versioned includes
+require_once __DIR__ . '/../includes/current_version.php';
+include gm_get_include_path('api-credentials.php');
+include gm_get_include_path('api-functions.php');
 
 // Assuming $mysqli is your mysqli connection object
 // Support Docker environment (use DB_HOST from env, fallback to localhost)

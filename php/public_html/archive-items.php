@@ -19,8 +19,9 @@ ini_set('log_errors', '1');
 // Set timezone
 date_default_timezone_set('UTC');
 
-// Include database credentials
-include "../includes/api-credentials.php";
+// Include database credentials (versioned)
+require_once __DIR__ . '/../includes/current_version.php';
+include gm_get_include_path('api-credentials.php');
 
 // Support Docker environment (use DB_HOST from env, fallback to localhost)
 $dbHost = getenv('DB_HOST') ?: 'localhost';
@@ -92,12 +93,12 @@ if ($stmt3) {
     $errors[] = "Failed to prepare query 3: (" . $mysqli->errno . ") " . $mysqli->error;
 }
 
-// Log summary
+// Log summary (include app/version information for easier debugging)
 if (count($errors) > 0) {
-    error_log("Archive Items CRON: Errors occurred: " . implode('; ', $errors));
+    error_log("Archive Items CRON [version=$APP_VERSION]: Errors occurred: " . implode('; ', $errors));
     exit(1);
 } else {
-    error_log("Archive Items CRON: Successfully completed. Total items archived: $totalArchived");
+    error_log("Archive Items CRON [version=$APP_VERSION]: Successfully completed. Total items archived: $totalArchived");
 }
 
 // Close the connection
