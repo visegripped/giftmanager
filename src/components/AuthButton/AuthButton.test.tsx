@@ -6,7 +6,10 @@ const { mockGoogleLogout, mockGoogleLogin, mockFetchData } = vi.hoisted(() => {
   return {
     mockGoogleLogout: vi.fn(),
     mockGoogleLogin: vi.fn(),
-    mockFetchData: vi.fn(() => Promise.resolve({ success: true })),
+    // Use a broad return type so tests can customize the resolved shape
+    mockFetchData: vi.fn<(...args: any[]) => Promise<any>>(() =>
+      Promise.resolve({ success: true })
+    ),
   };
 });
 
