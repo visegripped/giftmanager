@@ -110,6 +110,8 @@ export const reportCreate = async (
   // Gather standard browser data if not provided
   const standardData = gatherStandardBodyData(window);
 
+  const appVersion = import.meta.env.VITE_APP_VERSION;
+
   // Merge standard data into report input
   const fullReportInput: ReportInput = {
     ...reportInput,
@@ -119,6 +121,10 @@ export const reportCreate = async (
       reportInput.viewport_height ?? standardData?.viewportHeight,
     page_url: reportInput.page_url || standardData?.pageUrl,
     referrer: reportInput.referrer || document.referrer || undefined,
+    metadata: {
+      ...(reportInput.metadata || {}),
+      appVersion,
+    },
   };
 
   // GraphQL mutation

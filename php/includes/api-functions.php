@@ -306,7 +306,7 @@ function getFacebookProfile($access_token) {
     $fbAppSecret = getenv('FB_APP_SECRET') ?: getenv('FB_SECRET') ?: "";
     
     if (!$fbAppSecret) {
-        error_log("Facebook App Secret not configured. Please set FB_APP_SECRET environment variable.");
+        error_log("Facebook App Secret not configured [version=$APP_VERSION]. Please set FB_APP_SECRET environment variable.");
         return array("error" => "Facebook App Secret not configured. Please set FB_APP_SECRET environment variable.");
     }
     
@@ -319,7 +319,7 @@ function getFacebookProfile($access_token) {
         $appsecret_proof = hash_hmac('sha256', $access_token, $fbAppSecret);
         
         if (!$appsecret_proof) {
-            error_log("Failed to generate appsecret_proof for Facebook API call");
+            error_log("Failed to generate appsecret_proof for Facebook API call [version=$APP_VERSION]");
             return array("error" => "Failed to generate security proof for Facebook API call.");
         }
         
@@ -342,7 +342,7 @@ function getFacebookProfile($access_token) {
         
         if ($response === false) {
             $error = error_get_last();
-            error_log("Failed to fetch Facebook profile: " . ($error ? $error['message'] : 'Unknown error'));
+            error_log("Failed to fetch Facebook profile [version=$APP_VERSION]: " . ($error ? $error['message'] : 'Unknown error'));
             return array("error" => "Failed to fetch Facebook profile: Unable to connect to Facebook Graph API. Check error logs for details.");
         }
         
@@ -350,7 +350,7 @@ function getFacebookProfile($access_token) {
         
         // Check for JSON decode errors
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log("JSON decode error when fetching Facebook profile: " . json_last_error_msg());
+            error_log("JSON decode error when fetching Facebook profile [version=$APP_VERSION]: " . json_last_error_msg());
             return array("error" => "Failed to parse Facebook API response.");
         }
         
@@ -358,7 +358,7 @@ function getFacebookProfile($access_token) {
         if (isset($result['error'])) {
             $errorMsg = isset($result['error']['message']) ? $result['error']['message'] : 'Unknown error';
             $errorCode = isset($result['error']['code']) ? $result['error']['code'] : 'Unknown';
-            error_log("Facebook API error: Code $errorCode - $errorMsg");
+            error_log("Facebook API error [version=$APP_VERSION]: Code $errorCode - $errorMsg");
             return array("error" => "Facebook API error: $errorMsg");
         }
         
@@ -367,11 +367,11 @@ function getFacebookProfile($access_token) {
             return array("success" => array($result));
         }
         
-        error_log("Unexpected response from Facebook Graph API: " . substr($response, 0, 500));
+        error_log("Unexpected response from Facebook Graph API [version=$APP_VERSION]: " . substr($response, 0, 500));
         return array("error" => "Unexpected response from Facebook Graph API. Check error logs for details.");
         
     } catch (Exception $e) {
-        error_log("Exception in getFacebookProfile: " . $e->getMessage());
+        error_log("Exception in getFacebookProfile [version=$APP_VERSION]: " . $e->getMessage());
         return array("error" => "An error occurred while fetching Facebook profile: " . $e->getMessage());
     }
 }
