@@ -198,23 +198,24 @@ export const AuthButton = () => {
 
         try {
           // Use our API endpoint to fetch Facebook profile (server handles appsecret_proof)
-          const response = await fetchData({
+          const response = ((await fetchData({
             task: 'getFacebookProfile',
-          });
+          })) || {}) as responseInterface;
 
-          if (response.error) {
-            console.error('Facebook profile error:', response.error);
+          const errorMessage = response.error ?? response.err;
+          if (errorMessage) {
+            console.error('Facebook profile error:', errorMessage);
             postReport({
               type: 'error',
               report: 'Error fetching Facebook profile',
               body: {
                 file: 'AuthButton',
                 origin: 'apiResponse',
-                error: JSON.stringify(response.error),
+                error: errorMessage,
               },
             });
             addNotification({
-              message: `Failed to load Facebook profile: ${response.error}`,
+              message: `Failed to load Facebook profile: ${errorMessage}`,
               type: 'error',
             });
             return;
@@ -225,7 +226,8 @@ export const AuthButton = () => {
             Array.isArray(response.success) &&
             response.success.length > 0
           ) {
-            const userProfile = response.success[0];
+            const successArray = response.success as any[];
+            const userProfile = successArray[0] as FacebookProfileInterface;
             console.log(
               ' -> got a facebook profile from server: ',
               userProfile
