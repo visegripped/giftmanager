@@ -58,12 +58,15 @@ function App() {
   }, []);
 
   useEffect(() => {
-    console.log('myProfile changed:', myProfile);
-    console.log(
-      `isAuthenticated will be set to: ${!!(myProfile && myProfile.userid)}`
+    console.log('auth state changed:', { accessToken, myProfile });
+    const nextIsAuthenticated = !!(
+      accessToken &&
+      myProfile &&
+      myProfile.userid
     );
-    setIsAuthenticated(!!(myProfile && myProfile.userid));
-  }, [myProfile]);
+    console.log(`isAuthenticated will be set to: ${nextIsAuthenticated}`);
+    setIsAuthenticated(nextIsAuthenticated);
+  }, [accessToken, myProfile]);
 
   // Check if user is admin (userid === 1)
   const isAdmin = String(myProfile.userid) === '1';
@@ -198,6 +201,7 @@ function App() {
         <footer>
           <div>&copy; Copyright 2010 - {currentYear}. All rights reserved.</div>
           <div>
+            v1.0.0 |
             <a
               href="#"
               onClick={(e) => {

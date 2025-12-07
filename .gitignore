@@ -32,6 +32,10 @@ deploy.js
 /php/composer.lock
 composer.lock
 
+.pnpm-store/
+docker/ssl/
+
+
 .cursor/*
 
 AI-notes/*
