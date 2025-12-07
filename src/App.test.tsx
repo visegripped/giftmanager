@@ -71,6 +71,7 @@ describe('App Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('renders header with logo and navigation', () => {
@@ -108,6 +109,21 @@ describe('App Component', () => {
     expect(
       screen.getByText(
         'Please use the sign in button in the upper right corner.'
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('shows inactivity message when user was logged out due to inactivity', () => {
+    sessionStorage.setItem('logout_reason', 'inactivity');
+
+    renderApp();
+
+    expect(
+      screen.getByText('You were logged out due to inactivity.')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Please sign in again using the button in the upper right corner.'
       )
     ).toBeInTheDocument();
   });

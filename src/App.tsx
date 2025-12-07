@@ -137,9 +137,33 @@ function App() {
 
   const LoadingStates = (props: { accessToken: string }) => {
     const { accessToken } = props;
-    return accessToken ? (
-      <div>Loading your profile...</div>
-    ) : (
+    const [logoutReason] = useState(() => {
+      if (typeof window === 'undefined') {
+        return '';
+      }
+      const reason = window.sessionStorage.getItem('logout_reason') || '';
+      if (reason) {
+        window.sessionStorage.removeItem('logout_reason');
+      }
+      return reason;
+    });
+
+    if (accessToken) {
+      return <div>Loading your profile...</div>;
+    }
+
+    if (logoutReason === 'inactivity') {
+      return (
+        <div className="unauthenticated">
+          <h2>You were logged out due to inactivity.</h2>
+          <h3>
+            Please sign in again using the button in the upper right corner.
+          </h3>
+        </div>
+      );
+    }
+
+    return (
       <div className="unauthenticated">
         <h2>You are not logged in.</h2>
         <h3>Please use the sign in button in the upper right corner.</h3>
