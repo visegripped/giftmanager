@@ -17,9 +17,11 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "deploy": "pnpm deploy:patch",
-    "deploy:patch": "pnpm build && node deploy.js patch",
-    "deploy:minor": "pnpm build && node deploy.js minor",
-    "deploy:major": "pnpm build && node deploy.js major"
+    "deploy:patch": "node deploy.js patch",
+    "deploy:minor": "node deploy.js minor",
+    "deploy:major": "node deploy.js major",
+    "setup:siteground-keys": "node scripts/setup-siteground-keys.js",
+    "upload:vendor": "node upload-vendor.js"
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.2",
@@ -28,6 +30,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.1.2",
+    "react-facebook-login": "^4.1.1",
     "react-router-dom": "^6.30.1",
     "react-select": "^5.10.1",
     "uuidjs": "^5.1.0"

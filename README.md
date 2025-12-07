@@ -4,7 +4,7 @@ A modern gift list management application with reporting and analytics.
 
 ## Features
 
-- User authentication via Google OAuth
+- User authentication via Google OAuth and Facebook OAuth (requires HTTPS)
 - Personal and shared gift lists
 - Admin dashboard with database management
 - Comprehensive reporting and analytics system
@@ -36,20 +36,30 @@ A modern gift list management application with reporting and analytics.
    # Edit .env.local with your settings
    ```
 
-3. **Start services**:
+3. **Generate SSL certificates** (required for Facebook OAuth):
+
+   ```bash
+   ./docker/generate-ssl-cert.sh
+   ```
+
+   This creates self-signed certificates for HTTPS. Your browser will show a security warning - this is normal for local development. Click "Advanced" → "Proceed to localhost" to continue.
+
+   > **Note**: Facebook OAuth requires HTTPS. Without certificates, the app will run on HTTP but Facebook login won't work.
+
+4. **Start services**:
 
    ```bash
    docker-compose up -d
    ```
 
-4. **Import database** (first time only):
+5. **Import database** (first time only):
 
    ```bash
    docker-compose --profile setup up db-setup
    ```
 
-5. **Access application**:
-   - Frontend: http://localhost:5174
+6. **Access application**:
+   - Frontend: https://localhost:5174 (or http://localhost:5174 if SSL not configured)
    - phpMyAdmin: http://localhost:8082
    - API: http://localhost:8081/api.php
    - Reporting: http://localhost:8081/reporting.php
@@ -86,9 +96,31 @@ See [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md) for detailed instructions.
 - `pnpm prettier` - Format code
 - `pnpm storybook` - Start Storybook
 
+### Deployment & Rollback
+
+- `pnpm deploy:patch` / `deploy:minor` / `deploy:major`
+  - Uses `deploy.js` to:
+    - Bump version (on `master`) or create a canary version (on branches).
+    - Build the frontend with versioned asset filenames.
+    - Deploy PHP includes and entrypoints plus a versioned React build to:
+      - `public_html/releases/<version>/...`
+      - `includes/releases/<version>/...`
+    - On `master`:
+      - Commit `package.json` with the new version.
+      - Tag the release (`v<version>`) and push tag + commit.
+      - Clean up old releases (keep the 5 most recent stable versions, remove all canaries).
+- `pnpm setup:siteground-keys`
+  - One-time helper to materialize SSH keys from `delete-this-file.txt` into `~/.ssh` and print the `SITEGROUND_AUTH_KEY` path to use in your `.env`.
+- `node deploy.js rollback <version>`
+  - Updates the server-side `includes/current_version.php` to point to `<version>` if that release exists under:
+    - `public_html/releases/<version>`
+    - `includes/releases/<version>`
+  - This changes the default frontend/backend version without rebuilding.
+
 ## Documentation
 
 - [Docker Setup](docs/DOCKER_SETUP.md) - Local development with Docker
+- [Deployment, Versioning & Rollback](AI-notes/plan-deployment-versioning.md) - Versioned deploy flow, rollback, and logging
 - [Reporting System](docs/REPORTING_SYSTEM.md) - Error tracking and analytics
 - [Reporting Interface](docs/REPORTING_INTERFACE.md) - Admin reporting UI
 - [GraphQL API](docs/GRAPHQL_API.md) - GraphQL API reference

@@ -18,6 +18,7 @@ import {
   responseInterface,
 } from '../../types/types';
 import AddItemForm from '../../components/AddItemForm/AddItemForm';
+import DeliveryDateModal from '../../components/DeliveryDateModal/DeliveryDateModal';
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
@@ -64,30 +65,67 @@ const linkedName = (props: tableDataInterface) => {
   return props.data.link ? <Link {...props.data} /> : props.data.name;
 };
 
-const Table = (props: theirItemListInterface) => {
-  const { theirItemList, theirUserid, myUserid, fetchTheirItemList } = props;
+const Table = (
+  props: theirItemListInterface & { theirUserProfile: UserType }
+) => {
+  const {
+    theirItemList,
+    theirUserid,
+    myUserid,
+    fetchTheirItemList,
+    theirUserProfile,
+  } = props;
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingStatusUpdate, setPendingStatusUpdate] = useState<{
+    itemid: string | number;
+    status: itemStatusInterface;
+    itemName: string;
+  } | null>(null);
+
+  const { addNotification } = useContext(
+    NotificationsContext
+  ) as NotificationContextProps;
 
   const onSelectChange = (
     itemid: string | number,
     status: itemStatusInterface
   ) => {
-    updateStatusForTheirItem(itemid, status);
+    // If status is "purchased", show modal first
+    if (status === 'purchased') {
+      const item = theirItemList.find((i) => i.itemid === itemid);
+      setPendingStatusUpdate({
+        itemid,
+        status,
+        itemName: item?.name || 'Item',
+      });
+      setIsModalOpen(true);
+    } else {
+      // For other statuses (like "reserved"), proceed immediately
+      updateStatusForTheirItem(itemid, status);
+    }
   };
-  const { addNotification } = useContext(
-    NotificationsContext
-  ) as NotificationContextProps;
+
   const updateStatusForTheirItem = (
     itemid: string | number,
-    status: itemStatusInterface
+    status: itemStatusInterface,
+    dateReceived?: string
   ) => {
-    const response = fetchData({
+    const requestConfig: any = {
       task: 'updateStatusForTheirItem',
       itemid,
       status,
       myuserid: myUserid,
       theiruserid: theirUserid,
       groupid: '1',
-    });
+    };
+
+    // Add date_received if status is purchased
+    if (status === 'purchased' && dateReceived) {
+      requestConfig.date_received = dateReceived;
+    }
+
+    const response = fetchData(requestConfig);
     response &&
       response.then((data: responseInterface) => {
         if (data.error) {
@@ -111,6 +149,23 @@ const Table = (props: theirItemListInterface) => {
         }
       });
     return response;
+  };
+
+  const handleDateConfirm = (date: string) => {
+    if (pendingStatusUpdate) {
+      updateStatusForTheirItem(
+        pendingStatusUpdate.itemid,
+        pendingStatusUpdate.status,
+        date
+      );
+      setPendingStatusUpdate(null);
+    }
+    setIsModalOpen(false);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setPendingStatusUpdate(null);
   };
 
   const StatusDD = (props: { data: ItemType }) => {
@@ -183,6 +238,16 @@ const Table = (props: theirItemListInterface) => {
         rowClassRules={rowClassRules}
         style={{ width: '100%', height: '100%' }}
       />
+      {isModalOpen && pendingStatusUpdate && (
+        <DeliveryDateModal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          onConfirm={handleDateConfirm}
+          itemName={pendingStatusUpdate.itemName}
+          birthdayMonth={theirUserProfile?.birthday_month || null}
+          birthdayDay={theirUserProfile?.birthday_day || null}
+        />
+      )}
     </>
   );
 };
@@ -367,6 +432,7 @@ const PageContent = () => {
                   theirItemList={theirItemList}
                   myUserid={myUserid}
                   theirUserid={theirUserid || ''}
+                  theirUserProfile={theirUserProfile}
                 />
               ) : (
                 <h3>

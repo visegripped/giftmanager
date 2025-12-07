@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# SSL certificates (generated locally, do not commit)
+docker/ssl/*.crt
+docker/ssl/*.key
+!docker/ssl/.gitkeep
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -25,16 +30,12 @@ dist-ssr
 *.env*
 *storybook.log
 
-deploy.js
-
 /php/includes/*-credentials.php
 /php/vendor
 /php/composer.lock
 composer.lock
-
 .pnpm-store/
 docker/ssl/
-
 
 .cursor/*
 

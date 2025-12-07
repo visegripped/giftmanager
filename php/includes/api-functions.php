@@ -187,10 +187,27 @@ function getTheirItemList($userid, $mysqli) {
     return $apiResponse;
 }
 
-function updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli) {
-    $query = "UPDATE items SET status = ?, status_userid = ? WHERE itemid = ? AND userid = ?";
-    $stmt = $mysqli->prepare($query);
-    $stmt->bind_param('ssis', $status, $myuserid, $itemid, $theiruserid);
+function updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli, $date_received = null) {
+    // If status is purchased, date_received is required
+    if ($status === 'purchased' && empty($date_received)) {
+        return array("error" => "date_received is required when status is 'purchased'");
+    }
+
+    // Build query based on whether date_received is provided
+    if ($status === 'purchased' && !empty($date_received)) {
+        $query = "UPDATE items SET status = ?, status_userid = ?, date_received = ? WHERE itemid = ? AND userid = ?";
+        $stmt = $mysqli->prepare($query);
+        if ($stmt) {
+            $stmt->bind_param('sssis', $status, $myuserid, $date_received, $itemid, $theiruserid);
+        }
+    } else {
+        $query = "UPDATE items SET status = ?, status_userid = ? WHERE itemid = ? AND userid = ?";
+        $stmt = $mysqli->prepare($query);
+        if ($stmt) {
+            $stmt->bind_param('ssis', $status, $myuserid, $itemid, $theiruserid);
+        }
+    }
+
     if ($stmt) {
         $stmt->execute();
         if ($stmt->affected_rows > 0) {
@@ -207,7 +224,7 @@ function updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $my
 
 // generic
 function getUserProfileByUserId($userid, $mysqli) {
-    $query = "SELECT * FROM `users` WHERE userid = ? ";
+    $query = "SELECT userid, firstname, lastname, groupid, created, email, avatar, birthday_month, birthday_day FROM `users` WHERE userid = ? ";
     $stmt = $mysqli->prepare($query);
 
     if ($stmt) {
@@ -282,6 +299,81 @@ function updateAvatar($email_address, $avatar, $mysqli) {
         $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
     }
     return $apiResponse;
+}
+
+function getFacebookProfile($access_token) {
+    // Get Facebook App Secret from environment variable
+    $fbAppSecret = getenv('FB_APP_SECRET') ?: getenv('FB_SECRET') ?: "";
+    
+    if (!$fbAppSecret) {
+        error_log("Facebook App Secret not configured [version=$APP_VERSION]. Please set FB_APP_SECRET environment variable.");
+        return array("error" => "Facebook App Secret not configured. Please set FB_APP_SECRET environment variable.");
+    }
+    
+    if (!$access_token) {
+        return array("error" => "Access token is required.");
+    }
+    
+    try {
+        // Generate appsecret_proof using HMAC-SHA256
+        $appsecret_proof = hash_hmac('sha256', $access_token, $fbAppSecret);
+        
+        if (!$appsecret_proof) {
+            error_log("Failed to generate appsecret_proof for Facebook API call [version=$APP_VERSION]");
+            return array("error" => "Failed to generate security proof for Facebook API call.");
+        }
+        
+        // Build Facebook Graph API URL with appsecret_proof
+        $graphUrl = "https://graph.facebook.com/v18.0/me?" . http_build_query(array(
+            'access_token' => $access_token,
+            'appsecret_proof' => $appsecret_proof,
+            'fields' => 'id,name,email,picture.width(200).height(200),first_name,last_name'
+        ));
+        
+        // Make request to Facebook Graph API with error handling
+        $context = stream_context_create(array(
+            'http' => array(
+                'timeout' => 10,
+                'ignore_errors' => true
+            )
+        ));
+        
+        $response = @file_get_contents($graphUrl, false, $context);
+        
+        if ($response === false) {
+            $error = error_get_last();
+            error_log("Failed to fetch Facebook profile [version=$APP_VERSION]: " . ($error ? $error['message'] : 'Unknown error'));
+            return array("error" => "Failed to fetch Facebook profile: Unable to connect to Facebook Graph API. Check error logs for details.");
+        }
+        
+        $result = json_decode($response, true);
+        
+        // Check for JSON decode errors
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log("JSON decode error when fetching Facebook profile [version=$APP_VERSION]: " . json_last_error_msg());
+            return array("error" => "Failed to parse Facebook API response.");
+        }
+        
+        // Check for errors in response
+        if (isset($result['error'])) {
+            $errorMsg = isset($result['error']['message']) ? $result['error']['message'] : 'Unknown error';
+            $errorCode = isset($result['error']['code']) ? $result['error']['code'] : 'Unknown';
+            error_log("Facebook API error [version=$APP_VERSION]: Code $errorCode - $errorMsg");
+            return array("error" => "Facebook API error: $errorMsg");
+        }
+        
+        // Return success with profile data
+        if (isset($result['id'])) {
+            return array("success" => array($result));
+        }
+        
+        error_log("Unexpected response from Facebook Graph API [version=$APP_VERSION]: " . substr($response, 0, 500));
+        return array("error" => "Unexpected response from Facebook Graph API. Check error logs for details.");
+        
+    } catch (Exception $e) {
+        error_log("Exception in getFacebookProfile [version=$APP_VERSION]: " . $e->getMessage());
+        return array("error" => "An error occurred while fetching Facebook profile: " . $e->getMessage());
+    }
 }
 
 // admin -> This will need additional check to ensure that the user is an admin
