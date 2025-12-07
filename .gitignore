@@ -34,8 +34,9 @@ docker/ssl/*.key
 /php/vendor
 /php/composer.lock
 composer.lock
-.pnpm-store/*
+.pnpm-store/
+docker/ssl/
+
 .cursor/*
 
 AI-notes/*
-docker/ssl/*

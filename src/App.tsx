@@ -58,12 +58,15 @@ function App() {
   }, []);
 
   useEffect(() => {
-    console.log('myProfile changed:', myProfile);
-    console.log(
-      `isAuthenticated will be set to: ${!!(myProfile && myProfile.userid)}`
+    console.log('auth state changed:', { accessToken, myProfile });
+    const nextIsAuthenticated = !!(
+      accessToken &&
+      myProfile &&
+      myProfile.userid
     );
-    setIsAuthenticated(!!(myProfile && myProfile.userid));
-  }, [myProfile]);
+    console.log(`isAuthenticated will be set to: ${nextIsAuthenticated}`);
+    setIsAuthenticated(nextIsAuthenticated);
+  }, [accessToken, myProfile]);
 
   // Check if user is admin (userid === 1)
   const isAdmin = String(myProfile.userid) === '1';
@@ -134,9 +137,33 @@ function App() {
 
   const LoadingStates = (props: { accessToken: string }) => {
     const { accessToken } = props;
-    return accessToken ? (
-      <div>Loading your profile...</div>
-    ) : (
+    const [logoutReason] = useState(() => {
+      if (typeof window === 'undefined') {
+        return '';
+      }
+      const reason = window.sessionStorage.getItem('logout_reason') || '';
+      if (reason) {
+        window.sessionStorage.removeItem('logout_reason');
+      }
+      return reason;
+    });
+
+    if (accessToken) {
+      return <div>Loading your profile...</div>;
+    }
+
+    if (logoutReason === 'inactivity') {
+      return (
+        <div className="unauthenticated">
+          <h2>You were logged out due to inactivity.</h2>
+          <h3>
+            Please sign in again using the button in the upper right corner.
+          </h3>
+        </div>
+      );
+    }
+
+    return (
       <div className="unauthenticated">
         <h2>You are not logged in.</h2>
         <h3>Please use the sign in button in the upper right corner.</h3>
@@ -198,6 +225,7 @@ function App() {
         <footer>
           <div>&copy; Copyright 2010 - {currentYear}. All rights reserved.</div>
           <div>
+            v1.0.0 |
             <a
               href="#"
               onClick={(e) => {

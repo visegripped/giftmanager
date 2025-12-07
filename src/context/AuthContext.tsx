@@ -303,6 +303,50 @@ function AuthProvider(props: PropsWithChildren) {
     return () => clearTimeout(timeoutId);
   }, [accessToken, authProvider, tokenIsValid, validateTokenViaAPI, logout]);
 
+  // Automatically log the user out when the access token expires,
+  // and record the reason so the UI can show an appropriate message.
+  useEffect(() => {
+    if (!accessToken || !accessTokenExpiration) {
+      return;
+    }
+
+    const expirationTime = new Date(accessTokenExpiration).getTime();
+    const now = Date.now();
+    const timeoutMs = expirationTime - now;
+
+    if (Number.isNaN(timeoutMs)) {
+      return;
+    }
+
+    // If already expired, log out immediately.
+    if (timeoutMs <= 0) {
+      try {
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem('logout_reason', 'inactivity');
+        }
+      } catch (error) {
+        console.error('Failed to store logout_reason in sessionStorage', error);
+      }
+      logout();
+      return;
+    }
+
+    const timerId = window.setTimeout(() => {
+      try {
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem('logout_reason', 'inactivity');
+        }
+      } catch (error) {
+        console.error('Failed to store logout_reason in sessionStorage', error);
+      }
+      logout();
+    }, timeoutMs);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [accessToken, accessTokenExpiration, logout]);
+
   return (
     <AuthContext.Provider
       value={{
