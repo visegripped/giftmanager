@@ -1,5 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import Button from '../../components/Button/Button';
+import ReservedPurchasedItemsModal from '../../components/ReservedPurchasedItemsModal/ReservedPurchasedItemsModal';
+import PrintListModal from '../../components/PrintListModal/PrintListModal';
 import {
   ItemType,
   ItemRemovedType,
@@ -40,6 +42,9 @@ const Me = () => {
   const [addItemName, setAddItemName] = useState('');
   const [addItemDescription, setAddItemDescription] = useState('');
   const [addItemLink, setAddItemLink] = useState('');
+  const [isReservedPurchasedModalOpen, setIsReservedPurchasedModalOpen] =
+    useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
   const { addNotification } = useContext(
     NotificationsContext
@@ -274,6 +279,19 @@ const Me = () => {
           </fieldset>
         </form>
 
+        <div className="me-page-actions">
+          <Button
+            label="View reserved/purchased items"
+            onButtonClick={() => setIsReservedPurchasedModalOpen(true)}
+            title="View items from other users that you have reserved or purchased"
+          />
+          <Button
+            label="Print my list"
+            onButtonClick={() => setIsPrintModalOpen(true)}
+            title="Print a list of your purchased items"
+          />
+        </div>
+
         <>
           {myItemList?.length ? (
             <Table myItemList={myItemList} />
@@ -282,6 +300,18 @@ const Me = () => {
           )}
         </>
       </section>
+
+      <ReservedPurchasedItemsModal
+        isOpen={isReservedPurchasedModalOpen}
+        onClose={() => setIsReservedPurchasedModalOpen(false)}
+        myUserid={myUserid}
+      />
+
+      <PrintListModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        myUserid={myUserid}
+      />
     </>
   );
 };

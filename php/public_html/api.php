@@ -86,6 +86,8 @@ if(!$access_token) {
     $apiResponse = addItemToMyList($myuserid, $name, $description, $link, $groupid, $mysqli);
 } else if ($task == 'getMyItemList' && $myuserid) {
     $apiResponse = getMyItemList($myuserid, $mysqli);
+} else if ($task == 'getMyReservedPurchasedItems' && $myuserid) {
+    $apiResponse = getMyReservedPurchasedItems($myuserid, $mysqli);
 }  else if($task == 'updateItemOnMyList' && $myuserid && $myuserid && $itemid && ($description || $link)) {
     $apiResponse = updateItemOnMyList($myuserid, $itemid, $description, $link, $mysqli);
 } else if($task == 'updateRemovedStatusForMyItem' && $myuserid &&  $removed >= 0 &&  $itemid) {
