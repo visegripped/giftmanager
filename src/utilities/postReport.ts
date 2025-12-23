@@ -1,5 +1,7 @@
 import { responseInterface as ApiResponse } from '../types/types';
-const reportingUrl = import.meta.env.VITE_REPORTING_API_URL as string;
+import { getReportingUrl } from './urlHelper';
+
+const reportingUrl = getReportingUrl();
 
 // SANITY -> DO NOT THROW ERRORS FROM THIS FILE.
 // There is a method listening for uncaught errors that uses this.
@@ -25,8 +27,12 @@ export interface ReportBody {
   stackTrace?: string;
   error?: string;
   email?: string | unknown;
+  // Optional warning message for non-fatal issues
+  warn?: string;
   origin: 'apiResponse' | 'errorBoundary' | 'handledException';
   file: string;
+  // Allow additional metadata without type errors
+  [key: string]: unknown;
 }
 
 export interface ReportData {

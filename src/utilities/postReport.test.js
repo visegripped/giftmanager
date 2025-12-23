@@ -1,7 +1,8 @@
 import { describe, it, beforeEach, vi, expect } from 'vitest';
 import { gatherStandardBodyData, postReport } from './postReport';
+import { getReportingUrl } from './urlHelper';
 
-const reportingUrl = import.meta.env.VITE_REPORTING_API_URL;
+const reportingUrl = getReportingUrl();
 
 describe('gatherStandardBodyData', () => {
   it('should gather standard body data correctly', () => {

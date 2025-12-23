@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './Modal.css';
 
 export interface ModalProps {
@@ -7,13 +7,41 @@ export interface ModalProps {
   title: string;
   children: React.ReactNode;
   maxWidth?: string;
+  footer?: React.ReactNode;
 }
 
 /**
  * Reusable Modal component following the ReportingQuery modal pattern
  */
 export const Modal = React.memo((props: ModalProps) => {
-  const { isOpen, onClose, title, children, maxWidth = '800px' } = props;
+  const {
+    isOpen,
+    onClose,
+    title,
+    children,
+    maxWidth = '800px',
+    footer,
+  } = props;
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) {
     return null;
@@ -28,11 +56,17 @@ export const Modal = React.memo((props: ModalProps) => {
       >
         <div className="modal-header">
           <h3>{title}</h3>
-          <button onClick={onClose} className="modal-close" type="button">
+          <button
+            onClick={onClose}
+            className="modal-close"
+            aria-label="Close modal"
+            type="button"
+          >
             ×
           </button>
         </div>
         <div className="modal-body">{children}</div>
+        {footer && <div className="modal-footer">{footer}</div>}
       </div>
     </div>
   );

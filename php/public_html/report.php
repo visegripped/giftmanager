@@ -17,7 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-include "../includes/report-credentials.php";
+// Versioned includes
+require_once __DIR__ . '/../includes/current_version.php';
+include gm_get_include_path('report-credentials.php');
 
 $task = $_POST['task'] ?? "";
 

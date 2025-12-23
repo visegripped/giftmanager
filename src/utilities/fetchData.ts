@@ -1,9 +1,14 @@
-import { itemStatusInterface, ItemRemovedType } from '../types/types';
+import {
+  itemStatusInterface,
+  ItemRemovedType,
+  responseInterface,
+} from '../types/types';
 import { startAPICall, endAPICall } from './performanceTracker';
+import { getApiUrl } from './urlHelper';
 
 // Support environment variable for API URL (for Docker/local development)
-const apiUrl =
-  import.meta.env.VITE_API_URL || 'https://gm.visegripped.com/api.php';
+// URL is protocol-relative and will use current page's protocol (HTTP/HTTPS)
+const apiUrl = getApiUrl();
 
 type fetchInterface = {
   task: string;
@@ -52,99 +57,102 @@ export const fetchData = (config: fetchInterface) => {
     'archive',
   ];
   const accessToken = localStorage.getItem('access_token');
-  const makeAsyncRequest = async (theFormData: {}) => {
-    let jsonPayload = { err: '' };
+  const makeAsyncRequest =
+    async (theFormData: {}): Promise<responseInterface> => {
+      let jsonPayload: responseInterface = {};
 
-    // Start tracking API call
-    const callId = startAPICall(apiUrl, 'POST');
+      // Start tracking API call
+      const callId = startAPICall(apiUrl, 'POST');
 
-    // Extract request data for reporting
-    const requestData: Record<string, unknown> = {};
-    if (theFormData instanceof FormData) {
-      // Convert FormData to object for reporting (exclude sensitive data)
-      theFormData.forEach((value, key) => {
-        if (key !== 'access_token') {
-          requestData[key] = value;
+      // Extract request data for reporting
+      const requestData: Record<string, unknown> = {};
+      if (theFormData instanceof FormData) {
+        // Convert FormData to object for reporting (exclude sensitive data)
+        theFormData.forEach((value, key) => {
+          if (key !== 'access_token') {
+            requestData[key] = value;
+          }
+        });
+      }
+
+      try {
+        const apiResponse = await fetch(apiUrl, {
+          // @ts-ignore
+          body: theFormData,
+          method: 'POST',
+        });
+
+        let responseData: Record<string, unknown> | undefined;
+
+        if (apiResponse.status >= 200 && apiResponse.status < 300) {
+          jsonPayload = await apiResponse.json();
+          responseData = jsonPayload;
+
+          // End tracking with success
+          endAPICall(
+            callId,
+            apiResponse.status,
+            apiResponse.statusText,
+            undefined,
+            requestData,
+            responseData
+          );
+        } else {
+          jsonPayload.err = `API responded with a ${apiResponse.status}`;
+
+          // End tracking with error
+          endAPICall(
+            callId,
+            apiResponse.status,
+            apiResponse.statusText,
+            jsonPayload.err,
+            requestData,
+            undefined
+          );
+
+          throw new Error(`API responded with a ${apiResponse.status}`);
         }
-      });
-    }
 
-    try {
-      const apiResponse = await fetch(apiUrl, {
-        // @ts-ignore
-        body: theFormData,
-        method: 'POST',
-      });
+        if (jsonPayload?.err) {
+          jsonPayload.err = `API responded with a ${apiResponse.status}`;
 
-      let responseData: Record<string, unknown> | undefined;
+          // End tracking with error
+          endAPICall(
+            callId,
+            apiResponse.status,
+            apiResponse.statusText,
+            jsonPayload.err,
+            requestData,
+            responseData
+          );
 
-      if (apiResponse.status >= 200 && apiResponse.status < 300) {
-        jsonPayload = await apiResponse.json();
-        responseData = jsonPayload;
-
-        // End tracking with success
-        endAPICall(
-          callId,
-          apiResponse.status,
-          apiResponse.statusText,
-          undefined,
-          requestData,
-          responseData
-        );
-      } else {
-        jsonPayload.err = `API responded with a ${apiResponse.status}`;
+          throw new Error(jsonPayload.err);
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        jsonPayload.err = `API Request Failure: ${errorMessage}`;
 
         // End tracking with error
         endAPICall(
           callId,
-          apiResponse.status,
-          apiResponse.statusText,
-          jsonPayload.err,
+          undefined,
+          undefined,
+          errorMessage,
           requestData,
           undefined
         );
 
-        throw new Error(`API responded with a ${apiResponse.status}`);
+        throw new Error(`API Request Failure: ${errorMessage}`);
       }
-
-      if (jsonPayload?.err) {
-        jsonPayload.err = `API responded with a ${apiResponse.status}`;
-
-        // End tracking with error
-        endAPICall(
-          callId,
-          apiResponse.status,
-          apiResponse.statusText,
-          jsonPayload.err,
-          requestData,
-          responseData
-        );
-
-        throw new Error(jsonPayload.err);
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      jsonPayload.err = `API Request Failure: ${errorMessage}`;
-
-      // End tracking with error
-      endAPICall(
-        callId,
-        undefined,
-        undefined,
-        errorMessage,
-        requestData,
-        undefined
-      );
-
-      throw new Error(`API Request Failure: ${errorMessage}`);
-    }
-    return jsonPayload;
-  };
+      return jsonPayload;
+    };
 
   if (accessToken) {
     let formData = new FormData();
     formData.append('access_token', accessToken);
+    const authProvider = localStorage.getItem('auth_provider') || 'google';
+    formData.append('auth_provider', authProvider);
     for (let key of configWhiteList) {
       // @ts-ignore: todo - remove this and address TS issue.
       formData.append(key, config[key]);

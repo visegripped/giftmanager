@@ -1,2 +1,3 @@
-export { Modal, type ModalProps } from './Modal';
-export { default } from './Modal';
+export { Modal } from './Modal';
+export type { ModalProps } from './Modal';
+export { Modal as default } from './Modal';

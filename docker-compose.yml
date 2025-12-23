@@ -24,6 +24,8 @@ services:
       - REPORT_DB_USER=${REPORT_DB_USER:-visegripped}
       - REPORT_DB_PASSWORD=${REPORT_DB_PASSWORD:-giftmanager_db_password}
       - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID:-}
+      - FB_APP_ID=${FB_APP_ID:-}
+      - FB_APP_SECRET=${FB_APP_SECRET:-}
       - APP_ENV=development
     networks:
       - giftmanager-network
@@ -104,8 +106,10 @@ services:
       - .:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=http://localhost:${PHP_PORT:-8081}/api.php
-      - VITE_REPORTING_API_URL=http://localhost:${PHP_PORT:-8081}/reporting.php
+      - VITE_API_URL=//localhost:${PHP_PORT:-8081}/api.php
+      - VITE_REPORTING_API_URL=//localhost:${PHP_PORT:-8081}/reporting.php
+      - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}
+      - VITE_FB_APP_ID=${VITE_FB_APP_ID:-}
     depends_on:
       - php
     networks:

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Modal, ModalProps } from './Modal';
 
@@ -9,6 +9,14 @@ describe('Modal Component', () => {
     title: 'Test Modal',
     children: <div>Modal Content</div>,
   };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    document.body.style.overflow = 'unset';
+  });
 
   it('renders when isOpen is true', () => {
     render(<Modal {...defaultProps} />);
@@ -24,7 +32,7 @@ describe('Modal Component', () => {
   it('calls onClose when close button is clicked', () => {
     const onClose = vi.fn();
     render(<Modal {...defaultProps} onClose={onClose} />);
-    const closeButton = screen.getByRole('button', { name: /×/i });
+    const closeButton = screen.getByLabelText('Close modal');
     fireEvent.click(closeButton);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -47,6 +55,22 @@ describe('Modal Component', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  it('calls onClose when Escape key is pressed', () => {
+    const onClose = vi.fn();
+    render(<Modal {...defaultProps} onClose={onClose} />);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call onClose when other keys are pressed', () => {
+    const onClose = vi.fn();
+    render(<Modal {...defaultProps} onClose={onClose} />);
+    fireEvent.keyDown(document, { key: 'Enter' });
+    fireEvent.keyDown(document, { key: 'Space' });
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it('renders with custom maxWidth', () => {
     render(<Modal {...defaultProps} maxWidth="600px" />);
     const modalContent = screen
@@ -61,6 +85,33 @@ describe('Modal Component', () => {
       .getByText('Test Modal')
       .closest('.modal-content');
     expect(modalContent).toHaveStyle({ maxWidth: '800px' });
+  });
+
+  it('renders footer when provided', () => {
+    render(<Modal {...defaultProps} footer={<button>Footer Button</button>} />);
+    expect(screen.getByText('Footer Button')).toBeInTheDocument();
+  });
+
+  it('renders without footer when footer is not provided', () => {
+    const { container } = render(<Modal {...defaultProps} />);
+    const footer = container.querySelector('.modal-footer');
+    expect(footer).not.toBeInTheDocument();
+  });
+
+  it('prevents body scroll when modal is open', () => {
+    const { rerender } = render(<Modal {...defaultProps} isOpen={false} />);
+    expect(document.body.style.overflow).toBe('unset');
+
+    rerender(<Modal {...defaultProps} isOpen={true} />);
+    expect(document.body.style.overflow).toBe('hidden');
+  });
+
+  it('restores body scroll when modal is closed', () => {
+    const { rerender } = render(<Modal {...defaultProps} isOpen={true} />);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    rerender(<Modal {...defaultProps} isOpen={false} />);
+    expect(document.body.style.overflow).toBe('unset');
   });
 
   it('is memoized and only re-renders when props change', () => {

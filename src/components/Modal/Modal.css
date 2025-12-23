@@ -22,6 +22,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .modal-header {
@@ -50,6 +51,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.2s;
 }
 
 .modal-close:hover {
@@ -59,4 +61,12 @@
 .modal-body {
   padding: 20px;
   overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
