@@ -89,6 +89,7 @@ function AuthProvider(props: PropsWithChildren) {
         authResponse
       )}`,
       type: 'error',
+      persist: true,
     });
   };
 
@@ -113,6 +114,7 @@ function AuthProvider(props: PropsWithChildren) {
       addNotification({
         message: 'Facebook login failed. Please try again.',
         type: 'error',
+        persist: true,
       });
     }
   };

@@ -338,7 +338,8 @@ function updateAvatar($email_address, $avatar, $mysqli) {
 
 function getFacebookProfile($access_token) {
     // Get Facebook App Secret from environment variable
-    $fbAppSecret = getenv('FB_APP_SECRET') ?: getenv('FB_SECRET') ?: "";
+    // Note: gmGetEnv() is available via env-loader.php included by api-credentials.php
+    $fbAppSecret = gmGetEnv('FB_APP_SECRET') ?: gmGetEnv('FB_SECRET') ?: "";
     
     if (!$fbAppSecret) {
         error_log("Facebook App Secret not configured [version=$APP_VERSION]. Please set FB_APP_SECRET environment variable.");

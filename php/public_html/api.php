@@ -24,7 +24,7 @@ include gm_get_include_path('api-functions.php');
 
 // Assuming $mysqli is your mysqli connection object
 // Support Docker environment (use DB_HOST from env, fallback to localhost)
-$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbHost = gmGetEnv('DB_HOST') ?: 'localhost';
 $mysqli = new mysqli($dbHost, $username, $password, $database);
 $apiResponse = array("warn" => "successful post with no task passed.");
 
@@ -62,7 +62,7 @@ function isValidGoogleAccessToken($token) {
 
   // Get Google OAuth client ID from environment variable
   // Fallback to hardcoded value for backward compatibility (should be removed in production)
-  $googleClientId = getenv('GOOGLE_OAUTH_CLIENT_ID') ?: "451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleusercontent.com";
+  $googleClientId = gmGetEnv('GOOGLE_OAUTH_CLIENT_ID') ?: "451536185848-p0c132ugq4jr7r08k4m6odds43qk6ipj.apps.googleusercontent.com";
 
   $url = "https://oauth2.googleapis.com/tokeninfo?access_token=" . $token;
 
@@ -81,8 +81,8 @@ function isValidFacebookAccessToken($token) {
   }
 
   // Get Facebook App ID and Secret from environment variables
-  $fbAppId = getenv('FB_APP_ID') ?: "";
-  $fbAppSecret = getenv('FB_APP_SECRET') ?: getenv('FB_APP_SECRET') ?: "";
+  $fbAppId = gmGetEnv('FB_APP_ID') ?: "";
+  $fbAppSecret = gmGetEnv('FB_APP_SECRET') ?: "";
 
   // Generate appsecret_proof if app secret is available
   $appsecret_proof = '';

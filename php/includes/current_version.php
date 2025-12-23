@@ -20,6 +20,7 @@ if (!isset($INCLUDE_VERSION)) {
 
 /**
  * Helper to build a versioned include path relative to the includes root.
+ * Falls back to direct path if versioned path doesn't exist (for local development).
  *
  * Example:
  *   require gm_get_include_path('api-credentials.php');
@@ -30,8 +31,16 @@ function gm_get_include_path($relativePath)
 
     $relativePath = ltrim($relativePath, '/');
 
-    // __DIR__ points at /home/<USER>/includes on the server
-    return __DIR__ . '/releases/' . $INCLUDE_VERSION . '/' . $relativePath;
+    // Try versioned path first (for production)
+    $versionedPath = __DIR__ . '/releases/' . $INCLUDE_VERSION . '/' . $relativePath;
+    
+    // If versioned path exists, use it; otherwise fall back to direct path (for local dev)
+    if (file_exists($versionedPath)) {
+        return $versionedPath;
+    }
+    
+    // Fallback to direct path for local development
+    return __DIR__ . '/' . $relativePath;
 }
 
 

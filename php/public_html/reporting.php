@@ -35,7 +35,7 @@ use GraphQL\Type\Schema;
 use GraphQL\Error\FormattedError;
 
 // Connect to reports database
-$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbHost = gmGetEnv('DB_HOST') ?: 'localhost';
 $mysqli = new mysqli($dbHost, $username, $password, $database);
 
 // Check connection
