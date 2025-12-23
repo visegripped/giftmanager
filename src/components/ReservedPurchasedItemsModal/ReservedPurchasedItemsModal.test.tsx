@@ -149,9 +149,10 @@ describe('ReservedPurchasedItemsModal Component', () => {
       </NotificationsProvider>
     );
 
-    const closeButton = screen.getByRole('button', { name: /×/i });
-    closeButton.click();
-
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      const closeButton = screen.getByLabelText('Close modal');
+      closeButton.click();
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 });

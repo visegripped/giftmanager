@@ -85,6 +85,28 @@ exports[`The Me page > when no user context is provided > should match snapshot 
         </button>
       </fieldset>
     </form>
+    <div
+      class="me-page-actions"
+    >
+      <button
+        class="button button--undefined"
+        title="View items from other users that you have reserved or purchased"
+        type="button"
+      >
+        <span>
+          View reserved/purchased items
+        </span>
+      </button>
+      <button
+        class="button button--undefined"
+        title="Print a list of your purchased items"
+        type="button"
+      >
+        <span>
+          Print my list
+        </span>
+      </button>
+    </div>
     <h3>
       There are no items in this your list. Please add some.
     </h3>
