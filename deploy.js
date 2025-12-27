@@ -481,10 +481,22 @@ async function cleanupRemoteVersions() {
   const conn = new Client();
 
   await new Promise((resolve, reject) => {
+    // Set overall timeout for the cleanup operation
+    const overallTimeout = setTimeout(() => {
+      console.error('⚠️  Cleanup operation timed out');
+      conn.end();
+      resolve(null);
+    }, 60000); // 60 second overall timeout
+
+    const cleanupTimeout = () => {
+      clearTimeout(overallTimeout);
+    };
+
     conn
       .on('ready', () => {
         conn.exec(`ls -1 ${remoteReleasesPublic}`, (err, stream) => {
           if (err) {
+            cleanupTimeout();
             reject(err);
             return;
           }
@@ -495,6 +507,7 @@ async function cleanupRemoteVersions() {
               output += data.toString();
             })
             .on('close', () => {
+              cleanupTimeout();
               const names = output
                 .split('\n')
                 .map((n) => n.trim())
@@ -527,6 +540,7 @@ async function cleanupRemoteVersions() {
 
               if (deleteTargets.length === 0) {
                 console.log('🧹 No old releases to delete.');
+                cleanupTimeout();
                 resolve(null);
                 conn.end();
                 return;
@@ -539,6 +553,7 @@ async function cleanupRemoteVersions() {
 
               conn.exec(cmd, (rmErr, rmStream) => {
                 if (rmErr) {
+                  cleanupTimeout();
                   console.error(
                     '⚠️  Failed to remove old releases:',
                     rmErr.message
@@ -548,11 +563,35 @@ async function cleanupRemoteVersions() {
                   return;
                 }
 
-                rmStream
-                  .on('close', () => {
+                let hasResolved = false;
+                const cleanup = () => {
+                  if (!hasResolved) {
+                    hasResolved = true;
+                    cleanupTimeout();
                     console.log('✅ Old releases cleaned up on server');
                     resolve(null);
                     conn.end();
+                  }
+                };
+
+                // Set a timeout to prevent hanging
+                const timeout = setTimeout(() => {
+                  if (!hasResolved) {
+                    console.log(
+                      '⚠️  Cleanup command timed out, closing connection'
+                    );
+                    cleanup();
+                  }
+                }, 30000); // 30 second timeout
+
+                rmStream
+                  .on('close', (code) => {
+                    clearTimeout(timeout);
+                    cleanup();
+                  })
+                  .on('end', () => {
+                    clearTimeout(timeout);
+                    cleanup();
                   })
                   .stderr.on('data', (data) => {
                     console.log('⚠️  cleanup STDERR:', data.toString().trim());
@@ -562,6 +601,7 @@ async function cleanupRemoteVersions() {
         });
       })
       .on('error', (err) => {
+        cleanupTimeout();
         console.error('⚠️  Cleanup connection error:', err.message);
         resolve(null);
         conn.end();
@@ -744,6 +784,36 @@ async function performDeploy(version) {
                   console.log(
                     '✅ Backend includes deployed (credentials excluded)\n'
                   );
+
+                  // Deploy utility files to root includes folder (not versioned)
+                  // These files need to be in the root includes folder for api.php to find them
+                  console.log(
+                    '🔧 Deploying utility files to root includes folder...'
+                  );
+                  const utilityFiles = ['env-loader.php'];
+                  for (const utilityFile of utilityFiles) {
+                    const localUtilityPath = join(
+                      phpDeployPaths.includesLocal,
+                      utilityFile
+                    );
+                    const remoteUtilityPath = `${remoteIncludesRoot}/${utilityFile}`;
+                    try {
+                      await stat(localUtilityPath);
+                      await uploadFile(
+                        sftp,
+                        localUtilityPath,
+                        remoteUtilityPath
+                      );
+                      console.log(
+                        `  ✓ Deployed ${utilityFile} to root includes folder`
+                      );
+                    } catch (err) {
+                      console.log(
+                        `  ⚠️  Warning: Could not deploy ${utilityFile}: ${err.message}`
+                      );
+                    }
+                  }
+                  console.log('✅ Utility files deployed\n');
 
                   // Update includes/current_version.php on the server to point at this version.
                   // This controls which backend version is considered \"active\" for logs and includes.
