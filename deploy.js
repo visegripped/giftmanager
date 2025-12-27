@@ -1,11 +1,17 @@
 import { Client } from 'ssh2';
 import { readdir, readFile, stat, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { join, dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { homedir } from 'os';
 import { execSync } from 'child_process';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
+// Get project root directory (where deploy.js is located)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const projectRoot = resolve(__dirname);
 
 // -----------------------------
 // CLI argument parsing
@@ -112,7 +118,7 @@ async function updateVersion() {
   const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
   console.log(`   Branch: ${branch}`);
 
-  const packagePath = './package.json';
+  const packagePath = join(projectRoot, 'package.json');
   const packageJsonContent = await readFile(packagePath, 'utf-8');
   const packageJson = JSON.parse(packageJsonContent.toString());
   const currentVersion = packageJson.version;
@@ -198,7 +204,7 @@ async function updateVersion() {
 async function rollbackVersion() {
   if (originalPackageJson) {
     console.log('\n🔄 Rolling back package.json to original value...');
-    await writeFile('./package.json', originalPackageJson);
+    await writeFile(join(projectRoot, 'package.json'), originalPackageJson);
     console.log('✅ package.json restored to original version\n');
   }
 }
@@ -375,8 +381,8 @@ async function runBuild(version) {
 }
 
 async function prepareVersionedIndex(version) {
-  const indexHtmlPath = './dist/index.html';
-  const indexPhpPath = './dist/index.php';
+  const indexHtmlPath = join(projectRoot, 'dist', 'index.html');
+  const indexPhpPath = join(projectRoot, 'dist', 'index.php');
 
   const rawHtml = await readFile(indexHtmlPath, 'utf-8');
 
@@ -615,18 +621,23 @@ async function performDeploy(version) {
   ].join(' && ');
 
   const phpDeployPaths = {
-    includesLocal: './php/includes',
+    includesLocal: join(projectRoot, 'php', 'includes'),
     includesRemote: `${remoteReleasesIncludes}/${version}`,
     currentVersionFileRemote: `${remoteIncludesRoot}/current_version.php`,
-    apiLocal: './php/public_html/api.php',
+    apiLocal: join(projectRoot, 'php', 'public_html', 'api.php'),
     apiRemote: `${remotePublicHtml}/api.php`,
-    reportLocal: './php/public_html/report.php',
+    reportLocal: join(projectRoot, 'php', 'public_html', 'report.php'),
     reportRemote: `${remotePublicHtml}/report.php`,
-    reportingLocal: './php/public_html/reporting.php',
+    reportingLocal: join(projectRoot, 'php', 'public_html', 'reporting.php'),
     reportingRemote: `${remotePublicHtml}/reporting.php`,
-    archiveItemsLocal: './php/public_html/archive-items.php',
+    archiveItemsLocal: join(
+      projectRoot,
+      'php',
+      'public_html',
+      'archive-items.php'
+    ),
     archiveItemsRemote: `${remotePublicHtml}/archive-items.php`,
-    indexRouterLocal: './php/public_html/index.php',
+    indexRouterLocal: join(projectRoot, 'php', 'public_html', 'index.php'),
     indexRouterRemote: `${remotePublicHtml}/index.php`,
   };
 
@@ -736,12 +747,16 @@ async function performDeploy(version) {
                   // PHASE 2: Frontend
                   console.log('🔷 PHASE 2: Deploying frontend assets...\n');
                   const remoteAssetsDir = `${remoteReleasesPublic}/${version}/assets`;
-                  await uploadDirectory(sftp, './dist/assets', remoteAssetsDir);
+                  await uploadDirectory(
+                    sftp,
+                    join(projectRoot, 'dist', 'assets'),
+                    remoteAssetsDir
+                  );
                   console.log('✅ Frontend assets deployed\n');
 
                   await uploadFile(
                     sftp,
-                    './dist/index.php',
+                    join(projectRoot, 'dist', 'index.php'),
                     `${remoteReleasesPublic}/${version}/index.php`
                   );
                   console.log('✅ Versioned index.php deployed\n');
