@@ -98,6 +98,7 @@ describe('PrintListModal Component', () => {
         status_userid: 1,
         role: 'user' as const,
         date_received: 0,
+        owner_name: 'John Doe',
       },
       {
         itemid: 2,
@@ -111,12 +112,15 @@ describe('PrintListModal Component', () => {
         status_userid: 1,
         role: 'user' as const,
         date_received: 0,
+        owner_name: 'Jane Smith',
       },
     ];
 
-    vi.spyOn(fetchDataModule, 'default').mockResolvedValue({
-      success: mockItems,
-    });
+    const fetchDataSpy = vi
+      .spyOn(fetchDataModule, 'default')
+      .mockResolvedValue({
+        success: mockItems,
+      });
 
     render(
       <NotificationsProvider>
@@ -127,6 +131,12 @@ describe('PrintListModal Component', () => {
     await waitFor(() => {
       expect(screen.getByText('Purchased Item')).toBeInTheDocument();
       expect(screen.queryByText('Reserved Item')).not.toBeInTheDocument();
+    });
+
+    // Verify the correct task is called
+    expect(fetchDataSpy).toHaveBeenCalledWith({
+      task: 'getMyReservedPurchasedItems',
+      myuserid: '1',
     });
   });
 
@@ -144,6 +154,48 @@ describe('PrintListModal Component', () => {
         status_userid: 1,
         role: 'user' as const,
         date_received: 0,
+        owner_name: 'John Doe',
+      },
+    ];
+
+    const fetchDataSpy = vi
+      .spyOn(fetchDataModule, 'default')
+      .mockResolvedValue({
+        success: mockItems,
+      });
+
+    render(
+      <NotificationsProvider>
+        <PrintListModal {...defaultProps} />
+      </NotificationsProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Print')).toBeInTheDocument();
+    });
+
+    // Verify the correct task is called
+    expect(fetchDataSpy).toHaveBeenCalledWith({
+      task: 'getMyReservedPurchasedItems',
+      myuserid: '1',
+    });
+  });
+
+  it('displays owner name when available', async () => {
+    const mockItems = [
+      {
+        itemid: 1,
+        name: 'Purchased Item',
+        status: 'purchased',
+        userid: 1,
+        date_added: 1234567890,
+        removed: 0,
+        added_by_userid: 1,
+        groupid: 1,
+        status_userid: 1,
+        role: 'user' as const,
+        date_received: 0,
+        owner_name: 'John Doe',
       },
     ];
 
@@ -158,7 +210,7 @@ describe('PrintListModal Component', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Print')).toBeInTheDocument();
+      expect(screen.getByText('For: John Doe')).toBeInTheDocument();
     });
   });
 
