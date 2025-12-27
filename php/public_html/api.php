@@ -18,11 +18,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Versioned includes
-require_once __DIR__ . '/../includes/current_version.php';
+try {
+    require_once __DIR__ . '/../includes/current_version.php';
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(array("error" => "Failed to load version configuration: " . $e->getMessage()));
+    exit();
+}
+
 // Credentials always come from root includes folder (never versioned)
-include gm_get_credentials_path('api-credentials.php');
+try {
+    $credentialsPath = gm_get_credentials_path('api-credentials.php');
+    if (!file_exists($credentialsPath)) {
+        throw new Exception("Credentials file not found: $credentialsPath");
+    }
+    include $credentialsPath;
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(array("error" => "Failed to load credentials: " . $e->getMessage()));
+    exit();
+}
+
 // Versioned code files come from versioned releases
-include gm_get_include_path('api-functions.php');
+try {
+    $functionsPath = gm_get_include_path('api-functions.php');
+    if (!file_exists($functionsPath)) {
+        throw new Exception("API functions file not found: $functionsPath");
+    }
+    include $functionsPath;
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(array("error" => "Failed to load API functions: " . $e->getMessage()));
+    exit();
+}
 
 // Assuming $mysqli is your mysqli connection object
 // Support Docker environment (use DB_HOST from env, fallback to localhost)
@@ -204,8 +232,17 @@ if($task != 'getFacebookProfile' && (!isset($apiResponse) || !isset($apiResponse
 $mysqli->close();
 
 // Return the response as JSON
+// Ensure we always have a valid response array
+if (!isset($apiResponse) || !is_array($apiResponse)) {
+    $apiResponse = array("error" => "Invalid API response format");
+}
 
+// Ensure no output has been sent before this point
+if (headers_sent()) {
+    // If headers were already sent, log the error but can't send JSON
+    error_log("API Error: Headers already sent before JSON output");
+}
 
 echo json_encode($apiResponse);
-
+exit();
 ?>
