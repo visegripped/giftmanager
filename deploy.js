@@ -346,7 +346,12 @@ async function uploadFile(sftp, localPath, remotePath) {
   });
 }
 
-async function uploadDirectory(sftp, localDir, remoteDir) {
+async function uploadDirectory(
+  sftp,
+  localDir,
+  remoteDir,
+  excludePatterns = []
+) {
   // Verify local directory exists
   try {
     await stat(localDir);
@@ -357,11 +362,26 @@ async function uploadDirectory(sftp, localDir, remoteDir) {
   }
 
   const files = await readdir(localDir);
+
+  // Filter out excluded files
+  const filteredFiles = files.filter((file) => {
+    return !excludePatterns.some((pattern) => {
+      if (typeof pattern === 'string') {
+        // Exact match only - don't exclude example files
+        return file === pattern;
+      }
+      if (pattern instanceof RegExp) {
+        return pattern.test(file);
+      }
+      return false;
+    });
+  });
+
   console.log(
-    `  📂 [version=${activeDeployVersion}] Uploading directory: ${localDir} -> ${remoteDir} (${files.length} items)`
+    `  📂 [version=${activeDeployVersion}] Uploading directory: ${localDir} -> ${remoteDir} (${filteredFiles.length} items${files.length !== filteredFiles.length ? `, ${files.length - filteredFiles.length} excluded` : ''})`
   );
 
-  for (const file of files) {
+  for (const file of filteredFiles) {
     const localPath = join(localDir, file);
     const remotePath = `${remoteDir}/${file}`;
     const stats = await stat(localPath);
@@ -380,7 +400,7 @@ async function uploadDirectory(sftp, localDir, remoteDir) {
           resolve();
         });
       });
-      await uploadDirectory(sftp, localPath, remotePath);
+      await uploadDirectory(sftp, localPath, remotePath, excludePatterns);
     } else {
       await uploadFile(sftp, localPath, remotePath);
     }
@@ -595,7 +615,17 @@ async function rollbackRemoteVersion(targetVersion) {
             '{',
             '    global $INCLUDE_VERSION;',
             "    $relativePath = ltrim($relativePath, '/');",
-            "    return __DIR__ . '/releases/' . $INCLUDE_VERSION . '/' . $relativePath;",
+            "    $versionedPath = __DIR__ . '/releases/' . $INCLUDE_VERSION . '/' . $relativePath;",
+            '    if (file_exists($versionedPath)) {',
+            '        return $versionedPath;',
+            '    }',
+            "    return __DIR__ . '/' . $relativePath;",
+            '}',
+            '',
+            'function gm_get_credentials_path($relativePath)',
+            '{',
+            "    $relativePath = ltrim($relativePath, '/');",
+            "    return __DIR__ . '/' . $relativePath;",
             '}',
             '',
           ].join('\n');
@@ -698,12 +728,22 @@ async function performDeploy(version) {
                   console.log('🔷 PHASE 1: Deploying PHP files...\n');
 
                   console.log('🔧 Deploying backend includes...');
+                  // Exclude credential files - they should never be versioned
+                  // Credentials always come from root includes folder
+                  const credentialExclusions = [
+                    'api-credentials.php',
+                    'report-credentials.php',
+                    'reporting-credentials.php',
+                  ];
                   await uploadDirectory(
                     sftp,
                     phpDeployPaths.includesLocal,
-                    phpDeployPaths.includesRemote
+                    phpDeployPaths.includesRemote,
+                    credentialExclusions
                   );
-                  console.log('✅ Backend includes deployed\n');
+                  console.log(
+                    '✅ Backend includes deployed (credentials excluded)\n'
+                  );
 
                   // Update includes/current_version.php on the server to point at this version.
                   // This controls which backend version is considered \"active\" for logs and includes.
@@ -716,7 +756,17 @@ async function performDeploy(version) {
                     '{',
                     '    global $INCLUDE_VERSION;',
                     "    $relativePath = ltrim($relativePath, '/');",
-                    "    return __DIR__ . '/releases/' . $INCLUDE_VERSION . '/' . $relativePath;",
+                    "    $versionedPath = __DIR__ . '/releases/' . $INCLUDE_VERSION . '/' . $relativePath;",
+                    '    if (file_exists($versionedPath)) {',
+                    '        return $versionedPath;',
+                    '    }',
+                    "    return __DIR__ . '/' . $relativePath;",
+                    '}',
+                    '',
+                    'function gm_get_credentials_path($relativePath)',
+                    '{',
+                    "    $relativePath = ltrim($relativePath, '/');",
+                    "    return __DIR__ . '/' . $relativePath;",
                     '}',
                     '',
                   ].join('\n');

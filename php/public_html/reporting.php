@@ -25,7 +25,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 // Versioned includes
 require_once __DIR__ . '/../includes/current_version.php';
-require_once gm_get_include_path('reporting-credentials.php');
+// Credentials always come from root includes folder (never versioned)
+require_once gm_get_credentials_path('reporting-credentials.php');
+// Versioned code files come from versioned releases
 require_once gm_get_include_path('reporting-functions.php');
 require_once gm_get_include_path('graphql-schema.php');
 require_once gm_get_include_path('graphql-resolvers.php');

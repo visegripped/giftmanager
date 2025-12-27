@@ -19,7 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // Versioned includes
 require_once __DIR__ . '/../includes/current_version.php';
-include gm_get_include_path('api-credentials.php');
+// Credentials always come from root includes folder (never versioned)
+include gm_get_credentials_path('api-credentials.php');
+// Versioned code files come from versioned releases
 include gm_get_include_path('api-functions.php');
 
 // Assuming $mysqli is your mysqli connection object

@@ -19,7 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // Versioned includes
 require_once __DIR__ . '/../includes/current_version.php';
-include gm_get_include_path('report-credentials.php');
+// Credentials always come from root includes folder (never versioned)
+include gm_get_credentials_path('report-credentials.php');
 
 $task = $_POST['task'] ?? "";
 
