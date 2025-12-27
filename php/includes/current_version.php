@@ -22,8 +22,10 @@ if (!isset($INCLUDE_VERSION)) {
  * Helper to build a versioned include path relative to the includes root.
  * Falls back to direct path if versioned path doesn't exist (for local development).
  *
+ * Use this for versioned code files (e.g., api-functions.php, graphql-schema.php)
+ * 
  * Example:
- *   require gm_get_include_path('api-credentials.php');
+ *   require gm_get_include_path('api-functions.php');
  */
 function gm_get_include_path($relativePath)
 {
@@ -40,6 +42,24 @@ function gm_get_include_path($relativePath)
     }
     
     // Fallback to direct path for local development
+    return __DIR__ . '/' . $relativePath;
+}
+
+/**
+ * Helper to get credentials file path from the root includes folder.
+ * 
+ * Credentials should NEVER be versioned. They always come from the root includes
+ * directory to ensure they are maintained in one location and not accidentally
+ * committed to version control.
+ * 
+ * Example:
+ *   require gm_get_credentials_path('api-credentials.php');
+ */
+function gm_get_credentials_path($relativePath)
+{
+    $relativePath = ltrim($relativePath, '/');
+    
+    // Always load credentials from root includes folder (never from versioned releases)
     return __DIR__ . '/' . $relativePath;
 }
 

@@ -19,9 +19,9 @@ ini_set('log_errors', '1');
 // Set timezone
 date_default_timezone_set('UTC');
 
-// Include database credentials (versioned)
+// Include database credentials (always from root includes folder, never versioned)
 require_once __DIR__ . '/../includes/current_version.php';
-include gm_get_include_path('api-credentials.php');
+include gm_get_credentials_path('api-credentials.php');
 
 // Support Docker environment (use DB_HOST from env, fallback to localhost)
 $dbHost = gmGetEnv('DB_HOST') ?: 'localhost';
