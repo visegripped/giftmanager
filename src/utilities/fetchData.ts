@@ -145,7 +145,15 @@ export const fetchData = (config: fetchInterface) => {
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
-        jsonPayload.err = `API Request Failure: ${errorMessage}`;
+
+        // Check if it's a JSON parse error
+        if (error instanceof SyntaxError) {
+          jsonPayload = {
+            error: `Invalid JSON response from server: ${errorMessage}`,
+          };
+        } else {
+          jsonPayload.err = `API Request Failure: ${errorMessage}`;
+        }
 
         // End tracking with error
         endAPICall(
@@ -157,7 +165,8 @@ export const fetchData = (config: fetchInterface) => {
           undefined
         );
 
-        throw new Error(`API Request Failure: ${errorMessage}`);
+        // Return error response instead of throwing to prevent unhandled promise rejection
+        return jsonPayload;
       }
       return jsonPayload;
     };
