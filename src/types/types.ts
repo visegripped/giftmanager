@@ -5,6 +5,7 @@ export type ItemType = {
   date_added: number;
   name: string;
   note?: string;
+  description?: string;
   date_received: number;
   status: null | 'nochange' | 'uncancel' | 'removed' | 'purchased' | 'reserved';
   removed: ItemRemovedType;
@@ -54,10 +55,11 @@ export type itemStatusInterface =
   | 'cancelled'
   | 'uncancel'
   | 'purchased'
-  | 'reserved';
+  | 'reserved'
+  | 'nochange';
 
 export type responseInterface = {
-  success?: string | [];
+  success?: string | [] | ItemType[] | UserType[] | any[];
   error?: string;
   err?: string;
   warn?: string;

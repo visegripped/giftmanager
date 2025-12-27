@@ -66,9 +66,9 @@ export const ReservedPurchasedItemsModal = React.memo(
             setError(data.error);
           } else {
             const fetchedItems = (data.success as ItemType[]) || [];
-            // Filter out items with status "no change" or null
+            // Filter out items with status "nochange" or null
             const filteredItems = fetchedItems.filter(
-              (item) => item.status && item.status !== 'no change'
+              (item) => item.status && item.status !== 'nochange'
             );
             setItems(filteredItems);
           }
@@ -84,12 +84,12 @@ export const ReservedPurchasedItemsModal = React.memo(
     const handleStatusChange = (
       itemid: string | number,
       theiruserid: string | number,
-      status: itemStatusInterface | 'no change'
+      status: itemStatusInterface
     ) => {
       const response = fetchData({
         task: 'updateStatusForTheirItem',
         itemid,
-        status: status as string,
+        status: status,
         myuserid: myUserid,
         theiruserid: theiruserid,
         groupid: '1',
@@ -125,9 +125,9 @@ export const ReservedPurchasedItemsModal = React.memo(
       event: React.ChangeEvent<HTMLSelectElement>
     ) => {
       const newStatus = event.target.value;
-      if (newStatus === 'no change') {
-        // Update to "no change" which will remove it from the list
-        handleStatusChange(item.itemid, item.userid, 'no change');
+      if (newStatus === 'nochange') {
+        // Update to "nochange" which will remove it from the list
+        handleStatusChange(item.itemid, item.userid, 'nochange');
       } else {
         handleStatusChange(
           item.itemid,
@@ -185,11 +185,11 @@ export const ReservedPurchasedItemsModal = React.memo(
                     <td>{item.owner_name || 'Unknown'}</td>
                     <td>
                       <select
-                        value={item.status || 'no change'}
+                        value={item.status || 'nochange'}
                         onChange={(e) => handleSelectChange(item, e)}
                         className="reserved-purchased-modal__select"
                       >
-                        <option value="no change">No change/reset</option>
+                        <option value="nochange">No change/reset</option>
                         <option value="reserved">Reserved</option>
                         <option value="purchased">Purchased</option>
                       </select>
