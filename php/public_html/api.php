@@ -54,8 +54,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/../includes/current_version.php';
 } catch (Throwable $e) {
+    ob_clean();
     http_response_code(500);
+    header("Access-Control-Allow-Origin: *");
+    header('Content-type: application/json');
     echo json_encode(array("error" => "Failed to load version configuration: " . $e->getMessage()));
+    ob_end_flush();
+    exit();
+}
+
+// Load environment helper functions (needed for gmGetEnv())
+try {
+    require_once __DIR__ . '/../includes/env-loader.php';
+    // Load environment variables from .env files
+    if (function_exists('gmLoadEnv')) {
+        gmLoadEnv();
+    }
+} catch (Throwable $e) {
+    ob_clean();
+    http_response_code(500);
+    header("Access-Control-Allow-Origin: *");
+    header('Content-type: application/json');
+    echo json_encode(array("error" => "Failed to load environment loader: " . $e->getMessage()));
+    ob_end_flush();
     exit();
 }
 
