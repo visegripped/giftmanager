@@ -301,6 +301,17 @@ const remoteReleasesIncludes = `${remoteIncludesRoot}/releases`;
 // -----------------------------
 
 async function uploadFile(sftp, localPath, remotePath) {
+  // Verify local file exists before attempting upload
+  try {
+    await stat(localPath);
+  } catch (err) {
+    const error = new Error(
+      `Local file does not exist: ${localPath} (${err.message})`
+    );
+    console.error(`  ❌ [version=${activeDeployVersion}] ${error.message}`);
+    throw error;
+  }
+
   return new Promise((resolve, reject) => {
     const fileName = remotePath.split('/').pop();
     const fileIcon =
@@ -317,11 +328,15 @@ async function uploadFile(sftp, localPath, remotePath) {
     console.log(
       `  ${fileIcon} [version=${activeDeployVersion}] Uploading: ${fileName}`
     );
+    console.log(`     Local: ${localPath}`);
+    console.log(`     Remote: ${remotePath}`);
     sftp.fastPut(localPath, remotePath, (err) => {
       if (err) {
         console.error(
           `  ❌ [version=${activeDeployVersion}] Failed: ${fileName}`
         );
+        console.error(`     Error: ${err.message}`);
+        console.error(`     Local path: ${localPath}`);
         reject(err);
       } else {
         console.log(`  ✓ [version=${activeDeployVersion}] ${fileName}`);
@@ -332,7 +347,19 @@ async function uploadFile(sftp, localPath, remotePath) {
 }
 
 async function uploadDirectory(sftp, localDir, remoteDir) {
+  // Verify local directory exists
+  try {
+    await stat(localDir);
+  } catch (err) {
+    throw new Error(
+      `Local directory does not exist: ${localDir} (${err.message})`
+    );
+  }
+
   const files = await readdir(localDir);
+  console.log(
+    `  📂 [version=${activeDeployVersion}] Uploading directory: ${localDir} -> ${remoteDir} (${files.length} items)`
+  );
 
   for (const file of files) {
     const localPath = join(localDir, file);
@@ -617,6 +644,7 @@ async function performDeploy(version) {
     `mkdir -p ${remoteReleasesPublic}`,
     `mkdir -p ${remoteReleasesIncludes}`,
     `mkdir -p ${remoteReleasesPublic}/${version}`,
+    `mkdir -p ${remoteReleasesPublic}/${version}/assets`,
     `mkdir -p ${remoteReleasesIncludes}/${version}`,
   ].join(' && ');
 
@@ -747,11 +775,26 @@ async function performDeploy(version) {
                   // PHASE 2: Frontend
                   console.log('🔷 PHASE 2: Deploying frontend assets...\n');
                   const remoteAssetsDir = `${remoteReleasesPublic}/${version}/assets`;
-                  await uploadDirectory(
-                    sftp,
-                    join(projectRoot, 'dist', 'assets'),
-                    remoteAssetsDir
-                  );
+                  const localAssetsDir = join(projectRoot, 'dist', 'assets');
+
+                  // Verify local assets directory exists before attempting upload
+                  try {
+                    const localStats = await stat(localAssetsDir);
+                    if (!localStats.isDirectory()) {
+                      throw new Error(
+                        `${localAssetsDir} exists but is not a directory`
+                      );
+                    }
+                    console.log(
+                      `  ✓ Local assets directory found: ${localAssetsDir}`
+                    );
+                  } catch (err) {
+                    throw new Error(
+                      `Local assets directory does not exist: ${localAssetsDir} (${err.message})`
+                    );
+                  }
+
+                  await uploadDirectory(sftp, localAssetsDir, remoteAssetsDir);
                   console.log('✅ Frontend assets deployed\n');
 
                   await uploadFile(
