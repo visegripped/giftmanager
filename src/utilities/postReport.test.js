@@ -42,7 +42,9 @@ describe('postReport', () => {
   });
 
   it('should send a report successfully', async () => {
-    const mockResponse = { json: vi.fn().mockResolvedValue({ err: null }) };
+    const mockResponse = {
+      text: vi.fn().mockResolvedValue(JSON.stringify({ err: null })),
+    };
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -60,7 +62,7 @@ describe('postReport', () => {
     const result = await postReport(reportData);
 
     expect(fetch).toHaveBeenCalledWith(reportingUrl, expect.any(Object));
-    expect(mockResponse.json).toHaveBeenCalled();
+    expect(mockResponse.text).toHaveBeenCalled();
     expect(result).toEqual({ err: null });
   });
 
@@ -85,7 +87,7 @@ describe('postReport', () => {
   it('should log an error when jsonPayload contains an error', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const mockResponse = {
-      json: vi.fn().mockResolvedValue({ err: 'Some error' }),
+      text: vi.fn().mockResolvedValue(JSON.stringify({ err: 'Some error' })),
     };
     vi.stubGlobal(
       'fetch',
@@ -107,11 +109,14 @@ describe('postReport', () => {
     expect(result).toEqual({ err: 'Some error' });
   });
 
-  it('should log an error when no jsonPayload is present', async () => {
+  it('should log an error when response is empty', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({ status: 204, json: () => {} })
+      vi.fn().mockResolvedValue({
+        status: 200,
+        text: vi.fn().mockResolvedValue(''),
+      })
     );
 
     const reportData = {
@@ -123,8 +128,8 @@ describe('postReport', () => {
     const result = await postReport(reportData);
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      'ERROR IN REPORTING: no json payload in response'
+      'ERROR IN REPORTING: Empty response from server'
     );
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ err: 'Empty response from server' });
   });
 });

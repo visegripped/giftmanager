@@ -18,7 +18,7 @@ describe('graphqlClient', () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => mockResponse,
+        text: async () => JSON.stringify(mockResponse),
       });
 
       const result = await graphqlRequest('query { test }');
@@ -35,7 +35,7 @@ describe('graphqlClient', () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => mockResponse,
+        text: async () => JSON.stringify(mockResponse),
       });
 
       const result = await graphqlRequest('query { test }');
@@ -64,6 +64,18 @@ describe('graphqlClient', () => {
         'HTTP error'
       );
     });
+
+    it('should handle empty responses', async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => '',
+      });
+
+      await expect(graphqlRequest('query { test }')).rejects.toThrow(
+        'Empty response from GraphQL server'
+      );
+    });
   });
 
   describe('getReports', () => {
@@ -80,7 +92,7 @@ describe('graphqlClient', () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => mockResponse,
+        text: async () => JSON.stringify(mockResponse),
       });
 
       const result = await getReports(
@@ -111,7 +123,7 @@ describe('graphqlClient', () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => mockResponse,
+        text: async () => JSON.stringify(mockResponse),
       });
 
       const result = await getReportStats({ userid: 1 });

@@ -225,7 +225,11 @@ function App() {
         <footer>
           <div>&copy; Copyright 2010 - {currentYear}. All rights reserved.</div>
           <div>
-            v1.0.0 |
+            v
+            {import.meta.env.VITE_APP_VERSION ||
+              import.meta.env.npm_package_version ||
+              '1.0.0'}{' '}
+            |
             <a
               href="#"
               onClick={(e) => {
