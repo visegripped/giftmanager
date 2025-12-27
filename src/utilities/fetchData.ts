@@ -85,8 +85,22 @@ export const fetchData = (config: fetchInterface) => {
         let responseData: Record<string, unknown> | undefined;
 
         if (apiResponse.status >= 200 && apiResponse.status < 300) {
-          jsonPayload = await apiResponse.json();
-          responseData = jsonPayload;
+          const responseText = await apiResponse.text();
+          // Parse JSON response, handling empty responses
+          if (responseText.trim() === '') {
+            jsonPayload = { error: 'Empty response from server' };
+            responseData = jsonPayload;
+          } else {
+            try {
+              jsonPayload = JSON.parse(responseText);
+              responseData = jsonPayload;
+            } catch (parseError) {
+              jsonPayload = {
+                error: `Invalid JSON response: ${responseText.substring(0, 100)}`,
+              };
+              responseData = jsonPayload;
+            }
+          }
 
           // End tracking with success
           endAPICall(
@@ -155,7 +169,11 @@ export const fetchData = (config: fetchInterface) => {
     formData.append('auth_provider', authProvider);
     for (let key of configWhiteList) {
       // @ts-ignore: todo - remove this and address TS issue.
-      formData.append(key, config[key]);
+      const value = config[key];
+      // Only append fields that have actual values (not undefined or null)
+      if (value !== undefined && value !== null && value !== '') {
+        formData.append(key, String(value));
+      }
     }
 
     return makeAsyncRequest(formData);
