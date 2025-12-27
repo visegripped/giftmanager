@@ -9,8 +9,24 @@ import fs from 'fs';
 const buildVersion =
   process.env.BUILD_VERSION || process.env.npm_package_version || 'dev';
 
+// Read package.json to get version for environment variable
+const packageJson = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8')
+);
+const packageVersion = packageJson.version || 'dev';
+
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    // Make package version available in the app
+    'import.meta.env.npm_package_version': JSON.stringify(packageVersion),
+    // Also set VITE_APP_VERSION if not already set
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(
+      process.env.VITE_APP_VERSION ||
+        process.env.BUILD_VERSION ||
+        packageVersion
+    ),
+  },
   resolve: {
     alias: {
       '@assets': '/src/assets',
