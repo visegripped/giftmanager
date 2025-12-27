@@ -1,8 +1,41 @@
 <?php
+// Start output buffering to catch any premature output
+ob_start();
+
 // Suppress error output to prevent breaking JSON responses
 error_reporting(E_ALL);
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
+
+// Global error handler to ensure we always return JSON
+function globalErrorHandler($errno, $errstr, $errfile, $errline) {
+    // Log the error
+    error_log("PHP Error [$errno]: $errstr in $errfile on line $errline");
+    
+    // Only output JSON if headers haven't been sent
+    if (!headers_sent()) {
+        http_response_code(500);
+        header("Access-Control-Allow-Origin: *");
+        header('Content-type: application/json');
+        echo json_encode(array("error" => "Internal server error: $errstr"));
+        exit();
+    }
+}
+
+// Set up error handlers
+set_error_handler('globalErrorHandler', E_ALL);
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        // Fatal error occurred
+        if (!headers_sent()) {
+            http_response_code(500);
+            header("Access-Control-Allow-Origin: *");
+            header('Content-type: application/json');
+            echo json_encode(array("error" => "Fatal error: " . $error['message']));
+        }
+    }
+});
 
 // CORS headers - must be set before any output
 header("Access-Control-Allow-Origin: *");
@@ -28,14 +61,23 @@ try {
 
 // Credentials always come from root includes folder (never versioned)
 try {
+    // Check if the function exists (should be in current_version.php)
+    if (!function_exists('gm_get_credentials_path')) {
+        throw new Exception("Function gm_get_credentials_path() not found. Check includes/current_version.php");
+    }
+    
     $credentialsPath = gm_get_credentials_path('api-credentials.php');
     if (!file_exists($credentialsPath)) {
         throw new Exception("Credentials file not found: $credentialsPath");
     }
     include $credentialsPath;
 } catch (Throwable $e) {
+    ob_clean();
     http_response_code(500);
+    header("Access-Control-Allow-Origin: *");
+    header('Content-type: application/json');
     echo json_encode(array("error" => "Failed to load credentials: " . $e->getMessage()));
+    ob_end_flush();
     exit();
 }
 
@@ -182,6 +224,12 @@ if($task == 'getFacebookProfile') {
     }
 }
 
+// If token validation failed, exit early with error response
+if (isset($apiResponse["error"]) && $task != 'getFacebookProfile') {
+    echo json_encode($apiResponse);
+    exit();
+}
+
 // my tasks - only process if task is not getFacebookProfile and no error has been set
 if($task != 'getFacebookProfile' && (!isset($apiResponse) || !isset($apiResponse["error"]))) {
     if($task == 'addItemToMyList' && $myuserid && $name && $groupid) {
@@ -232,17 +280,24 @@ if($task != 'getFacebookProfile' && (!isset($apiResponse) || !isset($apiResponse
 $mysqli->close();
 
 // Return the response as JSON
+// Clear any output that might have been generated
+ob_clean();
+
 // Ensure we always have a valid response array
 if (!isset($apiResponse) || !is_array($apiResponse)) {
     $apiResponse = array("error" => "Invalid API response format");
 }
 
-// Ensure no output has been sent before this point
-if (headers_sent()) {
-    // If headers were already sent, log the error but can't send JSON
+// Ensure headers are set correctly
+if (!headers_sent()) {
+    header("Access-Control-Allow-Origin: *");
+    header('Content-type: application/json');
+} else {
+    // If headers were already sent, log the error
     error_log("API Error: Headers already sent before JSON output");
 }
 
 echo json_encode($apiResponse);
+ob_end_flush();
 exit();
 ?>
