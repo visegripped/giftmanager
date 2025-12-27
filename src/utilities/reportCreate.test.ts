@@ -28,7 +28,7 @@ describe('reportCreate', () => {
 
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       status: 200,
-      json: async () => mockResponse,
+      text: async () => JSON.stringify(mockResponse),
     });
 
     const reportInput: ReportInput = {
@@ -51,7 +51,7 @@ describe('reportCreate', () => {
 
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       status: 200,
-      json: async () => mockResponse,
+      text: async () => JSON.stringify(mockResponse),
     });
 
     const reportInput: ReportInput = {

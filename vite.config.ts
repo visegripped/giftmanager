@@ -78,11 +78,21 @@ export default defineConfig({
       },
     };
 
-    if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
-      serverConfig.https = {
-        cert: fs.readFileSync(certPath),
-        key: fs.readFileSync(keyPath),
-      };
+    // Only try to load SSL certs if they exist and are readable (skip in test environment)
+    if (
+      !process.env.VITEST &&
+      fs.existsSync(certPath) &&
+      fs.existsSync(keyPath)
+    ) {
+      try {
+        serverConfig.https = {
+          cert: fs.readFileSync(certPath),
+          key: fs.readFileSync(keyPath),
+        };
+      } catch (error) {
+        // Silently ignore SSL cert read errors (e.g., permission issues in test environment)
+        // HTTP will be used instead
+      }
     }
 
     return serverConfig;
