@@ -53,7 +53,11 @@ export async function graphqlRequest<T = unknown>(
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const result: GraphQLResponse<T> = await response.json();
+    const responseText = await response.text();
+    if (!responseText.trim()) {
+      throw new Error('Empty response from GraphQL server');
+    }
+    const result: GraphQLResponse<T> = JSON.parse(responseText);
 
     if (result.errors && result.errors.length > 0) {
       console.error('GraphQL errors:', result.errors);

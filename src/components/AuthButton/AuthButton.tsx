@@ -147,7 +147,11 @@ export const AuthButton = () => {
           });
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const userProfile = await response.json();
+        const responseText = await response.text();
+        if (!responseText.trim()) {
+          throw new Error('Empty response from Google API');
+        }
+        const userProfile = JSON.parse(responseText);
         console.log(' -> got a google profile: ', userProfile);
         const convertedProfile = convertGoogleProfile2Custom(userProfile);
         setGoogleProfileData(convertedProfile);

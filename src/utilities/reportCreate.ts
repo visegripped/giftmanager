@@ -176,16 +176,32 @@ export const reportCreate = async (
     });
 
     if (apiResponse.status >= 200 && apiResponse.status < 300) {
-      const result = await apiResponse.json();
-
-      if (result.errors) {
-        console.log('ERROR IN REPORTING: GraphQL errors:', result.errors);
-        jsonPayload = { err: JSON.stringify(result.errors) };
-      } else if (result.data?.createReport) {
-        jsonPayload = { success: 'Report created successfully' };
+      const responseText = await apiResponse.text();
+      // Parse JSON response, handling empty responses
+      if (responseText.trim() === '') {
+        console.log('ERROR IN REPORTING: Empty response from server');
+        jsonPayload = { err: 'Empty response from server' };
       } else {
-        console.log('ERROR IN REPORTING: Unexpected response format');
-        jsonPayload = { err: 'Unexpected response format' };
+        try {
+          const result = JSON.parse(responseText);
+
+          if (result.errors) {
+            console.log('ERROR IN REPORTING: GraphQL errors:', result.errors);
+            jsonPayload = { err: JSON.stringify(result.errors) };
+          } else if (result.data?.createReport) {
+            jsonPayload = { success: 'Report created successfully' };
+          } else {
+            console.log('ERROR IN REPORTING: Unexpected response format');
+            jsonPayload = { err: 'Unexpected response format' };
+          }
+        } catch (parseError) {
+          console.log(
+            `ERROR IN REPORTING: Invalid JSON response: ${parseError}`
+          );
+          jsonPayload = {
+            err: `Invalid JSON response: ${responseText.substring(0, 100)}`,
+          };
+        }
       }
     } else {
       console.log('ERROR IN REPORTING: response was non 20X');

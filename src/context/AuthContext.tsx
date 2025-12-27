@@ -166,7 +166,12 @@ function AuthProvider(props: PropsWithChildren) {
           'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' +
             accessToken
         );
-        const data = await response.json();
+        const responseText = await response.text();
+        if (!responseText.trim()) {
+          console.debug('Google token validation: Empty response');
+          return false;
+        }
+        const data = JSON.parse(responseText);
 
         if (data.error_description) {
           console.debug(
@@ -207,7 +212,12 @@ function AuthProvider(props: PropsWithChildren) {
             return true; // Don't logout on network/server errors
           }
 
-          const data = await response.json();
+          const responseText = await response.text();
+          if (!responseText.trim()) {
+            console.debug('Facebook token validation: Empty response');
+            return false;
+          }
+          const data = JSON.parse(responseText);
 
           if (data.error) {
             // Only logout on specific error codes that indicate invalid token

@@ -74,15 +74,36 @@ export const postReport = async (
   formData.append('type', type);
   formData.append('task', 'addReport');
 
-  const apiResponse = await fetch(reportingUrl, {
-    body: formData,
-    method: 'POST',
-  });
+  try {
+    const apiResponse = await fetch(reportingUrl, {
+      body: formData,
+      method: 'POST',
+    });
 
-  if (apiResponse.status >= 200 && apiResponse.status < 300) {
-    jsonPayload = (await apiResponse.json()) as ApiResponse;
-  } else {
-    console.log('ERROR IN REPORTING: response was non 20X');
+    if (apiResponse.status >= 200 && apiResponse.status < 300) {
+      const responseText = await apiResponse.text();
+      // Parse JSON response, handling empty responses
+      if (responseText.trim() === '') {
+        console.log('ERROR IN REPORTING: Empty response from server');
+        jsonPayload = { err: 'Empty response from server' };
+      } else {
+        try {
+          jsonPayload = JSON.parse(responseText) as ApiResponse;
+        } catch (parseError) {
+          console.log(
+            `ERROR IN REPORTING: Invalid JSON response: ${parseError}`
+          );
+          jsonPayload = {
+            err: `Invalid JSON response: ${responseText.substring(0, 100)}`,
+          };
+        }
+      }
+    } else {
+      console.log('ERROR IN REPORTING: response was non 20X');
+    }
+  } catch (error) {
+    console.log(`ERROR IN REPORTING: ${error}`);
+    jsonPayload = { err: `API Request Failure: ${error}` };
   }
 
   if (!jsonPayload) {
