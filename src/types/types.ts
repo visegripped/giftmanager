@@ -15,6 +15,7 @@ export type ItemType = {
   status_userid: number;
   role: 'user' | 'admin';
   status_username?: string | null;
+  owner_name?: string | null;
 };
 
 export type UserType = {
@@ -33,6 +34,7 @@ export type tasksInterface = {
   task: //my
   | 'addItemToMyList'
     | 'getMyItemList'
+    | 'getMyReservedPurchasedItems'
     | 'updateItemOnMyList'
     | 'updateRemovedStatusForMyItem'
 

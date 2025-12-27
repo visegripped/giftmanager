@@ -24,7 +24,7 @@ require_once __DIR__ . '/../includes/current_version.php';
 include gm_get_include_path('api-credentials.php');
 
 // Support Docker environment (use DB_HOST from env, fallback to localhost)
-$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbHost = gmGetEnv('DB_HOST') ?: 'localhost';
 $mysqli = new mysqli($dbHost, $username, $password, $database);
 
 // Check connection

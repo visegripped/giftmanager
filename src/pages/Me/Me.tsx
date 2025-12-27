@@ -1,5 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import Button from '../../components/Button/Button';
+import ReservedPurchasedItemsModal from '../../components/ReservedPurchasedItemsModal/ReservedPurchasedItemsModal';
+import PrintListModal from '../../components/PrintListModal/PrintListModal';
 import {
   ItemType,
   ItemRemovedType,
@@ -40,6 +42,9 @@ const Me = () => {
   const [addItemName, setAddItemName] = useState('');
   const [addItemDescription, setAddItemDescription] = useState('');
   const [addItemLink, setAddItemLink] = useState('');
+  const [isReservedPurchasedModalOpen, setIsReservedPurchasedModalOpen] =
+    useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
   const { addNotification } = useContext(
     NotificationsContext
@@ -225,54 +230,69 @@ const Me = () => {
     <>
       <h2 className="page-heading">Welcome to your list.</h2>
       <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
-        <form
-          className="form"
-          onSubmit={(formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
-            formSubmitEvent.preventDefault();
-            addItemToMyList(addItemName, addItemDescription, addItemLink);
-          }}
-        >
-          <fieldset className="fieldset">
-            <legend className="legend">Add item to my list</legend>
-            <label className="label">Name</label>
-            <div className="input-container">
-              <input
-                type="text"
-                name="name"
-                required
-                value={addItemName}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setAddItemName(event.target.value);
-                }}
-              />
-            </div>
+        <div>
+          <form
+            className="form"
+            onSubmit={(formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
+              formSubmitEvent.preventDefault();
+              addItemToMyList(addItemName, addItemDescription, addItemLink);
+            }}
+          >
+            <fieldset className="fieldset">
+              <legend className="legend">Add item to my list</legend>
+              <label className="label">Name</label>
+              <div className="input-container">
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={addItemName}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setAddItemName(event.target.value);
+                  }}
+                />
+              </div>
 
-            <label>Link</label>
-            <div className="input-container">
-              <input
-                type="url"
-                name="link"
-                value={addItemLink}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setAddItemLink(event.target.value);
-                }}
-              />
-            </div>
+              <label>Link</label>
+              <div className="input-container">
+                <input
+                  type="url"
+                  name="link"
+                  value={addItemLink}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setAddItemLink(event.target.value);
+                  }}
+                />
+              </div>
 
-            <label>Description</label>
-            <div className="input-container">
-              <textarea
-                name="description"
-                value={addItemDescription}
-                onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                  setAddItemDescription(event.target.value);
-                }}
-              ></textarea>
-            </div>
+              <label>Description</label>
+              <div className="input-container">
+                <textarea
+                  name="description"
+                  value={addItemDescription}
+                  onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    setAddItemDescription(event.target.value);
+                  }}
+                ></textarea>
+              </div>
 
-            <Button icon="plus" label="Add" type="submit" />
-          </fieldset>
-        </form>
+              <Button icon="plus" label="Add" type="submit" />
+            </fieldset>
+          </form>
+
+          <div className="me-page-actions">
+            <Button
+              label="View items"
+              onButtonClick={() => setIsReservedPurchasedModalOpen(true)}
+              title="View items from other users that you have reserved or purchased"
+            />
+            <Button
+              label="Print items"
+              onButtonClick={() => setIsPrintModalOpen(true)}
+              title="Print a list of your purchased items"
+            />
+          </div>
+        </div>
 
         <>
           {myItemList?.length ? (
@@ -282,6 +302,18 @@ const Me = () => {
           )}
         </>
       </section>
+
+      <ReservedPurchasedItemsModal
+        isOpen={isReservedPurchasedModalOpen}
+        onClose={() => setIsReservedPurchasedModalOpen(false)}
+        myUserid={myUserid}
+      />
+
+      <PrintListModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        myUserid={myUserid}
+      />
     </>
   );
 };

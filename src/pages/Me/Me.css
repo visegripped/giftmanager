@@ -10,3 +10,11 @@
 .row-removed {
   background-color: var(--container-bg-warning);
 }
+
+.me-page-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}

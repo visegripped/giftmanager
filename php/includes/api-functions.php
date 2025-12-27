@@ -47,6 +47,41 @@ function getMyItemList($userid, $mysqli) {
     return $apiResponse;
 }
 
+function getMyReservedPurchasedItems($myuserid, $mysqli) {
+    $query = "
+    SELECT 
+        items.*, 
+        CONCAT(users.firstname, ' ', users.lastname) AS owner_name
+    FROM 
+        `items`
+    LEFT JOIN 
+        `users` 
+    ON 
+        items.userid = users.userid
+    WHERE 
+        items.status_userid = ? 
+        AND items.status IN ('purchased', 'reserved')
+        AND items.archive = 0
+    ORDER BY 
+        items.date_added ASC";
+    $stmt = $mysqli->prepare($query);
+
+    if ($stmt) {
+        $stmt->bind_param("s", $myuserid);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+          $apiResponse = array("success" => $result->fetch_all(MYSQLI_ASSOC));
+        } else {
+            $apiResponse = array("warn" => "No items found for the specified user.");
+        }
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
+
 function updateItemOnMyList($userid, $itemid, $description, $link, $mysqli) {
     // Start building the SQL query dynamically
     $query = "UPDATE items SET ";
@@ -303,7 +338,8 @@ function updateAvatar($email_address, $avatar, $mysqli) {
 
 function getFacebookProfile($access_token) {
     // Get Facebook App Secret from environment variable
-    $fbAppSecret = getenv('FB_APP_SECRET') ?: getenv('FB_SECRET') ?: "";
+    // Note: gmGetEnv() is available via env-loader.php included by api-credentials.php
+    $fbAppSecret = gmGetEnv('FB_APP_SECRET') ?: gmGetEnv('FB_SECRET') ?: "";
     
     if (!$fbAppSecret) {
         error_log("Facebook App Secret not configured [version=$APP_VERSION]. Please set FB_APP_SECRET environment variable.");

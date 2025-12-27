@@ -25,7 +25,7 @@ $task = $_POST['task'] ?? "";
 
 // Assuming $mysqli is your mysqli connection object
 // Support Docker environment (use DB_HOST from env, fallback to localhost)
-$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbHost = gmGetEnv('DB_HOST') ?: 'localhost';
 $mysqli = new mysqli($dbHost, $username, $password, $database);
 
 // Check connection

@@ -217,6 +217,7 @@ export const AuthButton = () => {
             addNotification({
               message: `Failed to load Facebook profile: ${errorMessage}`,
               type: 'error',
+              persist: true,
             });
             return;
           }
@@ -240,6 +241,7 @@ export const AuthButton = () => {
                 message:
                   'Facebook profile is missing email address. Please ensure your Facebook account has an email.',
                 type: 'error',
+                persist: true,
               });
               return;
             }
@@ -255,6 +257,7 @@ export const AuthButton = () => {
               addNotification({
                 message: 'Failed to extract email from Facebook profile.',
                 type: 'error',
+                persist: true,
               });
               return;
             }
@@ -292,6 +295,7 @@ export const AuthButton = () => {
         addNotification({
           message: `Failed to load Facebook profile: ${errorMessage}`,
           type: 'error',
+          persist: true,
         });
       }
       return;
@@ -503,6 +507,7 @@ export const AuthButton = () => {
       addNotification({
         message: 'Facebook login was cancelled or not authorized.',
         type: 'warn',
+        persist: true,
       });
       return;
     }
@@ -515,6 +520,7 @@ export const AuthButton = () => {
       addNotification({
         message: 'Facebook login was cancelled or failed.',
         type: 'warn',
+        persist: true,
       });
     }
   };

@@ -6,14 +6,22 @@ export interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  maxWidth?: string;
   footer?: React.ReactNode;
 }
 
 /**
- * Generic reusable modal component
+ * Reusable Modal component following the ReportingQuery modal pattern
  */
 export const Modal = React.memo((props: ModalProps) => {
-  const { isOpen, onClose, title, children, footer } = props;
+  const {
+    isOpen,
+    onClose,
+    title,
+    children,
+    maxWidth = '800px',
+    footer,
+  } = props;
 
   // Handle escape key to close modal
   useEffect(() => {
@@ -41,13 +49,18 @@ export const Modal = React.memo((props: ModalProps) => {
 
   return (
     <div className="modal" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-content"
+        style={{ maxWidth }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <h3>{title}</h3>
           <button
             onClick={onClose}
             className="modal-close"
             aria-label="Close modal"
+            type="button"
           >
             ×
           </button>

@@ -60,7 +60,7 @@ A modern gift list management application with reporting and analytics.
 
 6. **Access application**:
    - Frontend: https://localhost:5174 (or http://localhost:5174 if SSL not configured)
-   - phpMyAdmin: http://localhost:8082
+   - phpMyAdmin: http://localhost:8082 (un: root and pw: MYSQL_ROOT_PASSWORD set in env.local)
    - API: http://localhost:8081/api.php
    - Reporting: http://localhost:8081/reporting.php
 

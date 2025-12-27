@@ -105,5 +105,28 @@ if (!function_exists('gmLoadEnv')) {
         $envLoaded = true;
     }
 }
+
+/**
+ * Get environment variable from multiple sources (getenv, $_ENV, $_SERVER)
+ * This ensures compatibility with different PHP configurations and Docker setups
+ */
+if (!function_exists('gmGetEnv')) {
+    function gmGetEnv($key, $default = false) {
+        // Try getenv() first (works with Docker environment variables)
+        $value = getenv($key);
+        if ($value !== false) {
+            return $value;
+        }
+        // Try $_ENV (if variables_order includes 'E')
+        if (isset($_ENV[$key])) {
+            return $_ENV[$key];
+        }
+        // Try $_SERVER (if variables_order includes 'S')
+        if (isset($_SERVER[$key])) {
+            return $_SERVER[$key];
+        }
+        return $default;
+    }
+}
 ?>
 

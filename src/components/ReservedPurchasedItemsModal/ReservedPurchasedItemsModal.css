@@ -1,0 +1,69 @@
+.reserved-purchased-modal__loading,
+.reserved-purchased-modal__error,
+.reserved-purchased-modal__empty {
+  padding: 20px;
+  text-align: center;
+}
+
+.reserved-purchased-modal__error {
+  color: #c62828;
+  background: #ffebee;
+  border-left: 4px solid #c62828;
+  border-radius: 4px;
+}
+
+.reserved-purchased-modal__list {
+  width: 100%;
+}
+
+.reserved-purchased-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reserved-purchased-modal__table thead {
+  background: #f5f5f5;
+}
+
+.reserved-purchased-modal__table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #eee;
+}
+
+.reserved-purchased-modal__table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.reserved-purchased-modal__table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.reserved-purchased-modal__table a {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.reserved-purchased-modal__table a:hover {
+  text-decoration: underline;
+}
+
+.reserved-purchased-modal__select {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.reserved-purchased-modal__select:hover {
+  border-color: #999;
+}
+
+.reserved-purchased-modal__select:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}

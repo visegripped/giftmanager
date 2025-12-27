@@ -485,17 +485,21 @@ describe('AuthContext', () => {
   });
 
   it('handles invalid Facebook token correctly', async () => {
-    // Mock fetch for Facebook token validation with error response
-    (globalThis as any).fetch = vi.fn().mockResolvedValue({
+    // Mock fetch for Facebook token validation with 401 error response
+    // 401 is treated as invalid token (400 is now treated as potentially temporary)
+    const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
-      status: 400,
-      json: () =>
-        Promise.resolve({ error: { message: 'Invalid token', code: 100 } }),
+      status: 401,
+      json: async () => ({
+        error: { message: 'Invalid OAuth 2.0 Access Token', code: 190 },
+      }),
     });
+    (globalThis as any).fetch = fetchMock;
 
     localStorage.setItem('access_token', 'invalid-facebook-token');
     localStorage.setItem('auth_provider', 'facebook');
-    // Set login_timestamp to be old so validation will run
+    // Set login_timestamp to be old so validation will run (20 seconds ago)
+    // This ensures validation runs after the 2 second delay
     localStorage.setItem('login_timestamp', (Date.now() - 20000).toString());
     localStorage.setItem(
       'access_token_expiration',
@@ -508,14 +512,18 @@ describe('AuthContext', () => {
       </AuthProvider>
     );
 
-    // Should logout with invalid Facebook token (after validation delay)
+    // Wait for validation to run (2 second delay + async operations)
+    // Should logout with invalid Facebook token after validation
     await waitFor(
       () => {
         expect(screen.getByTestId('access-token')).toHaveTextContent(
           'no-token'
         );
       },
-      { timeout: 5000 }
+      { timeout: 10000 }
     );
+
+    // Verify fetch was called for token validation
+    expect(fetchMock).toHaveBeenCalled();
   });
 });

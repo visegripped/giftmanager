@@ -37,6 +37,10 @@ composer.lock
 .pnpm-store/
 docker/ssl/
 
+.pnpm-store/
+docker/ssl/
+
+
 .cursor/*
 
 AI-notes/*

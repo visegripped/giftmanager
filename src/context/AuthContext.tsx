@@ -89,6 +89,7 @@ function AuthProvider(props: PropsWithChildren) {
         authResponse
       )}`,
       type: 'error',
+      persist: true,
     });
   };
 
@@ -113,6 +114,7 @@ function AuthProvider(props: PropsWithChildren) {
       addNotification({
         message: 'Facebook login failed. Please try again.',
         type: 'error',
+        persist: true,
       });
     }
   };
@@ -189,32 +191,56 @@ function AuthProvider(props: PropsWithChildren) {
           });
 
           if (!response.ok) {
+            // Only treat 401/403 as invalid token, other errors might be temporary
+            if (response.status === 401 || response.status === 403) {
+              console.debug(
+                'Facebook token validation failed: HTTP',
+                response.status
+              );
+              return false;
+            }
+            // For other HTTP errors, assume token might still be valid (network issue)
             console.debug(
-              'Facebook token validation failed: HTTP',
+              'Facebook token validation HTTP error (non-auth):',
               response.status
             );
-            return false;
+            return true; // Don't logout on network/server errors
           }
 
           const data = await response.json();
 
           if (data.error) {
-            console.debug('Facebook token validation error:', data.error);
-            return false;
+            // Only logout on specific error codes that indicate invalid token
+            const errorCode = data.error?.code;
+            if (errorCode === 190 || errorCode === 102) {
+              // 190 = Invalid OAuth 2.0 Access Token, 102 = Session key invalid
+              console.debug('Facebook token validation error:', data.error);
+              return false;
+            }
+            // Other errors might be temporary, don't logout
+            console.debug(
+              'Facebook token validation error (non-fatal):',
+              data.error
+            );
+            return true;
           }
 
           // Token is valid if we get user data back
           return !!data.id;
         } catch (error) {
-          console.debug('Facebook token validation network error:', error);
-          return false;
+          // Network errors - assume token might still be valid, don't logout
+          console.debug(
+            'Facebook token validation network error (non-fatal):',
+            error
+          );
+          return true; // Return true to avoid logout on network errors
         }
       }
       return false;
     } catch (error) {
-      // Network or other errors - return false but don't logout directly
-      console.debug('Token validation error:', error);
-      return false;
+      // Network or other errors - assume token might still be valid
+      console.debug('Token validation error (non-fatal):', error);
+      return true; // Return true to avoid logout on network errors
     }
   }, [accessToken, authProvider]);
 
@@ -296,11 +322,28 @@ function AuthProvider(props: PropsWithChildren) {
     // Increase delay if login was recent
     const delay =
       loginTimestamp && now - parseInt(loginTimestamp) < 15000 ? 5000 : 2000;
+
+    // For Facebook, validate less frequently to avoid premature logouts
+    // Facebook tokens are longer-lived and validation can be more lenient
+    const validationInterval = authProvider === 'facebook' ? 60000 : 30000; // 60s for FB, 30s for Google
+
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
     const timeoutId = setTimeout(() => {
       checkToken();
+
+      // Set up periodic validation (less frequent for Facebook)
+      intervalId = setInterval(() => {
+        checkToken();
+      }, validationInterval);
     }, delay);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [accessToken, authProvider, tokenIsValid, validateTokenViaAPI, logout]);
 
   // Automatically log the user out when the access token expires,
