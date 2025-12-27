@@ -43,7 +43,7 @@ export const PrintListModal = React.memo((props: PrintListModalProps) => {
     setError(null);
 
     const response = fetchData({
-      task: 'getMyItemList',
+      task: 'getMyReservedPurchasedItems',
       myuserid: myUserid,
     });
 
@@ -114,6 +114,11 @@ export const PrintListModal = React.memo((props: PrintListModalProps) => {
               {items.map((item) => (
                 <li key={item.itemid} className="print-list-modal__item">
                   <div className="print-list-modal__item-name">{item.name}</div>
+                  {item.owner_name && (
+                    <div className="print-list-modal__item-owner">
+                      For: {item.owner_name}
+                    </div>
+                  )}
                   {item.description && (
                     <div className="print-list-modal__item-description">
                       {item.description}
