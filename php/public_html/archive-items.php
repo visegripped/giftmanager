@@ -89,24 +89,38 @@ if (!$isCLI) {
 }
 
 // 1. Archive items where date_received < current date AND archive = 0
-// Use CAST to safely handle date comparison - invalid dates (like '0000-00-00') become NULL
-$query1 = "UPDATE items SET archive = 1 WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND CAST(date_received AS DATE) IS NOT NULL AND CAST(date_received AS DATE) < CAST(? AS DATE)";
-$stmt1 = $mysqli->prepare($query1);
+// Also archive items with no date_received (NULL or empty) as they're considered already received
+// Split into two queries: one for items with no date, one for items with valid dates
+// First: Archive items with no date or invalid dates
+$query1a = "UPDATE items SET archive = 1 WHERE archive = 0 AND (date_received IS NULL OR date_received = '' OR date_received = '0000-00-00')";
+$stmt1a = $mysqli->prepare($query1a);
+$archived1a = 0;
+if ($stmt1a) {
+    if ($stmt1a->execute()) {
+        $archived1a = $stmt1a->affected_rows;
+    }
+    $stmt1a->close();
+}
+
+// Second: Archive items with valid dates that are past
+$query1b = "UPDATE items SET archive = 1 WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND date_received < ?";
+$stmt1 = $mysqli->prepare($query1b);
 if ($stmt1) {
     $stmt1->bind_param('s', $currentDate);
     if ($stmt1->execute()) {
-        $archived1 = $stmt1->affected_rows;
+        $archived1b = $stmt1->affected_rows;
+        $archived1 = $archived1a + $archived1b;
         $totalArchived += $archived1;
         $results['past_delivery_date']['count'] = $archived1;
         if ($archived1 > 0) {
-            $logMsg = "Archive Items: Archived $archived1 items past delivery date";
+            $logMsg = "Archive Items: Archived $archived1 items (including $archived1a with no date and $archived1b past delivery date)";
             error_log($logMsg);
             if (!$isCLI) {
                 echo "<div class='info'>✓ $logMsg</div>";
             }
         } else {
             if (!$isCLI) {
-                echo "<div class='info'>No items found past delivery date to archive.</div>";
+                echo "<div class='info'>No items found past delivery date or with no date to archive.</div>";
             }
         }
     } else {
@@ -161,24 +175,38 @@ if ($stmt2) {
 }
 
 // 3. Archive items where removed = 1 AND status = 'purchased' AND date_received < current date AND archive = 0
-// Use CAST to safely handle date comparison - invalid dates (like '0000-00-00') become NULL
-$query3 = "UPDATE items SET archive = 1 WHERE removed = 1 AND status = 'purchased' AND archive = 0 AND date_received IS NOT NULL AND date_received != '' AND CAST(date_received AS DATE) IS NOT NULL AND CAST(date_received AS DATE) < CAST(? AS DATE)";
-$stmt3 = $mysqli->prepare($query3);
+// Also archive items with no date_received (NULL or empty) as they're considered already received
+// Split into two queries: one for items with no date, one for items with valid dates
+// First: Archive removed purchased items with no date or invalid dates
+$query3a = "UPDATE items SET archive = 1 WHERE removed = 1 AND status = 'purchased' AND archive = 0 AND (date_received IS NULL OR date_received = '' OR date_received = '0000-00-00')";
+$stmt3a = $mysqli->prepare($query3a);
+$archived3a = 0;
+if ($stmt3a) {
+    if ($stmt3a->execute()) {
+        $archived3a = $stmt3a->affected_rows;
+    }
+    $stmt3a->close();
+}
+
+// Second: Archive removed purchased items with valid dates that are past
+$query3b = "UPDATE items SET archive = 1 WHERE removed = 1 AND status = 'purchased' AND archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND date_received < ?";
+$stmt3 = $mysqli->prepare($query3b);
 if ($stmt3) {
     $stmt3->bind_param('s', $currentDate);
     if ($stmt3->execute()) {
-        $archived3 = $stmt3->affected_rows;
+        $archived3b = $stmt3->affected_rows;
+        $archived3 = $archived3a + $archived3b;
         $totalArchived += $archived3;
         $results['removed_purchased_past_date']['count'] = $archived3;
         if ($archived3 > 0) {
-            $logMsg = "Archive Items: Archived $archived3 removed purchased items past delivery date";
+            $logMsg = "Archive Items: Archived $archived3 removed purchased items (including $archived3a with no date and $archived3b past delivery date)";
             error_log($logMsg);
             if (!$isCLI) {
                 echo "<div class='info'>✓ $logMsg</div>";
             }
         } else {
             if (!$isCLI) {
-                echo "<div class='info'>No removed purchased items past delivery date found to archive.</div>";
+                echo "<div class='info'>No removed purchased items past delivery date or with no date found to archive.</div>";
             }
         }
     } else {
