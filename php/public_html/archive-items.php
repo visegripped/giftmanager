@@ -121,7 +121,7 @@ if (!$isCLI) {
     echo "<div class='info'><strong>Current Date (for comparison):</strong> $currentDate</div>";
     
         // Debug: Check for items that should match Query 1b
-        $debugQuery = "SELECT COUNT(*) as count FROM items WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND DATE(date_received) < DATE(?)";
+        $debugQuery = "SELECT COUNT(*) as count FROM items WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND CHAR_LENGTH(date_received) = 10 AND STR_TO_DATE(date_received, '%Y-%m-%d') IS NOT NULL AND STR_TO_DATE(date_received, '%Y-%m-%d') < ?";
     $debugStmt = $mysqli->prepare($debugQuery);
     if ($debugStmt) {
         $debugStmt->bind_param('s', $currentDate);
@@ -131,7 +131,7 @@ if (!$isCLI) {
         echo "<div class='info'><strong>Debug:</strong> Found {$debugRow['count']} items that match Query 1b criteria (past delivery date, not archived)</div>";
         
         // Also check specifically for purchased items with dates
-        $debugQuery2 = "SELECT itemid, status, date_received, archive, removed FROM items WHERE archive = 0 AND status = 'purchased' AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND DATE(date_received) < DATE(?) LIMIT 10";
+        $debugQuery2 = "SELECT itemid, status, date_received, archive, removed FROM items WHERE archive = 0 AND status = 'purchased' AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND CHAR_LENGTH(date_received) = 10 AND STR_TO_DATE(date_received, '%Y-%m-%d') IS NOT NULL AND STR_TO_DATE(date_received, '%Y-%m-%d') < ? LIMIT 10";
         $debugStmt2 = $mysqli->prepare($debugQuery2);
         if ($debugStmt2) {
             $debugStmt2->bind_param('s', $currentDate);
@@ -181,8 +181,8 @@ if ($stmt1a) {
 
 // Second: Archive items with valid dates that are past
 // Note: This archives ALL items past delivery date, including purchased items
-// Use DATE() to ensure proper date comparison, not string comparison
-$query1b = "UPDATE items SET archive = 1 WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND DATE(date_received) < DATE(?)";
+// Use STR_TO_DATE which returns NULL for invalid dates, then filter for valid dates before comparing
+$query1b = "UPDATE items SET archive = 1 WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND CHAR_LENGTH(date_received) = 10 AND STR_TO_DATE(date_received, '%Y-%m-%d') IS NOT NULL AND STR_TO_DATE(date_received, '%Y-%m-%d') < ?";
 $stmt1 = $mysqli->prepare($query1b);
 if ($stmt1) {
     $stmt1->bind_param('s', $currentDate);
@@ -268,8 +268,8 @@ if ($stmt3a) {
 }
 
 // Second: Archive removed purchased items with valid dates that are past
-// Use DATE() to ensure proper date comparison, not string comparison
-$query3b = "UPDATE items SET archive = 1 WHERE removed = 1 AND status = 'purchased' AND archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND DATE(date_received) < DATE(?)";
+// Use STR_TO_DATE which returns NULL for invalid dates, then filter for valid dates before comparing
+$query3b = "UPDATE items SET archive = 1 WHERE removed = 1 AND status = 'purchased' AND archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND CHAR_LENGTH(date_received) = 10 AND STR_TO_DATE(date_received, '%Y-%m-%d') IS NOT NULL AND STR_TO_DATE(date_received, '%Y-%m-%d') < ?";
 $stmt3 = $mysqli->prepare($query3b);
 if ($stmt3) {
     $stmt3->bind_param('s', $currentDate);
