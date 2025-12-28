@@ -89,7 +89,8 @@ if (!$isCLI) {
 }
 
 // 1. Archive items where date_received < current date AND archive = 0
-$query1 = "UPDATE items SET archive = 1 WHERE date_received < ? AND date_received != '0000-00-00' AND archive = 0";
+// Use CAST to safely handle date comparison - invalid dates (like '0000-00-00') become NULL
+$query1 = "UPDATE items SET archive = 1 WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND CAST(date_received AS DATE) IS NOT NULL AND CAST(date_received AS DATE) < CAST(? AS DATE)";
 $stmt1 = $mysqli->prepare($query1);
 if ($stmt1) {
     $stmt1->bind_param('s', $currentDate);
@@ -160,7 +161,8 @@ if ($stmt2) {
 }
 
 // 3. Archive items where removed = 1 AND status = 'purchased' AND date_received < current date AND archive = 0
-$query3 = "UPDATE items SET archive = 1 WHERE removed = 1 AND status = 'purchased' AND date_received < ? AND date_received != '0000-00-00' AND archive = 0";
+// Use CAST to safely handle date comparison - invalid dates (like '0000-00-00') become NULL
+$query3 = "UPDATE items SET archive = 1 WHERE removed = 1 AND status = 'purchased' AND archive = 0 AND date_received IS NOT NULL AND date_received != '' AND CAST(date_received AS DATE) IS NOT NULL AND CAST(date_received AS DATE) < CAST(? AS DATE)";
 $stmt3 = $mysqli->prepare($query3);
 if ($stmt3) {
     $stmt3->bind_param('s', $currentDate);
