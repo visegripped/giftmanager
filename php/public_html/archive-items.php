@@ -68,6 +68,39 @@ $results = [
     'removed_purchased_past_date' => ['count' => 0, 'description' => 'Removed purchased items past delivery date'],
 ];
 
+// Debug: Check for items that should match Query 1b
+if (!$isCLI) {
+    $debugQuery = "SELECT COUNT(*) as count FROM items WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND date_received < ?";
+    $debugStmt = $mysqli->prepare($debugQuery);
+    if ($debugStmt) {
+        $debugStmt->bind_param('s', $currentDate);
+        $debugStmt->execute();
+        $debugResult = $debugStmt->get_result();
+        $debugRow = $debugResult->fetch_assoc();
+        echo "<div class='info'><strong>Debug:</strong> Found {$debugRow['count']} items that match Query 1b criteria (past delivery date, not archived)</div>";
+        
+        // Also check specifically for purchased items
+        $debugQuery2 = "SELECT itemid, status, date_received, archive, removed FROM items WHERE archive = 0 AND status = 'purchased' AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND date_received < ? LIMIT 10";
+        $debugStmt2 = $mysqli->prepare($debugQuery2);
+        if ($debugStmt2) {
+            $debugStmt2->bind_param('s', $currentDate);
+            $debugStmt2->execute();
+            $debugResult2 = $debugStmt2->get_result();
+            $purchasedItems = [];
+            while ($row = $debugResult2->fetch_assoc()) {
+                $purchasedItems[] = $row;
+            }
+            if (count($purchasedItems) > 0) {
+                echo "<div class='info'><strong>Debug - Purchased items past date:</strong> <pre>" . print_r($purchasedItems, true) . "</pre></div>";
+            } else {
+                echo "<div class='info'><strong>Debug:</strong> No purchased items found matching criteria</div>";
+            }
+            $debugStmt2->close();
+        }
+        $debugStmt->close();
+    }
+}
+
 // Output header for web access
 if (!$isCLI) {
     echo "<!DOCTYPE html>\n";
@@ -86,6 +119,50 @@ if (!$isCLI) {
     echo "<h1>Archive Items - Execution Results</h1>";
     echo "<div class='info'><strong>Execution Date:</strong> " . date('Y-m-d H:i:s T') . "</div>";
     echo "<div class='info'><strong>Current Date (for comparison):</strong> $currentDate</div>";
+    
+        // Debug: Check for items that should match Query 1b
+        $debugQuery = "SELECT COUNT(*) as count FROM items WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND DATE(date_received) < DATE(?)";
+    $debugStmt = $mysqli->prepare($debugQuery);
+    if ($debugStmt) {
+        $debugStmt->bind_param('s', $currentDate);
+        $debugStmt->execute();
+        $debugResult = $debugStmt->get_result();
+        $debugRow = $debugResult->fetch_assoc();
+        echo "<div class='info'><strong>Debug:</strong> Found {$debugRow['count']} items that match Query 1b criteria (past delivery date, not archived)</div>";
+        
+        // Also check specifically for purchased items with dates
+        $debugQuery2 = "SELECT itemid, status, date_received, archive, removed FROM items WHERE archive = 0 AND status = 'purchased' AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND DATE(date_received) < DATE(?) LIMIT 10";
+        $debugStmt2 = $mysqli->prepare($debugQuery2);
+        if ($debugStmt2) {
+            $debugStmt2->bind_param('s', $currentDate);
+            $debugStmt2->execute();
+            $debugResult2 = $debugStmt2->get_result();
+            $purchasedItems = [];
+            while ($row = $debugResult2->fetch_assoc()) {
+                $purchasedItems[] = $row;
+            }
+            if (count($purchasedItems) > 0) {
+                echo "<div class='info'><strong>Debug - Purchased items past date (should be archived):</strong> <pre>" . htmlspecialchars(print_r($purchasedItems, true)) . "</pre></div>";
+            } else {
+                echo "<div class='info'><strong>Debug:</strong> No purchased items found matching criteria (archive=0, status='purchased', date_received < $currentDate)</div>";
+            }
+            $debugStmt2->close();
+        }
+        
+        // Check for any purchased items regardless of date
+        $debugQuery3 = "SELECT itemid, status, date_received, archive, removed FROM items WHERE archive = 0 AND status = 'purchased' LIMIT 5";
+        $debugResult3 = $mysqli->query($debugQuery3);
+        if ($debugResult3) {
+            $allPurchased = [];
+            while ($row = $debugResult3->fetch_assoc()) {
+                $allPurchased[] = $row;
+            }
+            if (count($allPurchased) > 0) {
+                echo "<div class='info'><strong>Debug - Sample purchased items (archive=0):</strong> <pre>" . htmlspecialchars(print_r($allPurchased, true)) . "</pre></div>";
+            }
+        }
+        $debugStmt->close();
+    }
 }
 
 // 1. Archive items where date_received < current date AND archive = 0
@@ -103,7 +180,9 @@ if ($stmt1a) {
 }
 
 // Second: Archive items with valid dates that are past
-$query1b = "UPDATE items SET archive = 1 WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND date_received < ?";
+// Note: This archives ALL items past delivery date, including purchased items
+// Use DATE() to ensure proper date comparison, not string comparison
+$query1b = "UPDATE items SET archive = 1 WHERE archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND DATE(date_received) < DATE(?)";
 $stmt1 = $mysqli->prepare($query1b);
 if ($stmt1) {
     $stmt1->bind_param('s', $currentDate);
@@ -189,7 +268,8 @@ if ($stmt3a) {
 }
 
 // Second: Archive removed purchased items with valid dates that are past
-$query3b = "UPDATE items SET archive = 1 WHERE removed = 1 AND status = 'purchased' AND archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND date_received < ?";
+// Use DATE() to ensure proper date comparison, not string comparison
+$query3b = "UPDATE items SET archive = 1 WHERE removed = 1 AND status = 'purchased' AND archive = 0 AND date_received IS NOT NULL AND date_received != '' AND date_received != '0000-00-00' AND DATE(date_received) < DATE(?)";
 $stmt3 = $mysqli->prepare($query3b);
 if ($stmt3) {
     $stmt3->bind_param('s', $currentDate);
