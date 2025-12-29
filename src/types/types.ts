@@ -17,6 +17,19 @@ export type ItemType = {
   role: 'user' | 'admin';
   status_username?: string | null;
   owner_name?: string | null;
+  notes_count?: number | null;
+  owner_avatar?: string | null;
+};
+
+export type ItemNoteType = {
+  noteid: number;
+  itemid: number;
+  userid: number;
+  note: string;
+  created_at?: string;
+  updated_at?: string;
+  author_name?: string | null;
+  author_avatar?: string | null;
 };
 
 export type UserType = {
@@ -43,6 +56,12 @@ export type tasksInterface = {
     | 'getTheirItemList'
     | 'addItemToTheirList'
     | 'updateStatusForTheirItem'
+
+    // item notes (other users' lists)
+    | 'getItemNotes'
+    | 'createItemNote'
+    | 'updateItemNote'
+    | 'deleteItemNote'
 
     //generic
     | 'getUserProfileByUserId'

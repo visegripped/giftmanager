@@ -3,6 +3,14 @@ import { getReportingUrl } from './urlHelper';
 
 const reportingUrl = getReportingUrl();
 
+function resolveReportingUrl(url: string): string {
+  if (!url) return url;
+  if (url.startsWith('/') && typeof window !== 'undefined' && window.location) {
+    return `${window.location.origin}${url}`;
+  }
+  return url;
+}
+
 // SANITY -> DO NOT THROW ERRORS FROM THIS FILE.
 // There is a method listening for uncaught errors that uses this.
 // if you throw an error, you could start a loop of error reporting.
@@ -107,6 +115,8 @@ export const reportCreate = async (
     return;
   }
 
+  const url = resolveReportingUrl(reportingUrl);
+
   // Gather standard browser data if not provided
   const standardData = gatherStandardBodyData(window);
 
@@ -164,7 +174,7 @@ export const reportCreate = async (
   let jsonPayload: ApiResponse | undefined;
 
   try {
-    const apiResponse = await fetch(reportingUrl, {
+    const apiResponse = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

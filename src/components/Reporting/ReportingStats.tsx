@@ -20,30 +20,44 @@ export function ReportingStats({ filters }: ReportingStatsProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchStats() {
-      setLoading(true);
-      setError(null);
+      if (isMounted) {
+        setLoading(true);
+        setError(null);
+      }
 
       try {
         const result = await getReportStats(filters);
 
         if (result.errors) {
-          setError('Failed to load statistics');
+          if (isMounted) {
+            setError('Failed to load statistics');
+          }
           return;
         }
 
         if (result.data?.getReportStats) {
-          setStats(result.data.getReportStats);
+          if (isMounted) {
+            setStats(result.data.getReportStats);
+          }
         }
       } catch (err) {
-        setError('Failed to load statistics');
+        if (isMounted) {
+          setError('Failed to load statistics');
+        }
         console.error('Error loading stats:', err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchStats();
+    return () => {
+      isMounted = false;
+    };
   }, [filters]);
 
   if (loading) {

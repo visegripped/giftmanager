@@ -37,6 +37,23 @@
   border-bottom: 1px solid #eee;
 }
 
+.reserved-purchased-modal__avatar-cell {
+  width: 44px;
+}
+
+.reserved-purchased-modal__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eee;
+  display: inline-block;
+}
+
+.reserved-purchased-modal__avatar--blank {
+  border: 1px solid #ddd;
+}
+
 .reserved-purchased-modal__table tbody tr:hover {
   background: #f9f9f9;
 }

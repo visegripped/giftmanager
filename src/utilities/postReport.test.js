@@ -61,7 +61,10 @@ describe('postReport', () => {
 
     const result = await postReport(reportData);
 
-    expect(fetch).toHaveBeenCalledWith(reportingUrl, expect.any(Object));
+    const expectedUrl = reportingUrl.startsWith('/')
+      ? `${window.location.origin}${reportingUrl}`
+      : reportingUrl;
+    expect(fetch).toHaveBeenCalledWith(expectedUrl, expect.any(Object));
     expect(mockResponse.text).toHaveBeenCalled();
     expect(result).toEqual({ err: null });
   });

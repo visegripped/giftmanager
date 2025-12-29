@@ -3,6 +3,7 @@ import { getReports } from '../../utilities/graphqlClient';
 import ReportingFilters, { ReportFilters } from './ReportingFilters';
 import ReportingGrid, { ReportData } from './ReportingGrid';
 import ReportingStats from './ReportingStats';
+import Modal from '../Modal/Modal';
 import './ReportingQuery.css';
 
 interface ReportingQueryProps {
@@ -88,100 +89,83 @@ export function ReportingQuery({ showStats = true }: ReportingQueryProps) {
         </div>
       )}
 
-      {selectedReport && (
-        <div className="reporting-query__modal" onClick={handleCloseModal}>
-          <div
-            className="reporting-query__modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="reporting-query__modal-header">
-              <h3>Report Details</h3>
-              <button
-                onClick={handleCloseModal}
-                className="reporting-query__modal-close"
+      <Modal
+        isOpen={!!selectedReport}
+        onClose={handleCloseModal}
+        title="Report Details"
+        maxWidth="900px"
+      >
+        {selectedReport && (
+          <div className="reporting-query__detail-grid">
+            <div className="reporting-query__detail-row">
+              <strong>ID:</strong>
+              <span>{selectedReport.id}</span>
+            </div>
+            <div className="reporting-query__detail-row">
+              <strong>Type:</strong>
+              <span
+                className={`reporting-query__type--${selectedReport.report_type}`}
               >
-                ×
-              </button>
+                {selectedReport.report_type}
+              </span>
             </div>
-            <div className="reporting-query__modal-body">
-              <div className="reporting-query__detail-grid">
-                <div className="reporting-query__detail-row">
-                  <strong>ID:</strong>
-                  <span>{selectedReport.id}</span>
-                </div>
-                <div className="reporting-query__detail-row">
-                  <strong>Type:</strong>
-                  <span
-                    className={`reporting-query__type--${selectedReport.report_type}`}
-                  >
-                    {selectedReport.report_type}
-                  </span>
-                </div>
-                <div className="reporting-query__detail-row">
-                  <strong>Timestamp:</strong>
-                  <span>
-                    {new Date(selectedReport.timestamp).toLocaleString()}
-                  </span>
-                </div>
-                <div className="reporting-query__detail-row">
-                  <strong>Component:</strong>
-                  <span>{selectedReport.component || 'N/A'}</span>
-                </div>
-                <div className="reporting-query__detail-row">
-                  <strong>User ID:</strong>
-                  <span>{selectedReport.userid || 'N/A'}</span>
-                </div>
-                <div className="reporting-query__detail-row">
-                  <strong>Session ID:</strong>
-                  <span>{selectedReport.stid}</span>
-                </div>
-                {selectedReport.message && (
-                  <div className="reporting-query__detail-row reporting-query__detail-row--full">
-                    <strong>Message:</strong>
-                    <p>{selectedReport.message}</p>
-                  </div>
-                )}
-                {selectedReport.page_url && (
-                  <div className="reporting-query__detail-row reporting-query__detail-row--full">
-                    <strong>Page URL:</strong>
-                    <p>{selectedReport.page_url}</p>
-                  </div>
-                )}
-                {selectedReport.stack_trace && (
-                  <div className="reporting-query__detail-row reporting-query__detail-row--full">
-                    <strong>Stack Trace:</strong>
-                    <pre>{selectedReport.stack_trace}</pre>
-                  </div>
-                )}
-                {selectedReport.performance_metrics && (
-                  <div className="reporting-query__detail-row reporting-query__detail-row--full">
-                    <strong>Performance Metrics:</strong>
-                    <pre>
-                      {JSON.stringify(
-                        JSON.parse(selectedReport.performance_metrics),
-                        null,
-                        2
-                      )}
-                    </pre>
-                  </div>
-                )}
-                {selectedReport.metadata && (
-                  <div className="reporting-query__detail-row reporting-query__detail-row--full">
-                    <strong>Metadata:</strong>
-                    <pre>
-                      {JSON.stringify(
-                        JSON.parse(selectedReport.metadata),
-                        null,
-                        2
-                      )}
-                    </pre>
-                  </div>
-                )}
+            <div className="reporting-query__detail-row">
+              <strong>Timestamp:</strong>
+              <span>{new Date(selectedReport.timestamp).toLocaleString()}</span>
+            </div>
+            <div className="reporting-query__detail-row">
+              <strong>Component:</strong>
+              <span>{selectedReport.component || 'N/A'}</span>
+            </div>
+            <div className="reporting-query__detail-row">
+              <strong>User ID:</strong>
+              <span>{selectedReport.userid || 'N/A'}</span>
+            </div>
+            <div className="reporting-query__detail-row">
+              <strong>Session ID:</strong>
+              <span>{selectedReport.stid}</span>
+            </div>
+            {selectedReport.message && (
+              <div className="reporting-query__detail-row reporting-query__detail-row--full">
+                <strong>Message:</strong>
+                <p>{selectedReport.message}</p>
               </div>
-            </div>
+            )}
+            {selectedReport.page_url && (
+              <div className="reporting-query__detail-row reporting-query__detail-row--full">
+                <strong>Page URL:</strong>
+                <p>{selectedReport.page_url}</p>
+              </div>
+            )}
+            {selectedReport.stack_trace && (
+              <div className="reporting-query__detail-row reporting-query__detail-row--full">
+                <strong>Stack Trace:</strong>
+                <pre>{selectedReport.stack_trace}</pre>
+              </div>
+            )}
+            {selectedReport.performance_metrics && (
+              <div className="reporting-query__detail-row reporting-query__detail-row--full">
+                <strong>Performance Metrics:</strong>
+                <pre>
+                  {JSON.stringify(
+                    JSON.parse(selectedReport.performance_metrics),
+                    null,
+                    2
+                  )}
+                </pre>
+              </div>
+            )}
+            {selectedReport.metadata && (
+              <div className="reporting-query__detail-row reporting-query__detail-row--full">
+                <strong>Metadata:</strong>
+                <pre>
+                  {JSON.stringify(JSON.parse(selectedReport.metadata), null, 2)}
+                </pre>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 }

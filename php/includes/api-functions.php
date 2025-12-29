@@ -51,7 +51,8 @@ function getMyReservedPurchasedItems($myuserid, $mysqli) {
     $query = "
     SELECT 
         items.*, 
-        CONCAT(users.firstname, ' ', users.lastname) AS owner_name
+        CONCAT(users.firstname, ' ', users.lastname) AS owner_name,
+        users.avatar AS owner_avatar
     FROM 
         `items`
     LEFT JOIN 
@@ -76,6 +77,190 @@ function getMyReservedPurchasedItems($myuserid, $mysqli) {
             $apiResponse = array("warn" => "No items found for the specified user.");
         }
         $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
+
+function gm_item_notes_verify_viewer_is_not_owner($myuserid, $itemid, $mysqli) {
+    $query = "SELECT userid FROM items WHERE itemid = ?";
+    $stmt = $mysqli->prepare($query);
+    if (!$stmt) {
+        return array("error" => "Failed to prepare item ownership statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    $stmt->bind_param("i", $itemid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows <= 0) {
+        $stmt->close();
+        return array("error" => "Item not found");
+    }
+    $row = $result->fetch_assoc();
+    $owner_userid = isset($row['userid']) ? $row['userid'] : null;
+    $stmt->close();
+
+    if ($owner_userid !== null && (string)$owner_userid === (string)$myuserid) {
+        return array("error" => "Item notes are not available on your own list");
+    }
+
+    return array("success" => "ok");
+}
+
+function getItemNotes($myuserid, $itemid, $mysqli) {
+    $check = gm_item_notes_verify_viewer_is_not_owner($myuserid, (int)$itemid, $mysqli);
+    if (isset($check['error'])) {
+        return $check;
+    }
+
+    $query = "
+        SELECT
+            n.noteid,
+            n.itemid,
+            n.userid,
+            n.note,
+            n.created_at,
+            n.updated_at,
+            CONCAT(u.firstname, ' ', u.lastname) AS author_name,
+            u.avatar AS author_avatar
+        FROM item_notes n
+        LEFT JOIN users u ON n.userid = u.userid
+        WHERE n.itemid = ?
+        ORDER BY n.created_at ASC
+    ";
+    $stmt = $mysqli->prepare($query);
+    if ($stmt) {
+        $stmt->bind_param("i", $itemid);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $apiResponse = array("success" => $result->fetch_all(MYSQLI_ASSOC));
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
+
+function createItemNote($myuserid, $itemid, $note, $mysqli) {
+    $trimmed = trim($note);
+    if ($trimmed === '') {
+        return array("error" => "Note cannot be empty");
+    }
+
+    $check = gm_item_notes_verify_viewer_is_not_owner($myuserid, (int)$itemid, $mysqli);
+    if (isset($check['error'])) {
+        return $check;
+    }
+
+    $query = "INSERT INTO item_notes (itemid, userid, note, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())";
+    $stmt = $mysqli->prepare($query);
+    if ($stmt) {
+        $stmt->bind_param("iis", $itemid, $myuserid, $trimmed);
+        if ($stmt->execute()) {
+            $apiResponse = array("success" => "Note created");
+        } else {
+            $apiResponse = array("error" => "Failed to create note: " . $stmt->error);
+        }
+        $stmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
+
+function updateItemNote($myuserid, $noteid, $note, $mysqli) {
+    $trimmed = trim($note);
+    if ($trimmed === '') {
+        return array("error" => "Note cannot be empty");
+    }
+
+    // Ensure note belongs to the caller and caller is not the item owner
+    $query = "
+        SELECT n.userid, n.itemid, i.userid AS owner_userid
+        FROM item_notes n
+        LEFT JOIN items i ON n.itemid = i.itemid
+        WHERE n.noteid = ?
+        LIMIT 1
+    ";
+    $stmt = $mysqli->prepare($query);
+    if (!$stmt) {
+        return array("error" => "Failed to prepare note lookup: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    $stmt->bind_param("i", $noteid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows <= 0) {
+        $stmt->close();
+        return array("error" => "Note not found");
+    }
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    if ((string)$row['userid'] !== (string)$myuserid) {
+        return array("error" => "You can only edit your own notes");
+    }
+    if (isset($row['owner_userid']) && (string)$row['owner_userid'] === (string)$myuserid) {
+        return array("error" => "Item notes are not available on your own list");
+    }
+
+    $updateQuery = "UPDATE item_notes SET note = ?, updated_at = NOW() WHERE noteid = ? AND userid = ?";
+    $updateStmt = $mysqli->prepare($updateQuery);
+    if ($updateStmt) {
+        $myuserid_int = (int)$myuserid;
+        $updateStmt->bind_param("sii", $trimmed, $noteid, $myuserid_int);
+        if ($updateStmt->execute()) {
+            $apiResponse = array("success" => "Note updated");
+        } else {
+            $apiResponse = array("error" => "Failed to update note: " . $updateStmt->error);
+        }
+        $updateStmt->close();
+    } else {
+        $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    return $apiResponse;
+}
+
+function deleteItemNote($myuserid, $noteid, $mysqli) {
+    // Ensure note belongs to the caller and caller is not the item owner
+    $query = "
+        SELECT n.userid, n.itemid, i.userid AS owner_userid
+        FROM item_notes n
+        LEFT JOIN items i ON n.itemid = i.itemid
+        WHERE n.noteid = ?
+        LIMIT 1
+    ";
+    $stmt = $mysqli->prepare($query);
+    if (!$stmt) {
+        return array("error" => "Failed to prepare note lookup: (" . $mysqli->errno . ") " . $mysqli->error);
+    }
+    $stmt->bind_param("i", $noteid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows <= 0) {
+        $stmt->close();
+        return array("error" => "Note not found");
+    }
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    if ((string)$row['userid'] !== (string)$myuserid) {
+        return array("error" => "You can only delete your own notes");
+    }
+    if (isset($row['owner_userid']) && (string)$row['owner_userid'] === (string)$myuserid) {
+        return array("error" => "Item notes are not available on your own list");
+    }
+
+    $deleteQuery = "DELETE FROM item_notes WHERE noteid = ? AND userid = ?";
+    $deleteStmt = $mysqli->prepare($deleteQuery);
+    if ($deleteStmt) {
+        $myuserid_int = (int)$myuserid;
+        $deleteStmt->bind_param("ii", $noteid, $myuserid_int);
+        if ($deleteStmt->execute()) {
+            $apiResponse = array("success" => "Note deleted");
+        } else {
+            $apiResponse = array("error" => "Failed to delete note: " . $deleteStmt->error);
+        }
+        $deleteStmt->close();
     } else {
         $apiResponse = array("error" => "Failed to prepare the statement: (" . $mysqli->errno . ") " . $mysqli->error);
     }
@@ -187,7 +372,8 @@ function getTheirItemList($userid, $mysqli) {
     // $query = "SELECT * FROM `items` WHERE userid = ? AND `archive` = 0 AND ((removed = 0) OR (removed = 1 AND status != 'no change')) ORDER BY date_added ASC";
     $query = "
     SELECT 
-        items.*, 
+        items.*,
+        (SELECT COUNT(*) FROM item_notes n WHERE n.itemid = items.itemid) AS notes_count,
         CONCAT(users.firstname, ' ', users.lastname) AS status_username
     FROM 
         `items`

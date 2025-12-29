@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import './Modal.css';
+import Icon from '../Icon/Icon';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -47,7 +49,7 @@ export const Modal = React.memo((props: ModalProps) => {
     return null;
   }
 
-  return (
+  const modalNode = (
     <div className="modal" onClick={onClose}>
       <div
         className="modal-content"
@@ -62,7 +64,7 @@ export const Modal = React.memo((props: ModalProps) => {
             aria-label="Close modal"
             type="button"
           >
-            ×
+            <Icon icon="close" title="Close" />
           </button>
         </div>
         <div className="modal-body">{children}</div>
@@ -70,6 +72,12 @@ export const Modal = React.memo((props: ModalProps) => {
       </div>
     </div>
   );
+
+  // Render in a portal so overlay covers header/footer regardless of stacking contexts
+  if (typeof document !== 'undefined' && document.body) {
+    return createPortal(modalNode, document.body);
+  }
+  return modalNode;
 });
 
 Modal.displayName = 'Modal';

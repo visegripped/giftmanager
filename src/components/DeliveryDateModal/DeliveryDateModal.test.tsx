@@ -70,7 +70,7 @@ describe('DeliveryDateModal', () => {
   });
 
   it('updates date when user selects a new date', () => {
-    const { container } = render(
+    render(
       <DeliveryDateModal
         isOpen={true}
         onClose={mockOnClose}
@@ -79,8 +79,8 @@ describe('DeliveryDateModal', () => {
       />
     );
 
-    // Use container query as fallback
-    const dateInput = container.querySelector(
+    // Modal renders via portal; query the document
+    const dateInput = document.querySelector(
       '#date-chooser-input'
     ) as HTMLInputElement;
     expect(dateInput).toBeTruthy();
@@ -110,7 +110,7 @@ describe('DeliveryDateModal', () => {
     const originalNow = Date.now;
     global.Date.now = () => mockDateInstance.getTime();
 
-    const { container } = render(
+    render(
       <DeliveryDateModal
         isOpen={true}
         onClose={mockOnClose}
@@ -120,7 +120,7 @@ describe('DeliveryDateModal', () => {
       />
     );
 
-    const dateInput = container.querySelector(
+    const dateInput = document.querySelector(
       '#date-chooser-input'
     ) as HTMLInputElement;
     expect(dateInput).toBeTruthy();
@@ -133,7 +133,7 @@ describe('DeliveryDateModal', () => {
   });
 
   it('calculates default date to Christmas when no birthday provided', () => {
-    const { container } = render(
+    render(
       <DeliveryDateModal
         isOpen={true}
         onClose={mockOnClose}
@@ -141,7 +141,7 @@ describe('DeliveryDateModal', () => {
       />
     );
 
-    const dateInput = container.querySelector(
+    const dateInput = document.querySelector(
       '#date-chooser-input'
     ) as HTMLInputElement;
     expect(dateInput).toBeTruthy();
@@ -150,7 +150,7 @@ describe('DeliveryDateModal', () => {
   });
 
   it('resets date when modal reopens', () => {
-    const { container, rerender } = render(
+    const { rerender } = render(
       <DeliveryDateModal
         isOpen={true}
         onClose={mockOnClose}
@@ -159,7 +159,7 @@ describe('DeliveryDateModal', () => {
       />
     );
 
-    let dateInput = container.querySelector(
+    let dateInput = document.querySelector(
       '#date-chooser-input'
     ) as HTMLInputElement;
     expect(dateInput).toBeTruthy();
@@ -179,7 +179,7 @@ describe('DeliveryDateModal', () => {
 
     // Modal should not be visible when closed
     expect(
-      container.querySelector('#date-chooser-input')
+      document.querySelector('#date-chooser-input')
     ).not.toBeInTheDocument();
 
     // Reopen modal
@@ -192,7 +192,7 @@ describe('DeliveryDateModal', () => {
       />
     );
 
-    dateInput = container.querySelector(
+    dateInput = document.querySelector(
       '#date-chooser-input'
     ) as HTMLInputElement;
     expect(dateInput).toBeTruthy();

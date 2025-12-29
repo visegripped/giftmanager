@@ -3,6 +3,14 @@ import { getReportingUrl } from './urlHelper';
 
 const reportingUrl = getReportingUrl();
 
+function resolveReportingUrl(url: string): string {
+  if (!url) return url;
+  if (url.startsWith('/') && typeof window !== 'undefined' && window.location) {
+    return `${window.location.origin}${url}`;
+  }
+  return url;
+}
+
 // SANITY -> DO NOT THROW ERRORS FROM THIS FILE.
 // There is a method listening for uncaught errors that uses this.
 // if you throw an error, you could start a loop of error reporting.
@@ -75,7 +83,12 @@ export const postReport = async (
   formData.append('task', 'addReport');
 
   try {
-    const apiResponse = await fetch(reportingUrl, {
+    if (!reportingUrl) {
+      console.log('ERROR IN REPORTING: VITE_REPORTING_API_URL not configured');
+      return;
+    }
+    const url = resolveReportingUrl(reportingUrl);
+    const apiResponse = await fetch(url, {
       body: formData,
       method: 'POST',
     });

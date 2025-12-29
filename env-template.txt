@@ -41,3 +41,11 @@ APP_ENV=development
 # Note: API URLs are protocol-relative (//) to support both HTTP and HTTPS
 # The app will automatically use the same protocol as the current page
 
+# Frontend API endpoints (Vite)
+# In local Docker dev, these should point to your PHP container port.
+VITE_API_URL=//localhost:${PHP_PORT}/api.php
+VITE_REPORTING_API_URL=//localhost:${PHP_PORT}/reporting.php
+
+# Optional: separate host for reporting DB (defaults to DB_HOST when unset)
+REPORT_DB_HOST=${DB_HOST}
+

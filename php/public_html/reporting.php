@@ -37,8 +37,25 @@ use GraphQL\Type\Schema;
 use GraphQL\Error\FormattedError;
 
 // Connect to reports database
-$dbHost = gmGetEnv('DB_HOST') ?: 'localhost';
-$mysqli = new mysqli($dbHost, $username, $password, $database);
+$dbHost = gmGetEnv('REPORT_DB_HOST') ?: (gmGetEnv('DB_HOST') ?: 'localhost');
+
+// Use mysqli_init so we can apply connection timeout (prevents hanging requests)
+$mysqli = mysqli_init();
+if ($mysqli) {
+    // 5 second connect timeout
+    @mysqli_options($mysqli, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+    @$mysqli->real_connect($dbHost, $username, $password, $database);
+} else {
+    http_response_code(500);
+    echo json_encode(array(
+        "errors" => array(
+            array(
+                "message" => "Failed to initialize MySQL connection"
+            )
+        )
+    ));
+    exit();
+}
 
 // Check connection
 if ($mysqli->connect_errno) {
