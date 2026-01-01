@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import './Modal.css';
-import Icon from '../Icon/Icon';
+import Button from '../Button/Button';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -51,21 +51,15 @@ export const Modal = React.memo((props: ModalProps) => {
 
   const modalNode = (
     <div className="modal" onClick={onClose}>
-      <div
-        className="modal-content"
-        style={{ maxWidth }}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="modal-content" style={{ maxWidth }}>
         <div className="modal-header">
           <h3>{title}</h3>
-          <button
-            onClick={onClose}
-            className="modal-close"
+          <Button
+            onButtonClick={onClose}
             aria-label="Close modal"
             type="button"
-          >
-            <Icon icon="close" title="Close" />
-          </button>
+            icon="close"
+          ></Button>
         </div>
         <div className="modal-body">{children}</div>
         {footer && <div className="modal-footer">{footer}</div>}

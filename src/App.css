@@ -126,8 +126,12 @@ select {
   color: var(--input-text-color);
 }
 
+input:read-only,
+textarea:read-only,
 select:disabled {
   opacity: 0.6;
+  background-color: var(--input-bg-disabled);
+  color: var(--input-text-disabled);
 }
 
 p,
@@ -241,6 +245,21 @@ fieldset {
   border-color: var(--container-border-primary);
   border-width: 1px;
   opacity: 80%;
+}
+
+fieldset.fieldset--flash {
+  animation: flashHighlight 0.6s ease-out;
+}
+
+@keyframes flashHighlight {
+  0% {
+    background-color: var(--container-bg-warning);
+    border-color: var(--container-bg-warning);
+  }
+  100% {
+    background-color: var(--container-bg-primary);
+    border-color: var(--container-border-primary);
+  }
 }
 
 legend {

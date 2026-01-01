@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import Button from '../../components/Button/Button';
 import ReservedPurchasedItemsModal from '../../components/ReservedPurchasedItemsModal/ReservedPurchasedItemsModal';
 import PrintListModal from '../../components/PrintListModal/PrintListModal';
@@ -43,9 +43,11 @@ const Me = () => {
   const [addItemDescription, setAddItemDescription] = useState('');
   const [addItemLink, setAddItemLink] = useState('');
   const [editingItem, setEditingItem] = useState<ItemType | null>(null);
+  const [shouldFlash, setShouldFlash] = useState(false);
   const [isReservedPurchasedModalOpen, setIsReservedPurchasedModalOpen] =
     useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const previousEditingItemRef = useRef<ItemType | null>(null);
   const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
   const { addNotification } = useContext(
     NotificationsContext
@@ -57,7 +59,21 @@ const Me = () => {
     setAddItemName('');
     setAddItemDescription('');
     setAddItemLink('');
+    setShouldFlash(false);
   };
+
+  // Trigger flash animation when editingItem changes from null to a value
+  useEffect(() => {
+    if (editingItem && !previousEditingItemRef.current) {
+      setShouldFlash(true);
+      // Reset flash after animation completes
+      const timer = setTimeout(() => {
+        setShouldFlash(false);
+      }, 600); // Match animation duration
+      return () => clearTimeout(timer);
+    }
+    previousEditingItemRef.current = editingItem;
+  }, [editingItem]);
 
   const updateRemoveStatus = (
     removed: ItemRemovedType,
@@ -147,7 +163,7 @@ const Me = () => {
   const StatusDD = (props: { data: ItemType }) => {
     const { removed, itemid, userid } = props.data;
     return (
-      <>
+      <div className="me-cell-actions">
         {removed === 1 ? (
           <Button
             icon="plus"
@@ -177,7 +193,7 @@ const Me = () => {
             />
           </>
         )}
-      </>
+      </div>
     );
   };
 
@@ -303,7 +319,9 @@ const Me = () => {
               }
             }}
           >
-            <fieldset className="fieldset">
+            <fieldset
+              className={`fieldset ${shouldFlash ? 'fieldset--flash' : ''}`}
+            >
               <legend className="legend">
                 {editingItem ? 'Edit item on my list' : 'Add item to my list'}
               </legend>

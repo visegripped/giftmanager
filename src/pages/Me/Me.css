@@ -25,3 +25,10 @@
   flex-wrap: wrap;
   align-items: center;
 }
+
+.me-cell-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
