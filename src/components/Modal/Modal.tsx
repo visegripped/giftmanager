@@ -51,12 +51,18 @@ export const Modal = React.memo((props: ModalProps) => {
 
   const modalNode = (
     <div className="modal" onClick={onClose}>
-      <div className="modal-content" style={{ maxWidth }}>
+      <div
+        className="modal-content"
+        style={{ maxWidth }}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
         <div className="modal-header">
           <h3>{title}</h3>
           <Button
             onButtonClick={onClose}
-            aria-label="Close modal"
+            title="Close modal"
             type="button"
             icon="close"
           ></Button>

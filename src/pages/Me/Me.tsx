@@ -320,7 +320,7 @@ const Me = () => {
             }}
           >
             <fieldset
-              className={`fieldset ${shouldFlash ? 'fieldset--flash' : ''}`}
+              className={shouldFlash ? 'fieldset fieldset--flash' : 'fieldset'}
             >
               <legend className="legend">
                 {editingItem ? 'Edit item on my list' : 'Add item to my list'}
