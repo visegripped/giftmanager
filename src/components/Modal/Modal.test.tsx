@@ -32,7 +32,7 @@ describe('Modal Component', () => {
   it('calls onClose when close button is clicked', () => {
     const onClose = vi.fn();
     render(<Modal {...defaultProps} onClose={onClose} />);
-    const closeButton = screen.getByLabelText('Close modal');
+    const closeButton = screen.getByTitle('Close modal');
     fireEvent.click(closeButton);
     expect(onClose).toHaveBeenCalledTimes(1);
   });

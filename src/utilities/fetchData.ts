@@ -15,6 +15,7 @@ type fetchInterface = {
   myuserid?: string | number;
   theiruserid?: string | number;
   itemid?: string | number;
+  noteid?: string | number;
   userid?: string | number;
   name?: string;
   avatar?: string;
@@ -28,6 +29,7 @@ type fetchInterface = {
   added_by_userid?: string;
   groupid?: string;
   archive?: string;
+  note?: string;
 };
 
 export const formatDate = (date: Date) => {
@@ -43,6 +45,7 @@ export const fetchData = (config: fetchInterface) => {
     'theiruserid',
     'userid',
     'itemid',
+    'noteid',
     'name',
     'avatar',
     'description',
@@ -55,6 +58,7 @@ export const fetchData = (config: fetchInterface) => {
     'added_by_userid',
     'groupid',
     'archive',
+    'note',
   ];
   const accessToken = localStorage.getItem('access_token');
   const makeAsyncRequest =

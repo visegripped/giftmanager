@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import Button from '../../components/Button/Button';
 import ReservedPurchasedItemsModal from '../../components/ReservedPurchasedItemsModal/ReservedPurchasedItemsModal';
 import PrintListModal from '../../components/PrintListModal/PrintListModal';
@@ -42,14 +42,38 @@ const Me = () => {
   const [addItemName, setAddItemName] = useState('');
   const [addItemDescription, setAddItemDescription] = useState('');
   const [addItemLink, setAddItemLink] = useState('');
+  const [editingItem, setEditingItem] = useState<ItemType | null>(null);
+  const [shouldFlash, setShouldFlash] = useState(false);
   const [isReservedPurchasedModalOpen, setIsReservedPurchasedModalOpen] =
     useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const previousEditingItemRef = useRef<ItemType | null>(null);
   const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
   const { addNotification } = useContext(
     NotificationsContext
   ) as NotificationContextProps;
   const [myUserid, setMyUserid] = useState(myProfile.userid || '');
+
+  const cancelEdit = () => {
+    setEditingItem(null);
+    setAddItemName('');
+    setAddItemDescription('');
+    setAddItemLink('');
+    setShouldFlash(false);
+  };
+
+  // Trigger flash animation when editingItem changes from null to a value
+  useEffect(() => {
+    if (editingItem && !previousEditingItemRef.current) {
+      setShouldFlash(true);
+      // Reset flash after animation completes
+      const timer = setTimeout(() => {
+        setShouldFlash(false);
+      }, 600); // Match animation duration
+      return () => clearTimeout(timer);
+    }
+    previousEditingItemRef.current = editingItem;
+  }, [editingItem]);
 
   const updateRemoveStatus = (
     removed: ItemRemovedType,
@@ -87,6 +111,46 @@ const Me = () => {
     return response;
   };
 
+  const updateItemOnMyList = (
+    item: ItemType,
+    description: string,
+    link: string
+  ) => {
+    const response = fetchData({
+      task: 'updateItemOnMyList',
+      itemid: item.itemid,
+      myuserid: myUserid,
+      description,
+      link,
+    });
+
+    response &&
+      response.then((data: responseInterface) => {
+        if (data.error || data.err) {
+          postReport({
+            type: 'error',
+            report: 'Unable to update item on my list',
+            body: {
+              error: data.error || data.err,
+              file: 'Me',
+              origin: 'apiResponse',
+            },
+          });
+          addNotification({
+            message: `Something has gone wrong updating the item on your list.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+            type: 'error',
+          });
+        } else {
+          fetchItemList(myUserid);
+          cancelEdit();
+        }
+      });
+
+    return response;
+  };
+
   const Link = (props: ItemType) => {
     const { link, name } = props;
     return (
@@ -99,7 +163,7 @@ const Me = () => {
   const StatusDD = (props: { data: ItemType }) => {
     const { removed, itemid, userid } = props.data;
     return (
-      <>
+      <div className="me-cell-actions">
         {removed === 1 ? (
           <Button
             icon="plus"
@@ -110,7 +174,16 @@ const Me = () => {
           />
         ) : (
           <>
-            {/* <Icon icon="edit" /> */}
+            <Button
+              icon="edit"
+              title="Edit item (link/description)"
+              onButtonClick={() => {
+                setEditingItem(props.data);
+                setAddItemName(props.data.name || '');
+                setAddItemDescription(props.data.description || '');
+                setAddItemLink(props.data.link || '');
+              }}
+            />
             <Button
               icon="delete"
               title="Remove item from my list"
@@ -120,7 +193,7 @@ const Me = () => {
             />
           </>
         )}
-      </>
+      </div>
     );
   };
 
@@ -235,11 +308,23 @@ const Me = () => {
             className="form"
             onSubmit={(formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
               formSubmitEvent.preventDefault();
-              addItemToMyList(addItemName, addItemDescription, addItemLink);
+              if (editingItem) {
+                updateItemOnMyList(
+                  editingItem,
+                  addItemDescription,
+                  addItemLink
+                );
+              } else {
+                addItemToMyList(addItemName, addItemDescription, addItemLink);
+              }
             }}
           >
-            <fieldset className="fieldset">
-              <legend className="legend">Add item to my list</legend>
+            <fieldset
+              className={shouldFlash ? 'fieldset fieldset--flash' : 'fieldset'}
+            >
+              <legend className="legend">
+                {editingItem ? 'Edit item on my list' : 'Add item to my list'}
+              </legend>
               <label className="label">Name</label>
               <div className="input-container">
                 <input
@@ -247,8 +332,11 @@ const Me = () => {
                   name="name"
                   required
                   value={addItemName}
+                  readOnly={!!editingItem}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setAddItemName(event.target.value);
+                    if (!editingItem) {
+                      setAddItemName(event.target.value);
+                    }
                   }}
                 />
               </div>
@@ -276,7 +364,20 @@ const Me = () => {
                 ></textarea>
               </div>
 
-              <Button icon="plus" label="Add" type="submit" />
+              <div className="me-form-actions">
+                <Button
+                  icon={editingItem ? 'edit' : 'plus'}
+                  label={editingItem ? 'Save' : 'Add'}
+                  type="submit"
+                />
+                {editingItem && (
+                  <Button
+                    label="Cancel"
+                    type="button"
+                    onButtonClick={() => cancelEdit()}
+                  />
+                )}
+              </div>
             </fieldset>
           </form>
 

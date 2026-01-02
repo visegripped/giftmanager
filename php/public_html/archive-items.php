@@ -1,3 +1,4 @@
+<php header("Cache-Control: no-cache"); ?>
 <?php
 /**
  * CRON script to archive items based on delivery dates and removal status

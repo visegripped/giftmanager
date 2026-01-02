@@ -162,6 +162,7 @@ export const ReservedPurchasedItemsModal = React.memo(
               <thead>
                 <tr>
                   <th>Item Name</th>
+                  <th>Avatar</th>
                   <th>Owner</th>
                   <th>Status</th>
                 </tr>
@@ -180,6 +181,17 @@ export const ReservedPurchasedItemsModal = React.memo(
                         </a>
                       ) : (
                         item.name
+                      )}
+                    </td>
+                    <td className="reserved-purchased-modal__avatar-cell">
+                      {item.owner_avatar ? (
+                        <img
+                          className="reserved-purchased-modal__avatar"
+                          src={item.owner_avatar}
+                          alt=""
+                        />
+                      ) : (
+                        <span className="reserved-purchased-modal__avatar reserved-purchased-modal__avatar--blank" />
                       )}
                     </td>
                     <td>{item.owner_name || 'Unknown'}</td>

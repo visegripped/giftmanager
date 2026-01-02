@@ -135,6 +135,7 @@ $myuserid = $_POST['myuserid'] ?? "";
 $theiruserid = $_POST['theiruserid'] ?? "";
 $userid = $_POST['userid'] ?? ""; // drop this in favor of my/their.
 $itemid = $_POST['itemid'] ?? "";
+$noteid = $_POST['noteid'] ?? "";
 $name = $_POST['name'] ?? "";
 $avatar = $_POST['avatar'] ?? "";
 $description = $_POST['description'] ?? "";
@@ -147,6 +148,7 @@ $archive = $_POST['archive'] ?? "1";
 $added_by_userid = $_POST['added_by_userid'] ?? ""; // drop this in favor of my/their
 $groupid = $_POST['groupid'] ?? "1";
 $email_address = $_POST['email_address'] ?? "";
+$note = $_POST['note'] ?? "";
 
 function isValidGoogleAccessToken($token) {
   if (!$token) {
@@ -273,6 +275,19 @@ if($task != 'getFacebookProfile' && (!isset($apiResponse) || !isset($apiResponse
     }
     else if ($task == 'updateStatusForTheirItem' && $theiruserid && $status && $myuserid && $itemid) {
         $apiResponse = updateStatusForTheirItem($myuserid, $theiruserid, $itemid, $status, $mysqli, $date_received);
+    }
+    // item notes (only for other users' lists)
+    else if ($task == 'getItemNotes' && $myuserid && $itemid) {
+        $apiResponse = getItemNotes($myuserid, $itemid, $mysqli);
+    }
+    else if ($task == 'createItemNote' && $myuserid && $itemid && $note !== "") {
+        $apiResponse = createItemNote($myuserid, $itemid, $note, $mysqli);
+    }
+    else if ($task == 'updateItemNote' && $myuserid && $noteid && $note !== "") {
+        $apiResponse = updateItemNote($myuserid, $noteid, $note, $mysqli);
+    }
+    else if ($task == 'deleteItemNote' && $myuserid && $noteid) {
+        $apiResponse = deleteItemNote($myuserid, $noteid, $mysqli);
     }
     //general
     else if ($task == 'getUserProfileByUserId' && $userid) {

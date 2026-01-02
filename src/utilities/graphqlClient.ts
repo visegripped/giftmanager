@@ -7,6 +7,16 @@ import { getReportingUrl } from './urlHelper';
 
 const reportingUrl = getReportingUrl();
 
+function resolveReportingUrl(url: string): string {
+  if (!url) return url;
+  // In dev, normalizeUrl can return a relative path like "/reporting.php" for Vite proxy.
+  // Node's fetch (used by Vitest) requires an absolute URL, so resolve against window origin.
+  if (url.startsWith('/') && typeof window !== 'undefined' && window.location) {
+    return `${window.location.origin}${url}`;
+  }
+  return url;
+}
+
 export interface GraphQLResponse<T = unknown> {
   data?: T;
   errors?: Array<{
@@ -34,19 +44,30 @@ export async function graphqlRequest<T = unknown>(
     throw new Error('VITE_REPORTING_API_URL not configured');
   }
 
+  const url = resolveReportingUrl(reportingUrl);
+
   const request: GraphQLRequest = {
     query,
     variables,
     operationName,
   };
 
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const controller =
+    typeof AbortController !== 'undefined' ? new AbortController() : undefined;
+
   try {
-    const response = await fetch(reportingUrl, {
+    if (controller) {
+      timeoutId = setTimeout(() => controller.abort(), 15000);
+    }
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(request),
+      signal: controller?.signal,
     });
 
     if (!response.ok) {
@@ -67,6 +88,11 @@ export async function graphqlRequest<T = unknown>(
   } catch (error) {
     console.error('GraphQL request failed:', error);
     throw error;
+  } finally {
+    // Clear timeout if set
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
   }
 }
 

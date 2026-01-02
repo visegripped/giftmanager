@@ -227,7 +227,7 @@ describe('PrintListModal Component', () => {
     );
 
     await waitFor(() => {
-      const closeButton = screen.getByLabelText('Close modal');
+      const closeButton = screen.getByTitle('Close modal');
       closeButton.click();
       expect(onClose).toHaveBeenCalled();
     });
