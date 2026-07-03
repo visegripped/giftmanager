@@ -69,7 +69,7 @@ function App() {
   }, [accessToken, myProfile]);
 
   // Check if user is admin (userid === 1)
-  const isAdmin = String(myProfile.userid) === '1';
+  const isAdmin = myProfile?.userid ? String(myProfile.userid) === '1' : false;
 
   const updateTheme = () => {
     const newTheme = 'theme__default';

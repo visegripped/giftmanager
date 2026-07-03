@@ -28,7 +28,7 @@
 
 .me-cell-actions {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   flex-wrap: nowrap;
   align-items: center;
 }

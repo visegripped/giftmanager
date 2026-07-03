@@ -41,8 +41,8 @@ export const UserChooser = () => {
   const { addNotification } = useContext(
     NotificationsContext
   ) as NotificationContextProps;
-  let [usersList, setUsersList] = useState([]);
-  let [currentUserid, setUserid] = useState(useridFromURL);
+  const [usersList, setUsersList] = useState([]);
+  const [currentUserid, setUserid] = useState(useridFromURL);
 
   const fetchUsersList = useCallback(() => {
     const response = fetchData({
