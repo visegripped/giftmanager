@@ -10,6 +10,7 @@ note-to-self.md
 node_modules
 dist
 dist-ssr
+.next
 *.local
 
 # SSL certificates (generated locally, do not commit)
@@ -27,19 +28,29 @@ docker/ssl/*.key
 *.njsproj
 *.sln
 *.sw?
-*.env*
+.env
+.env.local
+.env.production
+.env.*.local
 *storybook.log
 
-/php/includes/*-credentials.php
-/php/vendor
-/php/composer.lock
-composer.lock
-.pnpm-store/
-docker/ssl/
+# Vercel project link (team-specific)
+.vercel/
+
+# Database dumps and migration artifacts (may contain PII)
+*.sql
+!docker/postgres/init.sql
+!drizzle/migrations/*.sql
+
+# Migration output
+scripts/output/
+migration-data/
+
+# Personal images
+IMG_*
 
 .pnpm-store/
 docker/ssl/
-
 
 .cursor/*
 

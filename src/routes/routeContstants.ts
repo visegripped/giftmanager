@@ -1,9 +1,9 @@
 export const routeConstants = {
   HOME: '/',
-  ME: '/Me',
-  USER: '/User',
-  THEME: '/Theme',
-  ADMIN: '/Admin',
+  ME: '/me',
+  USER: '/user',
+  THEME: '/theme',
+  ADMIN: '/admin',
 };
 
 export type routeConstantsType = keyof typeof routeConstants;

@@ -1,24 +1,35 @@
 {
-  "files": [],
   "compilerOptions": {
-    "moduleResolution": "Node",
-    "baseUrl": ".",
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
     "paths": {
+      "@/*": ["./*"],
       "@assets/*": ["./src/assets/*"],
       "@types/*": ["./src/types/*"],
       "@components/*": ["./src/components/*"],
-      "@pages/*": ["./src/pages/"],
+      "@views/*": ["./src/views/*"],
       "@utilities/*": ["./src/utilities/*"],
       "@context/*": ["./src/context/*"],
       "@routes/*": ["./src/routes/*"]
     }
   },
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.node.json"
-    }
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "**/*.stories.tsx",
+    "**/*.stories.ts",
+    ".storybook"
   ]
 }

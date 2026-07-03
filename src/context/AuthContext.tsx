@@ -13,17 +13,17 @@ import {
 } from './NotificationsContext';
 
 export interface AuthContextInterface {
-  login: () => {};
-  logout: () => {};
+  login: () => void;
+  logout: () => void;
   accessToken: string;
-  setAccessToken: (accessToken: string) => {};
+  setAccessToken: (accessToken: string) => void;
   authProvider: 'google' | 'facebook' | '';
   facebookLogin: (response: FacebookAuthResponseInterface) => void;
 }
 
 const AuthContext = createContext({});
 // const refreshTokenUrl = import.meta.env.VITE_REFRESH_TOKEN_URL;
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
 
 export interface GoogleAuthResponseInterface {
   access_token: string;
@@ -59,7 +59,7 @@ function AuthProvider(props: PropsWithChildren) {
   ) as NotificationContextProps;
 
   const handleTokenExpiration = (expiresIn?: number) => {
-    let currentTime = new Date().getTime();
+    const currentTime = new Date().getTime();
     // Facebook tokens typically expire in 1-2 hours, Google in 2 hours
     const expirationTime = expiresIn
       ? new Date(currentTime + expiresIn * 1000)

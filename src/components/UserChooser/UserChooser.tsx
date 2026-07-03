@@ -5,7 +5,8 @@ import React, {
   useContext,
   useCallback,
 } from 'react';
-import { Link, useMatch } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { responseInterface, UserType } from '../../types/types';
 import './UserChooser.css';
 import {
@@ -36,8 +37,9 @@ export const UserChooser = () => {
     setOpen((prev) => !prev);
   }, []);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const paramsFromURL = useMatch('/User/:userid') || { params: { userid: '' } };
-  const useridFromURL = Number(paramsFromURL.params?.userid) || '';
+  const pathname = usePathname();
+  const userMatch = pathname.match(/^\/user\/(\d+)/);
+  const useridFromURL = userMatch ? Number(userMatch[1]) : '';
   const { addNotification } = useContext(
     NotificationsContext
   ) as NotificationContextProps;
@@ -86,7 +88,7 @@ export const UserChooser = () => {
         {usersList.map((user: UserType) => (
           <li key={user.userid}>
             <Link
-              to={`${routeConstants.USER}/${user.userid}`}
+              href={`${routeConstants.USER}/${user.userid}`}
               onClick={() => handleUserClick(user.userid)}
               className={`userlist-user ${currentUserid == user.userid ? 'userlist-user-active' : ''}`}
             >
