@@ -3,7 +3,7 @@ import { UserProfileInterface } from '../types/types';
 
 export interface ProfileContextInterface {
   myProfile: UserProfileInterface;
-  setMyProfile: (a: object) => {};
+  setMyProfile: (a: object) => void;
 }
 
 const ProfileContext = createContext({});

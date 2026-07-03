@@ -24,7 +24,7 @@ import {
 
 const convertGoogleProfile2Custom = (googleProfile: GoogleProfileInterface) => {
   // need the following from the profile: email. avatar? name.
-  let userProfile = { google: googleProfile } as UserProfileInterface;
+  const userProfile = { google: googleProfile } as UserProfileInterface;
   const { resourceName, emailAddresses, names, photos } = googleProfile;
 
   if (userProfile.google) {
@@ -54,7 +54,7 @@ const convertGoogleProfile2Custom = (googleProfile: GoogleProfileInterface) => {
 const convertFacebookProfile2Custom = (
   facebookProfile: FacebookProfileInterface
 ) => {
-  let userProfile = { facebook: facebookProfile } as UserProfileInterface;
+  const userProfile = { facebook: facebookProfile } as UserProfileInterface;
   const { email, name, picture, first_name, last_name } = facebookProfile;
 
   if (email) {
@@ -104,7 +104,7 @@ export const AuthButton = () => {
     useState<UserProfileInterface | null>(null);
   const [facebookProfileData, setFacebookProfileData] =
     useState<UserProfileInterface | null>(null);
-  const fbAppId = import.meta.env.VITE_FB_APP_ID;
+  const fbAppId = process.env.NEXT_PUBLIC_FB_APP_ID;
 
   // Debug: Log Facebook App ID status
   useEffect(() => {
@@ -116,7 +116,7 @@ export const AuthButton = () => {
       );
       console.log(
         'Available env vars:',
-        Object.keys(import.meta.env).filter((key) => key.startsWith('VITE_'))
+        Object.keys(process.env).filter((key) => key.startsWith('NEXT_PUBLIC_'))
       );
     }
   }, [fbAppId]);

@@ -32,7 +32,7 @@ export const PrintListModal = React.memo((props: PrintListModalProps) => {
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
+    contentRef: printRef,
     documentTitle: 'My Purchased Items List',
   });
 

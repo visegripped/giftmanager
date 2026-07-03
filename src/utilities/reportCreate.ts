@@ -44,12 +44,7 @@ export interface ReportBody {
 }
 
 export type ReportType =
-  | 'performance'
-  | 'interaction'
-  | 'error'
-  | 'warning'
-  | 'info'
-  | 'debug';
+  'performance' | 'interaction' | 'error' | 'warning' | 'info' | 'debug';
 
 type GraphQLReportType = Uppercase<ReportType>;
 
@@ -120,7 +115,7 @@ export const reportCreate = async (
   // Gather standard browser data if not provided
   const standardData = gatherStandardBodyData(window);
 
-  const appVersion = import.meta.env.VITE_APP_VERSION;
+  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION;
 
   // Merge standard data into report input
   const fullReportInput: ReportInput = {
@@ -243,7 +238,13 @@ export const postReport = async (
 
   // Get userid from localStorage or context if available
   // Note: userid is optional in ReportInput. If needed, it should be passed in the body
-  const userid = body.userid || undefined;
+  const rawUserid = body.userid;
+  const userid =
+    typeof rawUserid === 'number'
+      ? rawUserid
+      : typeof rawUserid === 'string' && rawUserid !== ''
+        ? Number(rawUserid)
+        : undefined;
 
   const reportInput: ReportInput = {
     stid,

@@ -45,8 +45,9 @@ export type UserType = {
 };
 
 export type tasksInterface = {
-  task: //my
-  | 'addItemToMyList'
+  task:
+    //my
+    | 'addItemToMyList'
     | 'getMyItemList'
     | 'getMyReservedPurchasedItems'
     | 'updateItemOnMyList'
@@ -71,11 +72,7 @@ export type tasksInterface = {
 };
 
 export type itemStatusInterface =
-  | 'cancelled'
-  | 'uncancel'
-  | 'purchased'
-  | 'reserved'
-  | 'nochange';
+  'cancelled' | 'uncancel' | 'purchased' | 'reserved' | 'nochange';
 
 export type responseInterface = {
   success?: string | [] | ItemType[] | UserType[] | any[];
