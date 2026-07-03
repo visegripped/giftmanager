@@ -701,7 +701,8 @@ const Table = (
 };
 
 const PageContent = () => {
-  let { userid: theirUserid } = useParams() || '';
+  const params = useParams();
+  const theirUserid = params?.userid || '';
   const emptyUserProfile = {
     userid: '',
     firstname: '',

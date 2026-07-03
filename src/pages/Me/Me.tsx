@@ -219,7 +219,7 @@ const Me = () => {
         field: 'removed',
         cellRenderer: StatusDD,
         headerName: 'actions',
-        flex: 1,
+        flex: 1.5,
       },
     ]);
 

@@ -242,7 +242,8 @@ export const postReport = async (
   }
 
   // Get userid from localStorage or context if available
-  const userid = body.email ? undefined : undefined; // TODO: Get from user context
+  // Note: userid is optional in ReportInput. If needed, it should be passed in the body
+  const userid = body.userid || undefined;
 
   const reportInput: ReportInput = {
     stid,
