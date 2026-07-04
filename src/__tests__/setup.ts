@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import '@/src/utilities/agGridSetup';
 import { vi } from 'vitest';
 import React from 'react';
 
