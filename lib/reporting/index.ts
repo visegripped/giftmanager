@@ -66,6 +66,12 @@ export async function createReport(input: ReportInput) {
     );
   }
 
+  if (!process.env.POSTGRES_URL) {
+    throw new Error(
+      'POSTGRES_URL environment variable is not set. Run Neon migrations before enabling reporting.'
+    );
+  }
+
   const db = getDb();
   const [row] = await db
     .insert(applicationReports)
