@@ -2,23 +2,97 @@ import { createHmac } from 'crypto';
 
 export type AuthProvider = 'google' | 'facebook';
 
+type GoogleTokenInfo = {
+  aud?: string;
+  azp?: string;
+  audience?: string;
+  issued_to?: string;
+  error?: string;
+  error_description?: string;
+  expires_in?: string | number;
+};
+
+export function getGoogleOAuthClientId(): string {
+  return (
+    process.env.GOOGLE_OAUTH_CLIENT_ID?.trim() ||
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim() ||
+    ''
+  );
+}
+
+function tokenAudienceMatchesClient(
+  tokenInfo: GoogleTokenInfo,
+  clientId: string
+): boolean {
+  const candidates = [
+    tokenInfo.aud,
+    tokenInfo.azp,
+    tokenInfo.audience,
+    tokenInfo.issued_to,
+  ]
+    .filter(Boolean)
+    .map((value) => String(value).trim());
+
+  return candidates.includes(clientId);
+}
+
 export async function isValidGoogleAccessToken(
   token: string
 ): Promise<boolean> {
-  const googleClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
-  if (!token || !googleClientId) {
+  const googleClientId = getGoogleOAuthClientId();
+  if (!token) {
+    console.error('Google token validation failed: missing access token');
+    return false;
+  }
+  if (!googleClientId) {
+    console.error(
+      'Google token validation failed: set GOOGLE_OAUTH_CLIENT_ID (or NEXT_PUBLIC_GOOGLE_CLIENT_ID) in server env'
+    );
     return false;
   }
 
-  const response = await fetch(
-    `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(token)}`
-  );
-  if (!response.ok) {
+  try {
+    const response = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(token)}`
+    );
+    if (!response.ok) {
+      console.error(
+        'Google token validation failed: tokeninfo HTTP',
+        response.status
+      );
+      return false;
+    }
+
+    const result = (await response.json()) as GoogleTokenInfo;
+    if (result.error || result.error_description) {
+      console.error(
+        'Google token validation failed:',
+        result.error_description || result.error
+      );
+      return false;
+    }
+
+    const matches = tokenAudienceMatchesClient(result, googleClientId);
+    if (!matches) {
+      console.error(
+        'Google token validation failed: client ID mismatch',
+        JSON.stringify({
+          expected: googleClientId,
+          aud: result.aud,
+          azp: result.azp,
+          audience: result.audience,
+          issued_to: result.issued_to,
+        })
+      );
+    }
+    return matches;
+  } catch (error) {
+    console.error(
+      'Google token validation failed: tokeninfo request error',
+      error
+    );
     return false;
   }
-
-  const result = (await response.json()) as { aud?: string };
-  return result.aud === googleClientId;
 }
 
 export async function isValidFacebookAccessToken(

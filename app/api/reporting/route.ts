@@ -172,16 +172,21 @@ export async function POST(request: NextRequest) {
       operationName: body.operationName,
     });
 
+    if (result.errors?.length) {
+      console.error('GraphQL resolver errors:', result.errors);
+    }
+
     return NextResponse.json(result, { headers: corsHeaders() });
   } catch (error) {
     console.error('GraphQL error:', error);
     return NextResponse.json(
       {
+        data: null,
         errors: [
           { message: error instanceof Error ? error.message : 'Unknown error' },
         ],
       },
-      { status: 500, headers: corsHeaders() }
+      { status: 200, headers: corsHeaders() }
     );
   }
 }

@@ -29,9 +29,9 @@
 
 | Variable                       | Notes                                             |
 | ------------------------------ | ------------------------------------------------- |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Google OAuth client ID                            |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Google OAuth client ID (browser login button)     |
 | `NEXT_PUBLIC_FB_APP_ID`        | Facebook app ID                                   |
-| `GOOGLE_OAUTH_CLIENT_ID`       | Same as Google client ID (server-side validation) |
+| `GOOGLE_OAUTH_CLIENT_ID`       | **Same value** as above (server token validation) |
 
 ## Data migration from MySQL
 
