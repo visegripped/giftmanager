@@ -3,6 +3,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { ColDef, GridOptions } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import '@/src/utilities/agGridSetup';
 import './ReportingGrid.css';
 
 export interface ReportData {
@@ -168,6 +169,7 @@ export function ReportingGrid({
         <div className="reporting-grid__loading">Loading reports...</div>
       )}
       <AgGridReact
+        theme="legacy"
         rowData={reports}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}

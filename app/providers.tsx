@@ -1,6 +1,5 @@
 'use client';
 
-import '@/src/utilities/agGridSetup';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from '@/src/context/AuthContext';
 import { ProfileProvider } from '@/src/context/ProfileContext';

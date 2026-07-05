@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import path from 'path';
+import { getPackageVersion } from './lib/packageVersion';
 
 export default defineConfig({
   plugins: [
@@ -36,5 +37,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['src/__tests__/setup.ts'],
+    env: {
+      NEXT_PUBLIC_APP_VERSION: getPackageVersion(),
+    },
   },
 });

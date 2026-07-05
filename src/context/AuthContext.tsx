@@ -11,6 +11,7 @@ import {
   NotificationsContext,
   NotificationContextProps,
 } from './NotificationsContext';
+import { getLocalStorageItem } from '../utilities/browserStorage';
 
 export interface AuthContextInterface {
   login: () => void;
@@ -43,20 +44,25 @@ export interface FacebookAuthResponseInterface {
 }
 
 function AuthProvider(props: PropsWithChildren) {
-  // console.log(' -> props from authProvider', props);
-  const [accessToken, setAccessToken] = useState(
-    localStorage.getItem('access_token') || ''
-  );
+  const [accessToken, setAccessToken] = useState('');
   const [accessTokenExpiration, setAccessTokenExpiration] = useState<
     Date | string
-  >(localStorage.getItem('access_token_expiration') || '');
+  >('');
   const [authProvider, setAuthProvider] = useState<'google' | 'facebook' | ''>(
-    (localStorage.getItem('auth_provider') as 'google' | 'facebook' | '') || ''
+    ''
   );
 
   const { addNotification } = useContext(
     NotificationsContext
   ) as NotificationContextProps;
+
+  useEffect(() => {
+    setAccessToken(getLocalStorageItem('access_token'));
+    setAccessTokenExpiration(getLocalStorageItem('access_token_expiration'));
+    setAuthProvider(
+      (getLocalStorageItem('auth_provider') as 'google' | 'facebook' | '') || ''
+    );
+  }, []);
 
   const handleTokenExpiration = (expiresIn?: number) => {
     const currentTime = new Date().getTime();

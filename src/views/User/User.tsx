@@ -30,6 +30,7 @@ import DeliveryDateModal from '../../components/DeliveryDateModal/DeliveryDateMo
 import Button from '../../components/Button/Button';
 import 'ag-grid-community/styles/ag-grid.css'; // Mandatory CSS required by the Data Grid
 import 'ag-grid-community/styles/ag-theme-quartz.css'; // Optional Theme applied to the Data Grid
+import '@/src/utilities/agGridSetup';
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 import './User.css';
 import { useReport } from '../../hooks/useReport';
@@ -680,6 +681,7 @@ const Table = (
   return (
     <>
       <AgGridReact
+        theme="legacy"
         rowData={theirItemList}
         // @ts-ignore
         columnDefs={colDefs}

@@ -152,10 +152,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const appVersion =
-    process.env.NEXT_PUBLIC_APP_VERSION ??
-    process.env.npm_package_version ??
-    '2.0.0';
+  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION ?? '0.0.0';
 
   return (
     <div id="root">

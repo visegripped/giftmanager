@@ -1,7 +1,10 @@
 import type { NextConfig } from 'next';
-import path from 'path';
+import { getPackageVersion } from './lib/packageVersion';
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_APP_VERSION: getPackageVersion(),
+  },
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
