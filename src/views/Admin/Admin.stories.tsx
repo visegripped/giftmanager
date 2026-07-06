@@ -9,6 +9,7 @@ import {
   NotificationsContext,
   NotificationContextProps,
 } from '../../context/NotificationsContext';
+import { ADMIN_USER_ID } from '@/lib/admin';
 
 const meta = {
   title: 'Pages/Admin',
@@ -52,11 +53,11 @@ const createContextProviders = (
 
 // Admin user stories
 export const AdminUser: Story = {
-  render: () => createContextProviders({ userid: '1' }),
+  render: () => createContextProviders({ userid: ADMIN_USER_ID }),
 };
 
 export const AdminUserStringId: Story = {
-  render: () => createContextProviders({ userid: '1' }),
+  render: () => createContextProviders({ userid: ADMIN_USER_ID }),
 };
 
 // Non-admin user stories

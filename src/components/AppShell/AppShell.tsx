@@ -18,6 +18,7 @@ import {
   ProfileContext,
   ProfileContextInterface,
 } from '@/src/context/ProfileContext';
+import { isAdminUser } from '@/lib/admin';
 
 function LoadingStates({ accessToken }: { accessToken: string }) {
   const [logoutReason] = useState(() => {
@@ -97,7 +98,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(nextIsAuthenticated);
   }, [accessToken, myProfile]);
 
-  const isAdmin = myProfile?.userid ? String(myProfile.userid) === '1' : false;
+  const isAdmin = isAdminUser(myProfile?.userid);
 
   const updateTheme = () => {
     const newTheme = 'theme__default';

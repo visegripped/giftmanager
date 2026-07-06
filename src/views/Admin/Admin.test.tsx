@@ -11,6 +11,7 @@ import {
 } from '../../context/NotificationsContext';
 import fetchData from '../../utilities/fetchData';
 import postReport from '../../utilities/postReport';
+import { ADMIN_USER_ID } from '@/lib/admin';
 
 // Mock the utilities
 vi.mock('../../utilities/fetchData');
@@ -51,17 +52,17 @@ describe('Admin Component', () => {
     vi.clearAllMocks();
   });
 
-  describe('when user is admin (userid === 1)', () => {
+  describe('when user is admin', () => {
     it('renders admin interface with buttons', () => {
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
 
       expect(screen.getByText('Administration')).toBeInTheDocument();
       expect(screen.getByText('Archive purchased items')).toBeInTheDocument();
       expect(screen.getByText('Archive removed items')).toBeInTheDocument();
     });
 
-    it('renders admin interface with userid as string "1"', () => {
-      renderWithContext({ userid: '1' });
+    it('renders admin interface with numeric admin userid', () => {
+      renderWithContext({ userid: 58627 });
 
       expect(screen.getByText('Administration')).toBeInTheDocument();
       expect(screen.getByText('Archive purchased items')).toBeInTheDocument();
@@ -75,7 +76,7 @@ describe('Admin Component', () => {
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -83,7 +84,7 @@ describe('Admin Component', () => {
       await waitFor(() => {
         expect(mockFetchData).toHaveBeenCalledWith({
           task: 'archivePurchasedItems',
-          myuserid: '1',
+          myuserid: ADMIN_USER_ID,
         });
       });
     });
@@ -95,7 +96,7 @@ describe('Admin Component', () => {
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
 
       const button = screen.getByText('Archive removed items');
       fireEvent.click(button);
@@ -103,7 +104,7 @@ describe('Admin Component', () => {
       await waitFor(() => {
         expect(mockFetchData).toHaveBeenCalledWith({
           task: 'archiveRemovedItems',
-          myuserid: '1',
+          myuserid: ADMIN_USER_ID,
         });
       });
     });
@@ -115,7 +116,7 @@ describe('Admin Component', () => {
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -135,7 +136,7 @@ describe('Admin Component', () => {
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
 
       const button = screen.getByText('Archive removed items');
       fireEvent.click(button);
@@ -155,7 +156,7 @@ describe('Admin Component', () => {
       });
       mockFetchData.mockReturnValue(mockResponse);
 
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -175,7 +176,7 @@ describe('Admin Component', () => {
       mockFetchData.mockReturnValue(mockResponse);
       mockPostReport.mockResolvedValue(undefined);
 
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -205,7 +206,7 @@ describe('Admin Component', () => {
       mockFetchData.mockReturnValue(mockResponse);
       mockPostReport.mockResolvedValue(undefined);
 
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
 
       const button = screen.getByText('Archive removed items');
       fireEvent.click(button);
@@ -231,7 +232,7 @@ describe('Admin Component', () => {
     it('does not call notification when fetchData returns undefined', async () => {
       mockFetchData.mockReturnValue(undefined);
 
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
 
       const button = screen.getByText('Archive purchased items');
       fireEvent.click(button);
@@ -279,7 +280,7 @@ describe('Admin Component', () => {
 
   describe('button titles', () => {
     it('has correct title for archive purchased items button', () => {
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
       const button = screen.getByRole('button', {
         name: /archive purchased items/i,
       });
@@ -290,7 +291,7 @@ describe('Admin Component', () => {
     });
 
     it('has correct title for archive removed items button', () => {
-      renderWithContext({ userid: '1' });
+      renderWithContext({ userid: ADMIN_USER_ID });
       const button = screen.getByRole('button', {
         name: /archive removed items/i,
       });

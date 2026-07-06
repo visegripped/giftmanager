@@ -5,6 +5,7 @@ import {
   type AuthProvider,
 } from '@/lib/auth';
 import * as handlers from '@/lib/handlers/items';
+import { isAdminUser } from '@/lib/admin';
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -158,9 +159,9 @@ export async function POST(request: NextRequest) {
         apiResponse = await handlers.updateAvatar(email_address, avatar);
       } else if (task === 'confirmUserIsValid' && email_address) {
         apiResponse = await handlers.confirmUserIsValid(email_address);
-      } else if (task === 'archivePurchasedItems' && myuserid === '1') {
+      } else if (task === 'archivePurchasedItems' && isAdminUser(myuserid)) {
         apiResponse = await handlers.archivePurchasedItems();
-      } else if (task === 'archiveRemovedItems' && myuserid === '1') {
+      } else if (task === 'archiveRemovedItems' && isAdminUser(myuserid)) {
         apiResponse = await handlers.archiveRemovedItems();
       } else if (task) {
         apiResponse = {

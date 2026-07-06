@@ -12,6 +12,7 @@ import {
   NotificationsContext,
   NotificationContextProps,
 } from '../../context/NotificationsContext';
+import { isAdminUser } from '@/lib/admin';
 import './Admin.css';
 
 const Admin = () => {
@@ -23,8 +24,7 @@ const Admin = () => {
 
   const [myUserid] = useState(myProfile.userid || '');
 
-  // Check if user is admin (userid === 1)
-  const isAdmin = String(myProfile.userid) === '1';
+  const isAdmin = isAdminUser(myProfile.userid);
 
   // TODO -> Refactor this so shared code is not duplicated
   const handleArchivePurchasedItemsClick = () => {
