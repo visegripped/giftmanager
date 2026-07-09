@@ -419,13 +419,14 @@ export async function runScheduledArchive(): Promise<{
   const currentDate = new Date().toISOString().slice(0, 10);
   const results: Record<string, number> = {};
 
-  // Archive items with no/invalid date_received
+  // Archive purchased items with no/invalid date_received (wish-list items have no date)
   await db
     .update(items)
     .set({ archive: 1 })
     .where(
       and(
         eq(items.archive, 0),
+        eq(items.status, 'purchased'),
         or(
           sql`${items.dateReceived} IS NULL`,
           sql`TRIM(COALESCE(${items.dateReceived}, '')) = ''`
@@ -433,13 +434,14 @@ export async function runScheduledArchive(): Promise<{
       )
     );
 
-  // Archive items past delivery date
+  // Archive purchased items past delivery date
   await db
     .update(items)
     .set({ archive: 1 })
     .where(
       and(
         eq(items.archive, 0),
+        eq(items.status, 'purchased'),
         sql`${items.dateReceived} IS NOT NULL`,
         sql`TRIM(${items.dateReceived}) != ''`,
         sql`${items.dateReceived} < ${currentDate}`
