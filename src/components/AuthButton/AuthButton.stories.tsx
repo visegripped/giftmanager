@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import AuthButton from './AuthButton';
 import { AuthProvider } from '../../context/AuthContext';
 import { ProfileProvider } from '../../context/ProfileContext';

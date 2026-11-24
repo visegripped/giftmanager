@@ -1,8 +1,8 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
-import path from 'path';
 import { getPackageVersion } from './lib/packageVersion';
+import { getViteAliases } from './lib/viteAliases';
 
 export default defineConfig({
   plugins: [
@@ -13,25 +13,7 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: [
-      { find: '@', replacement: path.resolve(__dirname, '.') },
-      { find: '@assets', replacement: path.resolve(__dirname, './src/assets') },
-      { find: '@types', replacement: path.resolve(__dirname, './src/types') },
-      {
-        find: '@components',
-        replacement: path.resolve(__dirname, './src/components'),
-      },
-      { find: '@views', replacement: path.resolve(__dirname, './src/views') },
-      {
-        find: '@utilities',
-        replacement: path.resolve(__dirname, './src/utilities'),
-      },
-      {
-        find: '@context',
-        replacement: path.resolve(__dirname, './src/context'),
-      },
-      { find: '@routes', replacement: path.resolve(__dirname, './src/routes') },
-    ],
+    alias: getViteAliases(__dirname),
   },
   test: {
     globals: true,
