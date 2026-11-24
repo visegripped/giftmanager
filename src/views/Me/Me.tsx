@@ -1,4 +1,12 @@
-import { useState, useEffect, useContext, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useMemo,
+  memo,
+} from 'react';
+import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import Button from '../../components/Button/Button';
 import ReservedPurchasedItemsModal from '../../components/ReservedPurchasedItemsModal/ReservedPurchasedItemsModal';
 import PrintListModal from '../../components/PrintListModal/PrintListModal';
@@ -30,266 +38,394 @@ To do:
   API response should be cleaned up to only return data that doesn't reveal anything.
 */
 
-type myItemListInterface = {
-  myItemList: ItemType[];
+type MeGridContext = {
+  myUserid: string | number;
+  onEdit: (item: ItemType) => void;
+  onUpdateRemoveStatus: (
+    removed: ItemRemovedType,
+    itemid: number | string,
+    userid: number | string
+  ) => void;
 };
 
-type tableDataInterface = {
-  data: ItemType;
+type MeItemFormProps = {
+  editingItem: ItemType | null;
+  onAdd: (
+    name: string,
+    description: string,
+    link: string
+  ) => Promise<responseInterface> | undefined;
+  onUpdate: (
+    item: ItemType,
+    description: string,
+    link: string
+  ) => Promise<responseInterface> | undefined;
+  onCancel: () => void;
 };
+
+const ItemLink = (props: ItemType) => {
+  const { link, name } = props;
+  return (
+    <a href={link} target="_blank">
+      {name}
+    </a>
+  );
+};
+
+const linkedName = (props: ICellRendererParams<ItemType>) => {
+  if (!props.data) {
+    return null;
+  }
+  return <ItemLink {...props.data} />;
+};
+
+const StatusCell = (
+  props: ICellRendererParams<ItemType, unknown, MeGridContext>
+) => {
+  const item = props.data;
+  const gridContext = props.context;
+  if (!item || !gridContext) {
+    return null;
+  }
+
+  const { removed, itemid, userid } = item;
+  const { myUserid, onEdit, onUpdateRemoveStatus } = gridContext;
+
+  return (
+    <div className="me-cell-actions">
+      {removed === 1 ? (
+        <Button
+          icon="plus"
+          title="Re-add item to my list"
+          onButtonClick={() => {
+            onUpdateRemoveStatus(0, itemid, userid);
+          }}
+        />
+      ) : (
+        <>
+          <Button
+            icon="edit"
+            title="Edit item (link/description)"
+            onButtonClick={() => {
+              onEdit(item);
+            }}
+          />
+          <Button
+            icon="delete"
+            title="Remove item from my list"
+            onButtonClick={() => {
+              onUpdateRemoveStatus(1, itemid, myUserid);
+            }}
+          />
+        </>
+      )}
+    </div>
+  );
+};
+
+const columnDefs: ColDef<ItemType>[] = [
+  {
+    field: 'name',
+    sortable: true,
+    cellRenderer: linkedName,
+    sort: 'asc',
+    wrapText: true,
+    autoHeight: true,
+    flex: 4,
+  },
+  { field: 'description', flex: 5, wrapText: true, autoHeight: true },
+  {
+    field: 'removed',
+    cellRenderer: StatusCell,
+    headerName: 'actions',
+    flex: 1.5,
+  },
+];
+
+const rowClassRules = {
+  'row-removed': 'data.removed >= 1',
+};
+
+const MeItemTable = memo(function MeItemTable({
+  myItemList,
+  gridContext,
+}: {
+  myItemList: ItemType[];
+  gridContext: MeGridContext;
+}) {
+  return (
+    <div style={{ width: '100%', height: '100%' }}>
+      <AgGridReact
+        theme="legacy"
+        rowData={myItemList}
+        columnDefs={columnDefs}
+        rowClassRules={rowClassRules}
+        context={gridContext}
+      />
+    </div>
+  );
+});
+
+const MeItemForm = memo(function MeItemForm({
+  editingItem,
+  onAdd,
+  onUpdate,
+  onCancel,
+}: MeItemFormProps) {
+  const [name, setName] = useState(editingItem?.name || '');
+  const [description, setDescription] = useState(
+    editingItem?.description || ''
+  );
+  const [link, setLink] = useState(editingItem?.link || '');
+  const [shouldFlash, setShouldFlash] = useState(!!editingItem);
+
+  useEffect(() => {
+    if (!editingItem) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      setShouldFlash(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [editingItem]);
+
+  const handleSubmit = (formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
+    formSubmitEvent.preventDefault();
+    if (editingItem) {
+      onUpdate(editingItem, description, link);
+      return;
+    }
+
+    const response = onAdd(name, description, link);
+    response?.then((data) => {
+      if (!data?.error && !data?.err) {
+        setName('');
+        setDescription('');
+        setLink('');
+      }
+    });
+  };
+
+  return (
+    <form className="form" onSubmit={handleSubmit}>
+      <fieldset
+        className={shouldFlash ? 'fieldset fieldset--flash' : 'fieldset'}
+      >
+        <legend className="legend">
+          {editingItem ? 'Edit item on my list' : 'Add item to my list'}
+        </legend>
+        <label className="label">Name</label>
+        <div className="input-container">
+          <input
+            type="text"
+            name="name"
+            required
+            value={name}
+            readOnly={!!editingItem}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              if (!editingItem) {
+                setName(event.target.value);
+              }
+            }}
+          />
+        </div>
+
+        <label>Link</label>
+        <div className="input-container">
+          <input
+            type="url"
+            name="link"
+            value={link}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setLink(event.target.value);
+            }}
+          />
+        </div>
+
+        <label>Description</label>
+        <div className="input-container">
+          <textarea
+            name="description"
+            value={description}
+            onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+              setDescription(event.target.value);
+            }}
+          ></textarea>
+        </div>
+
+        <div className="me-form-actions">
+          <Button
+            icon={editingItem ? 'edit' : 'plus'}
+            label={editingItem ? 'Save' : 'Add'}
+            type="submit"
+          />
+          {editingItem && (
+            <Button label="Cancel" type="button" onButtonClick={onCancel} />
+          )}
+        </div>
+      </fieldset>
+    </form>
+  );
+});
 
 const Me = () => {
-  const [myItemList, setMyItemList] = useState([]);
-  const [addItemName, setAddItemName] = useState('');
-  const [addItemDescription, setAddItemDescription] = useState('');
-  const [addItemLink, setAddItemLink] = useState('');
+  const [myItemList, setMyItemList] = useState<ItemType[]>([]);
   const [editingItem, setEditingItem] = useState<ItemType | null>(null);
-  const [shouldFlash, setShouldFlash] = useState(false);
   const [isReservedPurchasedModalOpen, setIsReservedPurchasedModalOpen] =
     useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const previousEditingItemRef = useRef<ItemType | null>(null);
   const { myProfile } = useContext(ProfileContext) as ProfileContextInterface;
   const { addNotification } = useContext(
     NotificationsContext
   ) as NotificationContextProps;
   const [myUserid, setMyUserid] = useState(myProfile.userid || '');
 
-  const cancelEdit = () => {
+  const cancelEdit = useCallback(() => {
     setEditingItem(null);
-    setAddItemName('');
-    setAddItemDescription('');
-    setAddItemLink('');
-    setShouldFlash(false);
-  };
+  }, []);
 
-  // Trigger flash animation when editingItem changes from null to a value
-  useEffect(() => {
-    if (editingItem && !previousEditingItemRef.current) {
-      setShouldFlash(true);
-      // Reset flash after animation completes
-      const timer = setTimeout(() => {
-        setShouldFlash(false);
-      }, 600); // Match animation duration
-      return () => clearTimeout(timer);
-    }
-    previousEditingItemRef.current = editingItem;
-  }, [editingItem]);
+  const startEdit = useCallback((item: ItemType) => {
+    setEditingItem(item);
+  }, []);
 
-  const updateRemoveStatus = (
-    removed: ItemRemovedType,
-    itemid: number | string,
-    userid: number | string
-  ) => {
-    const response = fetchData({
-      task: 'updateRemovedStatusForMyItem',
-      itemid,
-      myuserid: userid,
-      removed,
-    });
-    response &&
-      response.then((data: responseInterface) => {
-        if (data.error) {
-          postReport({
-            type: 'error',
-            report: 'Unable to remove/re-add item from item list',
-            body: {
-              error: data.error,
-              file: 'Me',
-              origin: 'apiResponse',
-            },
-          });
-          addNotification({
-            message: `Something has gone wrong with removing the item from your list.
-            Try refreshing the page.
-            If the error persists, reach out to the site administrator`,
-            type: 'error',
-          });
-        } else {
-          fetchItemList(userid);
-        }
-      });
-    return response;
-  };
-
-  const updateItemOnMyList = (
-    item: ItemType,
-    description: string,
-    link: string
-  ) => {
-    const response = fetchData({
-      task: 'updateItemOnMyList',
-      itemid: item.itemid,
-      myuserid: myUserid,
-      description,
-      link,
-    });
-
-    response &&
-      response.then((data: responseInterface) => {
-        if (data.error || data.err) {
-          postReport({
-            type: 'error',
-            report: 'Unable to update item on my list',
-            body: {
-              error: data.error || data.err,
-              file: 'Me',
-              origin: 'apiResponse',
-            },
-          });
-          addNotification({
-            message: `Something has gone wrong updating the item on your list.
-            Try refreshing the page.
-            If the error persists, reach out to the site administrator`,
-            type: 'error',
-          });
-        } else {
-          fetchItemList(myUserid);
-          cancelEdit();
-        }
-      });
-
-    return response;
-  };
-
-  const Link = (props: ItemType) => {
-    const { link, name } = props;
-    return (
-      <a href={link} target="_blank">
-        {name}
-      </a>
-    );
-  };
-
-  const StatusDD = (props: { data: ItemType }) => {
-    const { removed, itemid, userid } = props.data;
-    return (
-      <div className="me-cell-actions">
-        {removed === 1 ? (
-          <Button
-            icon="plus"
-            title="Re-add item to my list"
-            onButtonClick={() => {
-              updateRemoveStatus(0, itemid, userid);
-            }}
-          />
-        ) : (
-          <>
-            <Button
-              icon="edit"
-              title="Edit item (link/description)"
-              onButtonClick={() => {
-                setEditingItem(props.data);
-                setAddItemName(props.data.name || '');
-                setAddItemDescription(props.data.description || '');
-                setAddItemLink(props.data.link || '');
-              }}
-            />
-            <Button
-              icon="delete"
-              title="Remove item from my list"
-              onButtonClick={() => {
-                updateRemoveStatus(1, itemid, myUserid);
-              }}
-            />
-          </>
-        )}
-      </div>
-    );
-  };
-
-  const linkedName = (props: tableDataInterface) => {
-    // @ts-ignore
-    return <Link {...props.data} />;
-  };
-
-  const Table = (props: myItemListInterface) => {
-    const { myItemList } = props;
-    const [colDefs] = useState([
-      {
-        field: 'name',
-        sortable: true,
-        cellRenderer: linkedName,
-        sort: 'asc',
-        wrapText: true,
-        autoHeight: true,
-        flex: 4,
-      },
-      { field: 'description', flex: 5, wrapText: true, autoHeight: true },
-      {
-        field: 'removed',
-        cellRenderer: StatusDD,
-        headerName: 'actions',
-        flex: 1.5,
-      },
-    ]);
-
-    const rowClassRules = {
-      'row-removed': 'data.removed >= 1',
-    };
-
-    return (
-      <>
-        <AgGridReact
-          theme="legacy"
-          rowData={myItemList}
-          // @ts-ignore
-          columnDefs={colDefs}
-          rowClassRules={rowClassRules}
-          style={{ width: '100%', height: '100%' }}
-        />
-      </>
-    );
-  };
-
-  const fetchItemList = (userid: string | number) => {
+  const fetchItemList = useCallback((userid: string | number) => {
     const response = fetchData({
       task: 'getMyItemList',
       myuserid: userid,
     });
-    response &&
+    if (response) {
       response.then((data: responseInterface) => {
-        setMyItemList(data.success as []);
+        setMyItemList((data.success as ItemType[]) || []);
       });
-  };
-  // const [userProfile] = useState({ }); //, setUserProfile
+    }
+  }, []);
 
-  const addItemToMyList = (name: string, description: string, link: string) => {
-    const response = fetchData({
-      task: 'addItemToMyList',
-      myuserid: myUserid,
-      groupid: '1',
-      name,
-      description,
-      link,
-    });
-    response &&
-      response.then((data: responseInterface) => {
-        if (data.error) {
-          postReport({
-            type: 'error',
-            report: 'Unable to add item to item list',
-            body: {
-              error: data.error,
-              file: 'Me',
-              origin: 'apiResponse',
-            },
-          });
-          addNotification({
-            message: `Something has gone wrong with adding the item to your list.
+  const updateRemoveStatus = useCallback(
+    (
+      removed: ItemRemovedType,
+      itemid: number | string,
+      userid: number | string
+    ) => {
+      const response = fetchData({
+        task: 'updateRemovedStatusForMyItem',
+        itemid,
+        myuserid: userid,
+        removed,
+      });
+      if (response) {
+        response.then((data: responseInterface) => {
+          if (data.error) {
+            postReport({
+              type: 'error',
+              report: 'Unable to remove/re-add item from item list',
+              body: {
+                error: data.error,
+                file: 'Me',
+                origin: 'apiResponse',
+              },
+            });
+            addNotification({
+              message: `Something has gone wrong with removing the item from your list.
             Try refreshing the page.
             If the error persists, reach out to the site administrator`,
-            type: 'error',
-          });
-        } else {
-          setAddItemName('');
-          setAddItemDescription('');
-          setAddItemLink('');
-          fetchItemList(myUserid);
-        }
+              type: 'error',
+            });
+          } else {
+            fetchItemList(userid);
+          }
+        });
+      }
+      return response;
+    },
+    [addNotification, fetchItemList]
+  );
+
+  const updateItemOnMyList = useCallback(
+    (item: ItemType, description: string, link: string) => {
+      const response = fetchData({
+        task: 'updateItemOnMyList',
+        itemid: item.itemid,
+        myuserid: myUserid,
+        description,
+        link,
       });
-    return response;
-  };
+
+      if (response) {
+        response.then((data: responseInterface) => {
+          if (data.error || data.err) {
+            postReport({
+              type: 'error',
+              report: 'Unable to update item on my list',
+              body: {
+                error: data.error || data.err,
+                file: 'Me',
+                origin: 'apiResponse',
+              },
+            });
+            addNotification({
+              message: `Something has gone wrong updating the item on your list.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+              type: 'error',
+            });
+          } else {
+            fetchItemList(myUserid);
+            cancelEdit();
+          }
+        });
+      }
+
+      return response;
+    },
+    [addNotification, cancelEdit, fetchItemList, myUserid]
+  );
+
+  const addItemToMyList = useCallback(
+    (name: string, description: string, link: string) => {
+      const response = fetchData({
+        task: 'addItemToMyList',
+        myuserid: myUserid,
+        groupid: '1',
+        name,
+        description,
+        link,
+      });
+      if (response) {
+        response.then((data: responseInterface) => {
+          if (data.error) {
+            postReport({
+              type: 'error',
+              report: 'Unable to add item to item list',
+              body: {
+                error: data.error,
+                file: 'Me',
+                origin: 'apiResponse',
+              },
+            });
+            addNotification({
+              message: `Something has gone wrong with adding the item to your list.
+            Try refreshing the page.
+            If the error persists, reach out to the site administrator`,
+              type: 'error',
+            });
+          } else {
+            fetchItemList(myUserid);
+          }
+        });
+      }
+      return response;
+    },
+    [addNotification, fetchItemList, myUserid]
+  );
+
+  const gridContext = useMemo<MeGridContext>(
+    () => ({
+      myUserid,
+      onEdit: startEdit,
+      onUpdateRemoveStatus: updateRemoveStatus,
+    }),
+    [myUserid, startEdit, updateRemoveStatus]
+  );
 
   useEffect(() => {
     if (!myUserid && myProfile.userid) {
@@ -299,6 +435,8 @@ const Me = () => {
     if (myProfile.userid && !myItemList?.length) {
       fetchItemList(myProfile.userid);
     }
+    // List data is refreshed after add/save, not when the form changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myProfile.userid]);
 
   return (
@@ -306,82 +444,13 @@ const Me = () => {
       <h2 className="page-heading">Welcome to your list.</h2>
       <section className="table-container ag-theme-quartz responsive-grid-container responsive-grid-columns responsive-grid-sidebar">
         <div>
-          <form
-            className="form"
-            onSubmit={(formSubmitEvent: React.FormEvent<HTMLFormElement>) => {
-              formSubmitEvent.preventDefault();
-              if (editingItem) {
-                updateItemOnMyList(
-                  editingItem,
-                  addItemDescription,
-                  addItemLink
-                );
-              } else {
-                addItemToMyList(addItemName, addItemDescription, addItemLink);
-              }
-            }}
-          >
-            <fieldset
-              className={shouldFlash ? 'fieldset fieldset--flash' : 'fieldset'}
-            >
-              <legend className="legend">
-                {editingItem ? 'Edit item on my list' : 'Add item to my list'}
-              </legend>
-              <label className="label">Name</label>
-              <div className="input-container">
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={addItemName}
-                  readOnly={!!editingItem}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    if (!editingItem) {
-                      setAddItemName(event.target.value);
-                    }
-                  }}
-                />
-              </div>
-
-              <label>Link</label>
-              <div className="input-container">
-                <input
-                  type="url"
-                  name="link"
-                  value={addItemLink}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setAddItemLink(event.target.value);
-                  }}
-                />
-              </div>
-
-              <label>Description</label>
-              <div className="input-container">
-                <textarea
-                  name="description"
-                  value={addItemDescription}
-                  onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    setAddItemDescription(event.target.value);
-                  }}
-                ></textarea>
-              </div>
-
-              <div className="me-form-actions">
-                <Button
-                  icon={editingItem ? 'edit' : 'plus'}
-                  label={editingItem ? 'Save' : 'Add'}
-                  type="submit"
-                />
-                {editingItem && (
-                  <Button
-                    label="Cancel"
-                    type="button"
-                    onButtonClick={() => cancelEdit()}
-                  />
-                )}
-              </div>
-            </fieldset>
-          </form>
+          <MeItemForm
+            key={editingItem ? `edit-${editingItem.itemid}` : 'add'}
+            editingItem={editingItem}
+            onAdd={addItemToMyList}
+            onUpdate={updateItemOnMyList}
+            onCancel={cancelEdit}
+          />
 
           <div className="me-page-actions">
             <Button
@@ -399,7 +468,7 @@ const Me = () => {
 
         <>
           {myItemList?.length ? (
-            <Table myItemList={myItemList} />
+            <MeItemTable myItemList={myItemList} gridContext={gridContext} />
           ) : (
             <h3>There are no items in this your list. Please add some.</h3>
           )}
